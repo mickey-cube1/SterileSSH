@@ -1,0 +1,477 @@
+﻿<Project DefaultTargets="Build" ToolsVersion="3.5" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <ProjectType>Local</ProjectType>
+    <ProductVersion>9.0.30729</ProductVersion>
+    <SchemaVersion>2.0</SchemaVersion>
+    <ProjectGuid>{D27CF69D-4681-492A-BE4D-D3D209104423}</ProjectGuid>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ApplicationIcon>App.ico</ApplicationIcon>
+    <AssemblyKeyContainerName>
+    </AssemblyKeyContainerName>
+    <AssemblyName>LibSterileSSH</AssemblyName>
+    <AssemblyOriginatorKeyFile>
+    </AssemblyOriginatorKeyFile>
+    <DefaultClientScript>JScript</DefaultClientScript>
+    <DefaultHTMLPageLayout>Grid</DefaultHTMLPageLayout>
+    <DefaultTargetSchema>IE50</DefaultTargetSchema>
+    <DelaySign>false</DelaySign>
+    <OutputType>Library</OutputType>
+    <RootNamespace>LibSterileSSH.MiniSsh</RootNamespace>
+    <RunPostBuildEvent>OnBuildSuccess</RunPostBuildEvent>
+    <StartupObject>
+    </StartupObject>
+    <FileUpgradeFlags>
+    </FileUpgradeFlags>
+    <OldToolsVersion>0.0</OldToolsVersion>
+    <TargetFrameworkVersion>v3.5</TargetFrameworkVersion>
+    <UpgradeBackupLocation>
+    </UpgradeBackupLocation>
+    <PublishUrl>publish\</PublishUrl>
+    <Install>true</Install>
+    <InstallFrom>Disk</InstallFrom>
+    <UpdateEnabled>false</UpdateEnabled>
+    <UpdateMode>Foreground</UpdateMode>
+    <UpdateInterval>7</UpdateInterval>
+    <UpdateIntervalUnits>Days</UpdateIntervalUnits>
+    <UpdatePeriodically>false</UpdatePeriodically>
+    <UpdateRequired>false</UpdateRequired>
+    <MapFileExtensions>true</MapFileExtensions>
+    <ApplicationRevision>0</ApplicationRevision>
+    <ApplicationVersion>1.0.0.%2a</ApplicationVersion>
+    <IsWebBootstrapper>false</IsWebBootstrapper>
+    <UseApplicationTrust>false</UseApplicationTrust>
+    <BootstrapperEnabled>true</BootstrapperEnabled>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <OutputPath>..\bin\Debug\</OutputPath>
+    <AllowUnsafeBlocks>false</AllowUnsafeBlocks>
+    <BaseAddress>285212672</BaseAddress>
+    <CheckForOverflowUnderflow>false</CheckForOverflowUnderflow>
+    <ConfigurationOverrideFile>
+    </ConfigurationOverrideFile>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <DocumentationFile>
+    </DocumentationFile>
+    <DebugSymbols>true</DebugSymbols>
+    <FileAlignment>4096</FileAlignment>
+    <NoStdLib>false</NoStdLib>
+    <NoWarn>
+    </NoWarn>
+    <Optimize>false</Optimize>
+    <RegisterForComInterop>false</RegisterForComInterop>
+    <RemoveIntegerChecks>false</RemoveIntegerChecks>
+    <TreatWarningsAsErrors>false</TreatWarningsAsErrors>
+    <WarningLevel>4</WarningLevel>
+    <DebugType>full</DebugType>
+    <ErrorReport>prompt</ErrorReport>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <OutputPath>..\bin\Release\</OutputPath>
+    <AllowUnsafeBlocks>false</AllowUnsafeBlocks>
+    <BaseAddress>285212672</BaseAddress>
+    <CheckForOverflowUnderflow>false</CheckForOverflowUnderflow>
+    <ConfigurationOverrideFile>
+    </ConfigurationOverrideFile>
+    <DefineConstants>TRACE</DefineConstants>
+    <DocumentationFile>
+    </DocumentationFile>
+    <DebugSymbols>false</DebugSymbols>
+    <FileAlignment>4096</FileAlignment>
+    <NoStdLib>false</NoStdLib>
+    <NoWarn>
+    </NoWarn>
+    <Optimize>true</Optimize>
+    <RegisterForComInterop>false</RegisterForComInterop>
+    <RemoveIntegerChecks>false</RemoveIntegerChecks>
+    <TreatWarningsAsErrors>false</TreatWarningsAsErrors>
+    <WarningLevel>4</WarningLevel>
+    <DebugType>none</DebugType>
+    <ErrorReport>prompt</ErrorReport>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="System">
+      <Name>System</Name>
+    </Reference>
+    <Reference Include="System.Core">
+      <RequiredTargetFramework>3.5</RequiredTargetFramework>
+    </Reference>
+    <Reference Include="System.Data" />
+    <Reference Include="System.XML" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="App.ico" />
+    <Compile Include="Properties\AssemblyInfo.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Auxiliary\DateTimeAux.cs" />
+    <Compile Include="Compression\CompressionMode.cs" />
+    <Compile Include="ITransferProtocol.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Exceptions\RuntimeException.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Auxiliary\FileAux.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="SecureShell\Channel\SftpProgressMonitorDirectionMode.cs" />
+    <Compile Include="SecureShell\HostKey\HostKeyRepositoryCheckResult.cs" />
+    <Compile Include="Security\Crypto\CipherDirectionMode.cs" />
+    <Compile Include="Streams\FileInputStream.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Streams\FileOutputStream.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Streams\AInputStream.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Auxiliary\StreamAux.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Streams\AOutputStream.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Auxiliary\IRunnable.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Auxiliary\StringBufferAux.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Auxiliary\ThreadAux.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="NetworkSockets\TcpSocket.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Auxiliary\StringAux.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="SecureShell\Buffer.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="SecureShell\Channel\AChannel.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="SecureShell\Channel\ChannelDirectTCPIP.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="SecureShell\Channel\ChannelExec.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="SecureShell\Channel\ChannelForwardedTCPIP.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="SecureShell\Channel\ChannelSession.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="SecureShell\Channel\ChannelSftp.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="SecureShell\Channel\ChannelSftpStreamPut.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="SecureShell\Channel\ChannelShell.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="SecureShell\Channel\ChannelSubsystem.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="SecureShell\Channel\ChannelX11.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Security\Crypto\ICipher.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Compression\ICompression.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Security\KEX\IDH.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Security\KEX\DHG1.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Security\KEX\DHGEX.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="SecureShell\Channel\IForwardedTCPIPDaemon.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Security\Hash\IHASH.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="SecureShell\HostKey\HostKey.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="SecureShell\HostKey\IHostKeyRepository.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="SecureShell\IIdentity.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="SecureShell\IdentityFile.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="SecureShell\IO.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Security\Crypto\AES128CBC.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Math\BigInteger.cs" />
+    <Compile Include="Math\Prime\ConfidenceFactor.cs" />
+    <Compile Include="Security\KEX\DH.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Security\KEX\DHKeyGeneration.cs" />
+    <Compile Include="Security\KEX\DHParameters.cs" />
+    <Compile Include="Security\KEX\DiffieHellman.cs" />
+    <Compile Include="Security\KEX\DiffieHellmanManaged.cs" />
+    <Compile Include="Security\HMAC\HashTransformer.cs" />
+    <Compile Include="Security\HMAC\HMACMD5.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Security\HMAC\HMACMD596.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Security\HMAC\HMACSHA1.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Security\HMAC\HMACSHA196.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Security\KeyPair\KeyPairGenDSA.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Security\KeyPair\KeyPairGenRSA.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Security\Hash\MD5.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Math\Prime\NextPrimeFinder.cs" />
+    <Compile Include="Math\Prime\PrimalityTests.cs" />
+    <Compile Include="Math\Prime\PrimeGeneratorBase.cs" />
+    <Compile Include="Security\Random\Random.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Math\Prime\SequentialSearchPrimeGeneratorBase.cs" />
+    <Compile Include="Security\Hash\SHA1.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Security\KeyPair\SignatureDSA.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Security\KeyPair\SignatureRSA.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Security\Crypto\TripleDESCBC.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Security\Crypto\AES128CTR.cs" />
+    <Compile Include="SecureShell\SshClient.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Exceptions\SshClientAuthCancelException.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Exceptions\SshClientException.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Exceptions\SshClientPartialAuthException.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Security\KEX\KeyExchange.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Security\KeyPair\AKeyPair.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Security\KeyPair\KeyPairDSA.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Security\KeyPair\IKeyPairGenDSA.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Security\KeyPair\IKeyPairGenRSA.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Security\KeyPair\KeyPairRSA.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="SecureShell\HostKey\KnownHosts.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Security\HMAC\IHMAC.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="SecureShell\Packet.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="SecureShell\PortWatcher.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="SecureShell\Proxy\IProxy.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="SecureShell\Proxy\ProxyHTTP.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Security\Random\IRandom.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="SecureShell\Request\IRequest.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="SecureShell\Request\RequestExec.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="SecureShell\Request\RequestPtyReq.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="SecureShell\Request\RequestSftp.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="SecureShell\Request\RequestShell.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="SecureShell\Request\RequestSignal.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="SecureShell\Request\RequestSubsystem.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="SecureShell\Request\RequestWindowChange.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="SecureShell\Request\RequestX11.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="SecureShell\ITcpListenerFactory.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="SecureShell\Session.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="SecureShell\Channel\SftpATTRS.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Exceptions\SftpException.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="SecureShell\Channel\ISftpProgressMonitor.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Security\KeyPair\ISignatureDSA.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Security\KeyPair\ISignatureRSA.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="SecureShell\ISocketFactory.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="SecureShell\UserAuth\IUIKeyboardInteractive.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="SecureShell\UserAuth\UserAuth.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="SecureShell\UserAuth\UserAuthKeyboardInteractive.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="SecureShell\UserAuth\UserAuthNone.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="SecureShell\UserAuth\UserAuthPassword.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="SecureShell\UserAuth\UserAuthPublicKey.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="SecureShell\IUserInfo.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="NetworkSockets\TcpSocketCreator.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Security\KEX\DHG14.cs" />
+    <Compile Include="Scp.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Sftp.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="SshBase.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="SshExec.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="SshShell.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="SshStream.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Exceptions\SshTransferException.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="SshTransferProtocolBase.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Streams\CombinedStream.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Streams\PipedInputStream.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Streams\PipedOutputStream.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Streams\ProtectedConsoleStream.cs">
+      <SubType>Code</SubType>
+    </Compile>
+  </ItemGroup>
+  <ItemGroup>
+    <BootstrapperPackage Include="Microsoft.Net.Client.3.5">
+      <Visible>False</Visible>
+      <ProductName>.NET Framework Client Profile</ProductName>
+      <Install>false</Install>
+    </BootstrapperPackage>
+    <BootstrapperPackage Include="Microsoft.Net.Framework.2.0">
+      <Visible>False</Visible>
+      <ProductName>.NET Framework 2.0 %28x86%29</ProductName>
+      <Install>false</Install>
+    </BootstrapperPackage>
+    <BootstrapperPackage Include="Microsoft.Net.Framework.3.0">
+      <Visible>False</Visible>
+      <ProductName>.NET Framework 3.0 %28x86%29</ProductName>
+      <Install>false</Install>
+    </BootstrapperPackage>
+    <BootstrapperPackage Include="Microsoft.Net.Framework.3.5">
+      <Visible>False</Visible>
+      <ProductName>.NET Framework 3.5</ProductName>
+      <Install>false</Install>
+    </BootstrapperPackage>
+    <BootstrapperPackage Include="Microsoft.Net.Framework.3.5.SP1">
+      <Visible>False</Visible>
+      <ProductName>.NET Framework 3.5 SP1</ProductName>
+      <Install>true</Install>
+    </BootstrapperPackage>
+    <BootstrapperPackage Include="Microsoft.Windows.Installer.3.1">
+      <Visible>False</Visible>
+      <ProductName>Windows インストーラ 3.1</ProductName>
+      <Install>true</Install>
+    </BootstrapperPackage>
+  </ItemGroup>
+  <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
+  <PropertyGroup>
+    <PreBuildEvent>
+    </PreBuildEvent>
+    <PostBuildEvent>
+    </PostBuildEvent>
+  </PropertyGroup>
+</Project>

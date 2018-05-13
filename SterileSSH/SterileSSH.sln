@@ -1,0 +1,28 @@
+Microsoft Visual Studio Solution File, Format Version 10.00
+# Visual C# Express 2008
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LibSterileSSH", "LibSterileSSH\LibSterileSSH.csproj", "{D27CF69D-4681-492A-BE4D-D3D209104423}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SterileSSH", "SterileSSH\SterileSSH.csproj", "{F6804266-8AA6-42C1-BECA-BF0993C19297}"
+	ProjectSection(ProjectDependencies) = postProject
+		{D27CF69D-4681-492A-BE4D-D3D209104423} = {D27CF69D-4681-492A-BE4D-D3D209104423}
+	EndProjectSection
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{D27CF69D-4681-492A-BE4D-D3D209104423}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D27CF69D-4681-492A-BE4D-D3D209104423}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D27CF69D-4681-492A-BE4D-D3D209104423}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D27CF69D-4681-492A-BE4D-D3D209104423}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F6804266-8AA6-42C1-BECA-BF0993C19297}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F6804266-8AA6-42C1-BECA-BF0993C19297}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F6804266-8AA6-42C1-BECA-BF0993C19297}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F6804266-8AA6-42C1-BECA-BF0993C19297}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal
