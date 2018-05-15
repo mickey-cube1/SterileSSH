@@ -35,12 +35,4 @@ namespace SterileSSH
 			return info;
 		}
 	}
-
-	public struct SshConnectionInfo
-	{
-		public string Host;
-		public string User;
-		public string Pass;
-		public string IdentityFile;
-	}
 }

@@ -75,6 +75,7 @@
     </Compile>
     <Compile Include="SshFileTransferTest.cs" />
     <Compile Include="Util.cs" />
+    <Compile Include="SshConnectionInfo.cs" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="App.ico" />

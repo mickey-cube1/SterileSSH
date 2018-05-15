@@ -49,14 +49,10 @@ namespace SterileSSH
 		public static void usage()
 		{
 			Console.Write(
-					"Sterile-ssh: command-line connection utility\n" +
+					"SterileSSH: command-line connection utility\n" +
 					"{0}\n" +
-					"Usage: sterile-ssh [exectype] [options] [user@]host [command]\n" +
+					"Usage: SterileSSH [options] [ssh://][user@]host [command]\n" +
 					"        (\"host\" can also be a PASSER saved session name)\n" +
-					"Exectype:\n" +
-					"  ssh       ssh, default\n" +
-					"  scp       scp\n" +
-					"  keygen    keygen\n" +
 					"Options:\n" +
 					"  -V        print version information and exit\n" +
 					"  -k        print PGP key fingerprints and exit\n" +
