@@ -30,11 +30,69 @@ EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 namespace SterileSSH
 {
-	public struct SshConnectionInfo
+	public class SshConnectionInfo
 	{
-		public string Host;
-		public string User;
-		public string Pass;
-		public string IdentityFile;
+		public enum SchemeType
+		{
+			ERROR,
+			ANON,
+			SSH,
+			SCP,
+			SFTP
+		}
+
+		public SchemeType Scheme;
+		public String Host;
+		public String User;
+		public String Pass;
+		public String IdentityFile;
+
+		public SshConnectionInfo()
+		{
+		}
+		public SshConnectionInfo(String p)
+		{
+			Scheme = SchemeType.ANON;
+
+			String user = null;
+			String host = null;
+
+			if (p.StartsWith("ssh://"))
+			{
+				Scheme = SchemeType.SSH;
+				p = p.Substring(6);
+			}
+			else if (p.StartsWith("scp://"))
+			{
+				Scheme = SchemeType.SCP;
+				p = p.Substring(6);
+			}
+			else if (p.StartsWith("sftp://"))
+			{
+				Scheme = SchemeType.SFTP;
+				p = p.Substring(7);
+			}
+
+			Int32 ii = p.IndexOf('@');
+			/* Avoid initial @ */
+			if (ii == 0)
+			{
+				p = p.Substring(1);
+				ii = -1;
+			}
+			if (ii > 0)
+			{
+				user = p.Substring(0, ii);
+				host = p.Substring(ii + 1);
+			}
+			else
+			{
+				user = null;
+				host = p;
+			}
+
+			Host = host;
+			User = user;
+		}
 	}
 }

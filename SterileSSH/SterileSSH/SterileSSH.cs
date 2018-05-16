@@ -90,8 +90,8 @@ namespace SterileSSH
 		 */
 		public static void Main(String[] argv)
 		{
-			Boolean got_host = false;
-			SshConnectionInfo coninfo = new SshConnectionInfo();
+			SshConnectionInfo coninfo = null;
+			SshConnectionInfo globalconinfo = new SshConnectionInfo();
 
 			int optch;
 			Getopt getopt = new Getopt();
@@ -191,7 +191,7 @@ namespace SterileSSH
 						break;
 
 					case 'w':				/* --pw password */
-						coninfo.Pass = getopt.optarg;
+						globalconinfo.Pass = getopt.optarg;
 						break;
 
 					case 'z':				/* --sshlog filename */
@@ -213,38 +213,9 @@ namespace SterileSSH
 				String p = argv[argidx];
 				if (p.Length > 0)
 				{
-					if (!got_host)
+					if (coninfo == null)
 					{
-						String user;
-						String host;
-						Int32 ii = p.IndexOf('@');
-						/* Avoid initial @ */
-						if (ii == 0)
-						{
-							p = p.Substring(1);
-							ii = -1;
-						}
-						if (ii > 0)
-						{
-							user = p.Substring(0, ii);
-							host = p.Substring(ii + 1);
-						}
-						else
-						{
-							user = null;
-							host = p;
-						}
-
-						if (host != null && host.Length > 0)
-						{
-							coninfo.Host = host;
-							got_host = true;
-						}
-						if (user != null && user.Length > 0)
-						{
-							coninfo.User = user;
-							got_host = true;
-						}
+						coninfo = new SshConnectionInfo(p);
 					}
 					else
 					{
@@ -253,10 +224,14 @@ namespace SterileSSH
 				argidx++;
 			}
 
-			if (!got_host)
+			if (coninfo == null)
 			{
 				usage();
 				Environment.Exit(0);
+			}
+			if (coninfo.Pass == null)
+			{
+				coninfo.Pass = globalconinfo.Pass;
 			}
 			RunSsh(coninfo);
 		}
