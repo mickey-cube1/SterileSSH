@@ -73,8 +73,10 @@ namespace SterileSSH
 				p = p.Substring(7);
 			}
 
-			Int32 ii = p.IndexOf('@');
-			/* Avoid initial @ */
+            Int32 ip = p.IndexOf(':');
+
+            Int32 ii = p.IndexOf('@');
+            /* Avoid initial @ */
 			if (ii == 0)
 			{
 				p = p.Substring(1);
