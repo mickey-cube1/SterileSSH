@@ -142,8 +142,7 @@ namespace LibSterileSSH
 		/// </summary>
 		public override void Close()
 		{
-			try
-			{
+			try {
 				base.Close();
 				m_in.Close();
 				m_out.Close();
@@ -151,8 +150,7 @@ namespace LibSterileSSH
 				m_channel.disconnect();
 				m_session.disconnect();
 			}
-			catch
-			{
+			catch {
 			}
 		}
 
@@ -322,8 +320,7 @@ namespace LibSterileSSH
 			byte[] buff = new byte[1024];
 			Match match;
 
-			do
-			{
+			do {
 				readCount = this.Read(buff);
 				resp.Append(System.Text.Encoding.Default.GetString(buff), 0, readCount);
 				string s = resp.ToString();
@@ -340,8 +337,7 @@ namespace LibSterileSSH
 		/// <returns></returns>
 		private string HandleTerminalChars(string str)
 		{
-			if (RemoveTerminalEmulationCharacters)
-			{
+			if (RemoveTerminalEmulationCharacters) {
 				str = str.Replace("(B)0", "");
 				str = Regex.Replace(str, m_escapeCharPattern, "");
 				str = str.Replace(((char)15).ToString(), "");

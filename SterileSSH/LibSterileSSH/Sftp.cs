@@ -91,16 +91,14 @@ namespace LibSterileSSH
 
 		public void Get(string[] fromFilePaths)
 		{
-			for (int i = 0; i < fromFilePaths.Length; i++)
-			{
+			for (int i = 0; i < fromFilePaths.Length; i++) {
 				Get(fromFilePaths[i]);
 			}
 		}
 
 		public void Get(string[] fromFilePaths, string toDirPath)
 		{
-			for (int i = 0; i < fromFilePaths.Length; i++)
-			{
+			for (int i = 0; i < fromFilePaths.Length; i++) {
 				Get(fromFilePaths[i], toDirPath);
 			}
 		}
@@ -120,16 +118,14 @@ namespace LibSterileSSH
 
 		public void Put(string[] fromFilePaths)
 		{
-			for (int i = 0; i < fromFilePaths.Length; i++)
-			{
+			for (int i = 0; i < fromFilePaths.Length; i++) {
 				Put(fromFilePaths[i]);
 			}
 		}
 
 		public void Put(string[] fromFilePaths, string toDirPath)
 		{
-			for (int i = 0; i < fromFilePaths.Length; i++)
-			{
+			for (int i = 0; i < fromFilePaths.Length; i++) {
 				Put(fromFilePaths[i], toDirPath);
 			}
 		}
@@ -152,8 +148,7 @@ namespace LibSterileSSH
 		public ArrayList GetFileList(string path)
 		{
 			ArrayList list = new ArrayList();
-			foreach (LibSterileSSH.SecureShell.ChannelSftp.LsEntry entry in SftpChannel.ls(path))
-			{
+			foreach (LibSterileSSH.SecureShell.ChannelSftp.LsEntry entry in SftpChannel.ls(path)) {
 				list.Add(entry.getFilename().ToString());
 			}
 			return list;
@@ -188,12 +183,10 @@ namespace LibSterileSSH
 				timer.Elapsed += new System.Timers.ElapsedEventHandler(timer_Elapsed);
 
 				string note;
-				if (op.Equals(SftpProgressMonitorDirectionMode.GET))
-				{
+				if (op.Equals(SftpProgressMonitorDirectionMode.GET)) {
 					note = "Downloading " + System.IO.Path.GetFileName(src) + "...";
 				}
-				else
-				{
+				else {
 					note = "Uploading " + System.IO.Path.GetFileName(src) + "...";
 				}
 				m_sftp.SendStartMessage(src, dest, (int)total, note);

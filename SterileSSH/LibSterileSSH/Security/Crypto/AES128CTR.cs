@@ -52,14 +52,12 @@ namespace LibSterileSSH.Security
 			rijndael.Mode = CipherMode.ECB;
 			rijndael.Padding = PaddingMode.None;
 			byte[] tmp;
-			if (iv.Length > ivsize)
-			{
+			if (iv.Length > ivsize) {
 				tmp = new byte[ivsize];
 				Array.Copy(iv, 0, tmp, 0, tmp.Length);
 				iv = tmp;
 			}
-			if (key.Length > bsize)
-			{
+			if (key.Length > bsize) {
 				tmp = new byte[bsize];
 				Array.Copy(key, 0, tmp, 0, tmp.Length);
 				key = tmp;
@@ -68,12 +66,10 @@ namespace LibSterileSSH.Security
 			counter = new byte[iv.Length];
 			Array.Copy(iv, counter, iv.Length);
 
-			try
-			{
+			try {
 				cipher = rijndael.CreateEncryptor(key, null);
 			}
-			catch (Exception e)
-			{
+			catch (Exception e) {
 				Console.WriteLine(e);
 				cipher = null;
 			}
@@ -83,18 +79,14 @@ namespace LibSterileSSH.Security
 			int i;
 			int j;
 			byte[] tmp = new byte[bsize];
-			for (i = 0; i < len; i = i + bsize)
-			{
+			for (i = 0; i < len; i = i + bsize) {
 				cipher.TransformBlock(counter, 0, bsize, tmp, 0);
-				for (j = 0; j < bsize; j++)
-				{
+				for (j = 0; j < bsize; j++) {
 					bar[s2 + i + j] = (byte)((uint)tmp[j] ^ (uint)foo[s1 + i + j]);
 				}
-				for (j = bsize - 1; j >= 0; --j)
-				{
+				for (j = bsize - 1; j >= 0; --j) {
 					counter[j]++;
-					if (counter[j] != 0)
-					{
+					if (counter[j] != 0) {
 						break;
 					}
 				}

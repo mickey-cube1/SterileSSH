@@ -25,15 +25,12 @@ namespace LibSterileSSH.SecureShell
 		{
 			int port = DEFAULTPORT;
 			String host = proxy_host;
-			if (proxy_host.IndexOf(':') != -1)
-			{
-				try
-				{
+			if (proxy_host.IndexOf(':') != -1) {
+				try {
 					host = proxy_host.Substring(0, proxy_host.IndexOf(':'));
 					port = int.Parse(proxy_host.Substring(proxy_host.IndexOf(':') + 1));
 				}
-				catch (RuntimeException)
-				{
+				catch (RuntimeException) {
 				}
 			}
 			this.proxy_host = host;
@@ -51,30 +48,25 @@ namespace LibSterileSSH.SecureShell
 		}
 		public void connect(ISocketFactory socket_factory, String host, int port, int timeout)
 		{
-			try
-			{
-				if (socket_factory == null)
-				{
+			try {
+				if (socket_factory == null) {
 					socket = TcpSocketCreator.CreateSocket(proxy_host, proxy_port, timeout);
 					ins = socket.getInputStream();
 					outs = socket.getOutputStream();
 				}
-				else
-				{
+				else {
 					socket = socket_factory.createSocket(proxy_host, proxy_port);
 					ins = socket_factory.getInputStream(socket);
 					outs = socket_factory.getOutputStream(socket);
 				}
-				if (timeout > 0)
-				{
+				if (timeout > 0) {
 					socket.setSoTimeout(timeout);
 				}
 				socket.setTcpNoDelay(true);
 
 				StreamAux.write(outs, StringAux.getBytesUTF8("CONNECT " + host + ":" + port + " HTTP/1.0\r\n"));
 
-				if (user != null && passwd != null)
-				{
+				if (user != null && passwd != null) {
 					byte[] _code = StringAux.getBytesUTF8((user + ":" + passwd));
 					_code = StringAux.toBase64(_code, 0, _code.Length);
 					StreamAux.write(outs, StringAux.getBytesUTF8("Proxy-Authorization: Basic "));
@@ -88,31 +80,26 @@ namespace LibSterileSSH.SecureShell
 				int foo = 0;
 
 				StringBuilder sb = new StringBuilder();
-				while (foo >= 0)
-				{
+				while (foo >= 0) {
 					foo = ins.ReadByte();
-					if (foo != 13)
-					{
+					if (foo != 13) {
 						sb.Append((char)foo);
 						continue;
 					}
 					foo = ins.ReadByte();
-					if (foo != 10)
-					{
+					if (foo != 10) {
 						continue;
 					}
 					break;
 				}
-				if (foo < 0)
-				{
+				if (foo < 0) {
 					throw new System.IO.IOException();
 				}
 
 				String response = sb.ToString();
 				String reason = "Unknow reason";
 				int code = -1;
-				try
-				{
+				try {
 					foo = response.IndexOf(' ');
 					int bar = response.IndexOf(' ', foo + 1);
 					code = int.Parse(response.Substring(foo + 1, bar - (foo + 1)));
@@ -121,8 +108,7 @@ namespace LibSterileSSH.SecureShell
 				catch//(JException e)
 				{
 				}
-				if (code != 200)
-				{
+				if (code != 200) {
 					throw new System.IO.IOException("proxy error: " + reason);
 				}
 
@@ -137,36 +123,29 @@ namespace LibSterileSSH.SecureShell
 				*/
 
 				int count = 0;
-				while (true)
-				{
+				while (true) {
 					count = 0;
-					while (foo >= 0)
-					{
+					while (foo >= 0) {
 						foo = ins.ReadByte();
-						if (foo != 13)
-						{
+						if (foo != 13) {
 							count++;
 							continue;
 						}
 						foo = ins.ReadByte();
-						if (foo != 10)
-						{
+						if (foo != 10) {
 							continue;
 						}
 						break;
 					}
-					if (foo < 0)
-					{
+					if (foo < 0) {
 						throw new System.IO.IOException();
 					}
 					if (count == 0)
 						break;
 				}
 			}
-			catch (RuntimeException e)
-			{
-				try
-				{
+			catch (RuntimeException e) {
+				try {
 					if (socket != null)
 						socket.close();
 				}
@@ -191,8 +170,7 @@ namespace LibSterileSSH.SecureShell
 		}
 		public void close()
 		{
-			try
-			{
+			try {
 				if (ins != null)
 					ins.Close();
 				if (outs != null)
@@ -200,8 +178,7 @@ namespace LibSterileSSH.SecureShell
 				if (socket != null)
 					socket.close();
 			}
-			catch (RuntimeException)
-			{
+			catch (RuntimeException) {
 			}
 			ins = null;
 			outs = null;

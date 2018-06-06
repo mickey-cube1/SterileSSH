@@ -60,26 +60,21 @@ namespace LibSterileSSH.SecureShell
 		}
 		public override void start()
 		{
-			try
-			{
+			try {
 				IRequest request;
-				if (xforwading)
-				{
+				if (xforwading) {
 					request = new RequestX11();
 					request.request(session, this);
 				}
-				if (pty)
-				{
+				if (pty) {
 					request = new RequestPtyReq();
 					request.request(session, this);
 				}
 				request = new RequestSubsystem();
 				((RequestSubsystem)request).request(session, this, subsystem, want_reply);
 			}
-			catch (Exception e)
-			{
-				if (e is SshClientException)
-				{
+			catch (Exception e) {
+				if (e is SshClientException) {
 					throw (SshClientException)e;
 				}
 				throw new SshClientException("ChannelSubsystem");

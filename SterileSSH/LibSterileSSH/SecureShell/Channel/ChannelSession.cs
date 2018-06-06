@@ -56,13 +56,11 @@ namespace LibSterileSSH.SecureShell
 			Buffer buf = new Buffer(rmpsize);
 			Packet packet = new Packet(buf);
 			int i = -1;
-			try
-			{
+			try {
 				while (isConnected() &&
 					thread != null &&
 					io != null &&
-					io.ins != null)
-				{
+					io.ins != null) {
 					i = io.ins.Read(buf.buffer,
 						14,
 						buf.buffer.Length - 14
@@ -70,8 +68,7 @@ namespace LibSterileSSH.SecureShell
 						);
 					if (i == 0)
 						continue;
-					if (i == -1)
-					{
+					if (i == -1) {
 						eof();
 						break;
 					}
@@ -85,13 +82,11 @@ namespace LibSterileSSH.SecureShell
 					session.write(packet, this, i);
 				}
 			}
-			catch (Exception e)
-			{
+			catch (Exception e) {
 				Console.WriteLine("# ChannelSession.run");
 				Console.WriteLine(e);
 			}
-			if (thread != null)
-			{
+			if (thread != null) {
 				//lock(thread){ System.Threading.Monitor.PulseAll(this);/*thread.notifyAll();*/ }
 			}
 			thread = null;

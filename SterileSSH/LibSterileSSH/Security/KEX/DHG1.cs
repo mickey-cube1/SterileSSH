@@ -98,28 +98,24 @@ namespace LibSterileSSH.Security
 
 			//    sha=new SHA1();
 			//    sha.init();
-			try
-			{
+			try {
 				Type t = Type.GetType(session.getConfig("sha-1"));
 				sha = (IHASH)(Activator.CreateInstance(t));
 				sha.Init();
 			}
-			catch (Exception ee)
-			{
+			catch (Exception ee) {
 				Console.WriteLine(ee);
 			}
 
 			buf = new LibSterileSSH.SecureShell.Buffer();
 			packet = new Packet(buf);
 
-			try
-			{
+			try {
 				Type t = Type.GetType(session.getConfig("dh"));
 				dh = (IDH)(Activator.CreateInstance(t));
 				dh.init();
 			}
-			catch (Exception ee)
-			{
+			catch (Exception ee) {
 				throw ee;
 			}
 
@@ -145,8 +141,7 @@ namespace LibSterileSSH.Security
 		{
 			int i, j;
 			bool result = false;
-			switch (state)
-			{
+			switch (state) {
 				case SSH_MSG_KEXDH_REPLY:
 					// The server responds with:
 					// byte      SSH_MSG_KEXDH_REPLY(31)
@@ -156,8 +151,7 @@ namespace LibSterileSSH.Security
 					j = _buf.getInt();
 					j = _buf.getByte();
 					j = _buf.getByte();
-					if (j != 31)
-					{
+					if (j != 31) {
 						Console.WriteLine("type: must be 31 " + j);
 						result = false;
 						break;
@@ -220,8 +214,7 @@ namespace LibSterileSSH.Security
 
 					result = false;
 
-					if (alg.Equals("ssh-rsa"))
-					{
+					if (alg.Equals("ssh-rsa")) {
 						byte[] tmp;
 						byte[] ee;
 						byte[] n;
@@ -245,14 +238,12 @@ namespace LibSterileSSH.Security
 						//	sig.init();
 
 						ISignatureRSA sig = null;
-						try
-						{
+						try {
 							Type t = Type.GetType(session.getConfig("signature.rsa"));
 							sig = (ISignatureRSA)(Activator.CreateInstance(t));
 							sig.init();
 						}
-						catch (Exception eee)
-						{
+						catch (Exception eee) {
 							Console.WriteLine(eee);
 						}
 
@@ -261,8 +252,7 @@ namespace LibSterileSSH.Security
 						result = sig.verify(sig_of_H);
 						//MainClass.dump(ee, n, sig_of_H, H);
 					}
-					else if (alg.Equals("ssh-dss"))
-					{
+					else if (alg.Equals("ssh-dss")) {
 						byte[] q = null;
 						byte[] tmp;
 						byte[] p;
@@ -297,22 +287,19 @@ namespace LibSterileSSH.Security
 						//	SignatureDSA sig=new SignatureDSA();
 						//	sig.init();
 						ISignatureDSA sig = null;
-						try
-						{
+						try {
 							Type t = Type.GetType(session.getConfig("signature.dss"));
 							sig = (ISignatureDSA)(Activator.CreateInstance(t));
 							sig.init();
 						}
-						catch (Exception ee)
-						{
+						catch (Exception ee) {
 							Console.WriteLine(ee);
 						}
 						sig.setPubKey(f, p, q, g);
 						sig.update(H);
 						result = sig.verify(sig_of_H);
 					}
-					else
-					{
+					else {
 						Console.WriteLine("unknow alg");
 					}
 					state = STATE_END;

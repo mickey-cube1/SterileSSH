@@ -49,24 +49,20 @@ namespace LibSterileSSH.SecureShell
 		}
 		public override void start()
 		{
-			try
-			{
+			try {
 				IRequest request;
-				if (xforwading)
-				{
+				if (xforwading) {
 					request = new RequestX11();
 					request.request(session, this);
 				}
-				if (pty)
-				{
+				if (pty) {
 					request = new RequestPtyReq();
 					request.request(session, this);
 				}
 				request = new RequestShell();
 				request.request(session, this);
 			}
-			catch (Exception)
-			{
+			catch (Exception) {
 				throw new SshClientException("ChannelShell");
 			}
 			thread = new ThreadAux(this);
@@ -82,14 +78,12 @@ namespace LibSterileSSH.SecureShell
 		public void setPtySize(int col, int row, int wp, int hp)
 		{
 			//if(thread==null) return;
-			try
-			{
+			try {
 				RequestWindowChange request = new RequestWindowChange();
 				request.setSize(col, row, wp, hp);
 				request.request(session, this);
 			}
-			catch (Exception e)
-			{
+			catch (Exception e) {
 				throw new SshClientException("ChannelShell.setPtySize: " + e.ToString());
 			}
 		}

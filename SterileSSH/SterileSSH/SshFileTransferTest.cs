@@ -11,20 +11,21 @@ namespace SterileSSH
 	public class SshFileTransferTest
 	{
 		public static void RunExample()
-		{		
-			try
-			{
+		{
+			try {
 				SshConnectionInfo input = Util.GetInput();
 				string proto = GetProtocol();
 				SshTransferProtocolBase sshCp;
 
-				if(proto.Equals("scp"))
+				if (proto.Equals("scp"))
 					sshCp = new Scp(input.Host, input.User);
 				else
 					sshCp = new Sftp(input.Host, input.User);
 
-				if(input.Pass != null) sshCp.Password = input.Pass;
-				if(input.IdentityFile != null) sshCp.AddIdentityFile( input.IdentityFile );
+				if (input.Pass != null)
+					sshCp.Password = input.Pass;
+				if (input.IdentityFile != null)
+					sshCp.AddIdentityFile(input.IdentityFile);
 				sshCp.OnTransferStart += new FileTransferEvent(sshCp_OnTransferStart);
 				sshCp.OnTransferProgress += new FileTransferEvent(sshCp_OnTransferProgress);
 				sshCp.OnTransferEnd += new FileTransferEvent(sshCp_OnTransferEnd);
@@ -33,23 +34,24 @@ namespace SterileSSH
 				sshCp.Connect();
 				Console.WriteLine("OK");
 
-				while(true)
-				{
+				while (true) {
 					string direction = GetTransferDirection();
-					if(direction.Equals("to"))
-					{
+					if (direction.Equals("to")) {
 						string lfile = GetArg("Enter local file ['Enter to cancel']");
-						if(lfile=="") break;
+						if (lfile == "")
+							break;
 						string rfile = GetArg("Enter remote file ['Enter to cancel']");
-						if(rfile=="") break;
+						if (rfile == "")
+							break;
 						sshCp.Put(lfile, rfile);
 					}
-					else
-					{
+					else {
 						string rfile = GetArg("Enter remote file ['Enter to cancel']");
-						if(rfile=="") break;
+						if (rfile == "")
+							break;
 						string lpath = GetArg("Enter local path ['Enter to cancel']");
-						if(lpath=="") break;
+						if (lpath == "")
+							break;
 						sshCp.Get(rfile, lpath);
 					}
 				}
@@ -58,8 +60,7 @@ namespace SterileSSH
 				sshCp.Close();
 				Console.WriteLine("OK");
 			}
-			catch(Exception e)
-			{
+			catch (Exception e) {
 				Console.WriteLine(e.Message);
 			}
 		}
@@ -67,12 +68,12 @@ namespace SterileSSH
 		public static string GetProtocol()
 		{
 			string proto = "";
-			while( true )
-			{
+			while (true) {
 				Console.Write("Enter SSH transfer protocol [SCP|SFTP]: ");
 				proto = Console.ReadLine();
-				if(proto.ToLower().Equals("")) break;
-				if( proto.ToLower().Equals("scp") || proto.ToLower().Equals("sftp"))
+				if (proto.ToLower().Equals(""))
+					break;
+				if (proto.ToLower().Equals("scp") || proto.ToLower().Equals("sftp"))
 					break;
 				Console.Write("Bad input, ");
 			}
@@ -82,12 +83,12 @@ namespace SterileSSH
 		public static string GetTransferDirection()
 		{
 			string dir = "";
-			while( true )
-			{
+			while (true) {
 				Console.Write("Enter transfer direction [To|From]: ");
 				dir = Console.ReadLine();
-				if(dir.ToLower().Equals("")) break;
-				if( dir.ToLower().Equals("to") || dir.ToLower().Equals("from"))
+				if (dir.ToLower().Equals(""))
+					break;
+				if (dir.ToLower().Equals("to") || dir.ToLower().Equals("from"))
 					break;
 				Console.Write("Bad input, ");
 			}
@@ -96,7 +97,7 @@ namespace SterileSSH
 
 		public static string GetArg(string msg)
 		{
-			Console.Write(msg+": ");
+			Console.Write(msg + ": ");
 			return Console.ReadLine();
 		}
 
@@ -111,18 +112,16 @@ namespace SterileSSH
 
 		private static void sshCp_OnTransferProgress(string src, string dst, int transferredBytes, int totalBytes, string message)
 		{
-			if(progressBar!=null)
-			{
+			if (progressBar != null) {
 				progressBar.Update(transferredBytes, totalBytes, message);
 			}
 		}
 
 		private static void sshCp_OnTransferEnd(string src, string dst, int transferredBytes, int totalBytes, string message)
 		{
-			if(progressBar!=null)
-			{
+			if (progressBar != null) {
 				progressBar.Update(transferredBytes, totalBytes, message);
-				progressBar=null;
+				progressBar = null;
 			}
 		}
 	}

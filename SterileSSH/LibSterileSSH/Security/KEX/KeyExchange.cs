@@ -101,8 +101,7 @@ namespace LibSterileSSH.Security
 			LibSterileSSH.SecureShell.Buffer cb = new LibSterileSSH.SecureShell.Buffer(I_C);
 			cb.setOffSet(17);
 
-			for (int i = 0; i < PROPOSAL_MAX; i++)
-			{
+			for (int i = 0; i < PROPOSAL_MAX; i++) {
 				byte[] sp = sb.getString();  // server proposal
 				byte[] cp = cb.getString();  // client proposal
 
@@ -113,8 +112,7 @@ namespace LibSterileSSH.Security
 				int k = 0;
 				//System.out.println(new String(cp));
 				//loop(using BREAK instead):
-				while (j < cp.Length)
-				{
+				while (j < cp.Length) {
 					while (j < cp.Length && cp[j] != ',')
 						j++;
 					if (k == j)
@@ -123,15 +121,13 @@ namespace LibSterileSSH.Security
 					//System.out.println("algorithm: "+algorithm);
 					int l = 0;
 					int m = 0;
-					while (l < sp.Length)
-					{
+					while (l < sp.Length) {
 						while (l < sp.Length && sp[l] != ',')
 							l++;
 						if (m == l)
 							return null;
 						//System.out.println("  "+new String(sp, m, l-m));
-						if (algorithm.Equals(StringAux.getString(sp, m, l - m)))
-						{
+						if (algorithm.Equals(StringAux.getString(sp, m, l - m))) {
 							guess[i] = algorithm;
 							//System.out.println("  "+algorithm);
 							goto BREAK;
@@ -143,12 +139,10 @@ namespace LibSterileSSH.Security
 					k = j;
 				}
 			BREAK:
-				if (j == 0)
-				{
+				if (j == 0) {
 					guess[i] = "";
 				}
-				else if (guess[i] == null)
-				{
+				else if (guess[i] == null) {
 					//System.out.println("  fail");
 					return null;
 				}
@@ -164,13 +158,11 @@ namespace LibSterileSSH.Security
 		public String getFingerPrint()
 		{
 			IHASH hash = null;
-			try
-			{
+			try {
 				Type t = Type.GetType(session.getConfig("md5"));
 				hash = (IHASH)(Activator.CreateInstance(t));
 			}
-			catch (Exception e)
-			{
+			catch (Exception e) {
 				Console.Error.WriteLine("getFingerPrint: " + e);
 			}
 			return StringAux.getFingerPrint(hash, getHostKey());

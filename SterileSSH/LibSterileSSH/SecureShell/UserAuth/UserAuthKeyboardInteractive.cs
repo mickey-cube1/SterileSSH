@@ -50,25 +50,21 @@ namespace LibSterileSSH.SecureShell
 			Buffer buf = session.buf;
 			String username = session.username;
 			String dest = username + "@" + session.host;
-			if (session.port != 22)
-			{
+			if (session.port != 22) {
 				dest += (":" + session.port);
 			}
 
 			bool cancel = false;
 
 			byte[] _username = null;
-			try
-			{
+			try {
 				_username = System.Text.Encoding.UTF8.GetBytes(username);
 			}
-			catch
-			{
+			catch {
 				_username = StringAux.getBytes(username);
 			}
 
-			while (true)
-			{
+			while (true) {
 				// send
 				// byte      SSH_MSG_USERAUTH_REQUEST(50)
 				// string    user name (ISO-10646 UTF-8, as defined in [RFC-2279])
@@ -88,54 +84,44 @@ namespace LibSterileSSH.SecureShell
 
 				bool firsttime = true;
 			loop:
-				while (true)
-				{
+				while (true) {
 					// receive
 					// byte      SSH_MSG_USERAUTH_SUCCESS(52)
 					// string    service name
-					try
-					{
+					try {
 						buf = session.read(buf);
 					}
-					catch (SshClientException e)
-					{
+					catch (SshClientException e) {
 						e.GetType();
 						return false;
 					}
-					catch (System.IO.IOException e)
-					{
+					catch (System.IO.IOException e) {
 						e.GetType();
 						return false;
 					}
 					//System.out.println("read: 52 ? "+    buf.buffer[5]);
-					if (buf.buffer[5] == Session.SSH_MSG_USERAUTH_SUCCESS)
-					{
+					if (buf.buffer[5] == Session.SSH_MSG_USERAUTH_SUCCESS) {
 						return true;
 					}
-					if (buf.buffer[5] == Session.SSH_MSG_USERAUTH_BANNER)
-					{
+					if (buf.buffer[5] == Session.SSH_MSG_USERAUTH_BANNER) {
 						buf.getInt();
 						buf.getByte();
 						buf.getByte();
 						byte[] _message = buf.getString();
 						byte[] lang = buf.getString();
 						String message = null;
-						try
-						{
+						try {
 							message = StringAux.getStringUTF8(_message);
 						}
-						catch
-						{
+						catch {
 							message = StringAux.getString(_message);
 						}
-						if (userinfo != null)
-						{
+						if (userinfo != null) {
 							userinfo.showMessage(message);
 						}
 						goto loop;
 					}
-					if (buf.buffer[5] == Session.SSH_MSG_USERAUTH_FAILURE)
-					{
+					if (buf.buffer[5] == Session.SSH_MSG_USERAUTH_FAILURE) {
 						buf.getInt();
 						buf.getByte();
 						buf.getByte();
@@ -144,21 +130,18 @@ namespace LibSterileSSH.SecureShell
 						//	  System.out.println(new String(foo)+
 						//			     " partial_success:"+(partial_success!=0));
 
-						if (partial_success != 0)
-						{
+						if (partial_success != 0) {
 							throw new SshClientPartialAuthException(StringAux.getString(foo));
 						}
 
-						if (firsttime)
-						{
+						if (firsttime) {
 							throw new SshClientException("USERAUTH KI is not supported");
 							//return false;
 							//cancel=true;  // ??
 						}
 						break;
 					}
-					if (buf.buffer[5] == Session.SSH_MSG_USERAUTH_INFO_REQUEST)
-					{
+					if (buf.buffer[5] == Session.SSH_MSG_USERAUTH_INFO_REQUEST) {
 						firsttime = false;
 						buf.getInt();
 						buf.getByte();
@@ -173,8 +156,7 @@ namespace LibSterileSSH.SecureShell
 						//System.out.println("num: "+num);
 						String[] prompt = new String[num];
 						bool[] echo = new bool[num];
-						for (int i = 0; i < num; i++)
-						{
+						for (int i = 0; i < num; i++) {
 							prompt[i] = StringAux.getString(buf.getString());
 							echo[i] = (buf.getByte() != 0);
 							//System.out.println("  "+prompt[i]+","+echo[i]);
@@ -183,11 +165,9 @@ namespace LibSterileSSH.SecureShell
 						String[] response = null;
 						if (num > 0
 						   || (name.Length > 0 || instruction.Length > 0)
-						   )
-						{
+						   ) {
 							IUIKeyboardInteractive kbi = (IUIKeyboardInteractive)userinfo;
-							if (userinfo != null)
-							{
+							if (userinfo != null) {
 								response = kbi.promptKeyboardInteractive(dest,
 												   name,
 												   instruction,
@@ -208,17 +188,14 @@ namespace LibSterileSSH.SecureShell
 						buf.putByte((byte)Session.SSH_MSG_USERAUTH_INFO_RESPONSE);
 						if (num > 0 &&
 						   (response == null ||  // cancel
-							num != response.Length))
-						{
+							num != response.Length)) {
 							buf.putInt(0);
 							if (response == null)
 								cancel = true;
 						}
-						else
-						{
+						else {
 							buf.putInt(num);
-							for (int i = 0; i < num; i++)
-							{
+							for (int i = 0; i < num; i++) {
 								//System.out.println("response: |"+response[i]+"| <- replace here with **** if you need");
 								buf.putString(StringAux.getBytes(response[i]));
 							}
@@ -232,8 +209,7 @@ namespace LibSterileSSH.SecureShell
 					//throw new JSchException("USERAUTH fail ("+buf.buffer[5]+")");
 					return false;
 				}
-				if (cancel)
-				{
+				if (cancel) {
 					throw new SshClientAuthCancelException("keyboard-interactive");
 					//break;
 				}

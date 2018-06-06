@@ -45,8 +45,7 @@ namespace LibSterileSSH.Math.Prime.Generator
 			//
 			// STEP 2. Search for primes
 			//
-			while (true)
-			{
+			while (true) {
 
 				//
 				// STEP 2.1 Sieve out numbers divisible by the first 9 primes
@@ -73,8 +72,7 @@ namespace LibSterileSSH.Math.Prime.Generator
 				//
 				// STEP 2.2 Sieve out all numbers divisible by the primes <= DivisionBound
 				//
-				for (int p = 9; p < SmallPrimes.Length && SmallPrimes[p] <= DivisionBound; p++)
-				{
+				for (int p = 9; p < SmallPrimes.Length && SmallPrimes[p] <= DivisionBound; p++) {
 					if (curVal % SmallPrimes[p] == 0)
 						goto biNotPrime;
 				}
@@ -92,7 +90,7 @@ namespace LibSterileSSH.Math.Prime.Generator
 					return curVal;
 
 
-				//
+							 //
 			// STEP 2.4
 			//
 			biNotPrime:

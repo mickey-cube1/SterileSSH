@@ -107,8 +107,7 @@ namespace LibSterileSSH
 		/// <param name="msg">A transfer message</param>
 		protected void SendProgressMessage(string src, string dst, int transferredBytes, int totalBytes, string msg)
 		{
-			if (OnTransferProgress != null)
-			{
+			if (OnTransferProgress != null) {
 				OnTransferProgress(src, dst, transferredBytes, totalBytes, msg);
 			}
 		}

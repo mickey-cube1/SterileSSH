@@ -58,24 +58,20 @@ namespace LibSterileSSH.SecureShell
 			String username = session.username;
 
 			byte[] _username = null;
-			try
-			{
+			try {
 				_username = StringAux.getBytesUTF8(username);
 			}
-			catch
-			{//(java.io.UnsupportedEncodingException e){
+			catch {//(java.io.UnsupportedEncodingException e){
 				_username = StringAux.getBytes(username);
 			}
 
-			for (int i = 0; i < identities.Count; i++)
-			{
+			for (int i = 0; i < identities.Count; i++) {
 				IIdentity identity = (IIdentity)(identities[i]);
 				byte[] pubkeyblob = identity.getPublicKeyBlob();
 
 				//System.out.println("UserAuthPublicKey: "+identity+" "+pubkeyblob);
 
-				if (pubkeyblob != null)
-				{
+				if (pubkeyblob != null) {
 					// send
 					// byte      SSH_MSG_USERAUTH_REQUEST(50)
 					// string    user name
@@ -94,54 +90,45 @@ namespace LibSterileSSH.SecureShell
 					session.write(packet);
 
 				loop1:
-					while (true)
-					{
+					while (true) {
 						// receive
 						// byte      SSH_MSG_USERAUTH_PK_OK(52)
 						// string    service name
 						buf = session.read(buf);
 						//System.out.println("read: 60 ? "+    buf.buffer[5]);
-						if (buf.buffer[5] == Session.SSH_MSG_USERAUTH_PK_OK)
-						{
+						if (buf.buffer[5] == Session.SSH_MSG_USERAUTH_PK_OK) {
 							break;
 						}
-						else if (buf.buffer[5] == Session.SSH_MSG_USERAUTH_FAILURE)
-						{
+						else if (buf.buffer[5] == Session.SSH_MSG_USERAUTH_FAILURE) {
 							//	System.out.println("USERAUTH publickey "+session.getIdentity()+
 							//			   " is not acceptable.");
 							break;
 						}
-						else if (buf.buffer[5] == Session.SSH_MSG_USERAUTH_BANNER)
-						{
+						else if (buf.buffer[5] == Session.SSH_MSG_USERAUTH_BANNER) {
 							buf.getInt();
 							buf.getByte();
 							buf.getByte();
 							byte[] _message = buf.getString();
 							byte[] lang = buf.getString();
 							String message = null;
-							try
-							{
+							try {
 								message = StringAux.getStringUTF8(_message);
 							}
-							catch
-							{//(java.io.UnsupportedEncodingException e){
+							catch {//(java.io.UnsupportedEncodingException e){
 								message = StringAux.getString(_message);
 							}
-							if (userinfo != null)
-							{
+							if (userinfo != null) {
 								userinfo.showMessage(message);
 							}
 							goto loop1;
 						}
-						else
-						{
+						else {
 							//System.out.println("USERAUTH fail ("+buf.buffer[5]+")");
 							//throw new JSchException("USERAUTH fail ("+buf.buffer[5]+")");
 							break;
 						}
 					}
-					if (buf.buffer[5] != Session.SSH_MSG_USERAUTH_PK_OK)
-					{
+					if (buf.buffer[5] != Session.SSH_MSG_USERAUTH_PK_OK) {
 						continue;
 					}
 				}
@@ -149,15 +136,12 @@ namespace LibSterileSSH.SecureShell
 				//System.out.println("UserAuthPublicKey: identity.isEncrypted()="+identity.isEncrypted());
 
 				int count = 5;
-				while (true)
-				{
-					if ((identity.isEncrypted() && passphrase == null))
-					{
+				while (true) {
+					if ((identity.isEncrypted() && passphrase == null)) {
 						if (userinfo == null)
 							throw new SshClientException("USERAUTH fail");
 						if (identity.isEncrypted() &&
-							!userinfo.promptPassphrase("Passphrase for " + identity.getName()))
-						{
+							!userinfo.promptPassphrase("Passphrase for " + identity.getName())) {
 							throw new SshClientAuthCancelException("publickey");
 							//throw new JSchException("USERAUTH cancel");
 							//break;
@@ -165,8 +149,7 @@ namespace LibSterileSSH.SecureShell
 						passphrase = userinfo.getPassphrase();
 					}
 
-					if (!identity.isEncrypted() || passphrase != null)
-					{
+					if (!identity.isEncrypted() || passphrase != null) {
 						//System.out.println("UserAuthPublicKey: @1 "+passphrase);
 						if (identity.setPassphrase(passphrase))
 							break;
@@ -220,8 +203,7 @@ namespace LibSterileSSH.SecureShell
 				Array.Copy(buf.buffer, 5, tmp, 4 + sidlen, buf.index - 5);
 
 				byte[] signature = identity.getSignature(session, tmp);
-				if (signature == null)
-				{  // for example, too long key length.
+				if (signature == null) {  // for example, too long key length.
 					break;
 				}
 				buf.putString(signature);
@@ -229,41 +211,34 @@ namespace LibSterileSSH.SecureShell
 				session.write(packet);
 
 			loop2:
-				while (true)
-				{
+				while (true) {
 					// receive
 					// byte      SSH_MSG_USERAUTH_SUCCESS(52)
 					// string    service name
 					buf = session.read(buf);
 					//System.out.println("read: 52 ? "+    buf.buffer[5]);
-					if (buf.buffer[5] == Session.SSH_MSG_USERAUTH_SUCCESS)
-					{
+					if (buf.buffer[5] == Session.SSH_MSG_USERAUTH_SUCCESS) {
 						return true;
 					}
-					else if (buf.buffer[5] == Session.SSH_MSG_USERAUTH_BANNER)
-					{
+					else if (buf.buffer[5] == Session.SSH_MSG_USERAUTH_BANNER) {
 						buf.getInt();
 						buf.getByte();
 						buf.getByte();
 						byte[] _message = buf.getString();
 						byte[] lang = buf.getString();
 						String message = null;
-						try
-						{
+						try {
 							message = StringAux.getStringUTF8(_message);
 						}
-						catch
-						{//(java.io.UnsupportedEncodingException e){
+						catch {//(java.io.UnsupportedEncodingException e){
 							message = StringAux.getString(_message);
 						}
-						if (userinfo != null)
-						{
+						if (userinfo != null) {
 							userinfo.showMessage(message);
 						}
 						goto loop2;
 					}
-					else if (buf.buffer[5] == Session.SSH_MSG_USERAUTH_FAILURE)
-					{
+					else if (buf.buffer[5] == Session.SSH_MSG_USERAUTH_FAILURE) {
 						buf.getInt();
 						buf.getByte();
 						buf.getByte();
@@ -271,8 +246,7 @@ namespace LibSterileSSH.SecureShell
 						int partial_success = buf.getByte();
 						//System.out.println(new String(foo)+
 						//                   " partial_success:"+(partial_success!=0));
-						if (partial_success != 0)
-						{
+						if (partial_success != 0) {
 							throw new SshClientPartialAuthException(StringAux.getString(foo));
 						}
 						break;

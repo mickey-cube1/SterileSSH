@@ -177,33 +177,25 @@ namespace LibSterileSSH.Math
 			char c;
 			bool digits_seen = false;
 			BigInteger val = new BigInteger(0);
-			if (number[i] == '+')
-			{
+			if (number[i] == '+') {
 				i++;
 			}
-			else if (number[i] == '-')
-			{
+			else if (number[i] == '-') {
 				throw new FormatException("Only positive integers are allowed.");
 			}
-			for (; i < len; i++)
-			{
+			for (; i < len; i++) {
 				c = number[i];
-				if (c == '\0')
-				{
+				if (c == '\0') {
 					i = len;
 					continue;
 				}
-				if (c >= '0' && c <= '9')
-				{
+				if (c >= '0' && c <= '9') {
 					val = val * 10 + (c - '0');
 					digits_seen = true;
 				}
-				else
-				{
-					if (Char.IsWhiteSpace(c))
-					{
-						for (i++; i < len; i++)
-						{
+				else {
+					if (Char.IsWhiteSpace(c)) {
+						for (i++; i < len; i++) {
 							if (!Char.IsWhiteSpace(number[i]))
 								throw new FormatException();
 						}
@@ -231,8 +223,7 @@ namespace LibSterileSSH.Math
 
 			data = new uint[length];
 
-			for (int i = inData.Length - 1, j = 0; i >= 3; i -= 4, j++)
-			{
+			for (int i = inData.Length - 1, j = 0; i >= 3; i -= 4, j++) {
 				data[j] = (uint)(
 					(inData[i - 3] << (3 * 8)) |
 					(inData[i - 2] << (2 * 8)) |
@@ -241,8 +232,7 @@ namespace LibSterileSSH.Math
 					);
 			}
 
-			switch (leftOver)
-			{
+			switch (leftOver) {
 				case 1:
 					data[length - 1] = (uint)inData[0];
 					break;
@@ -321,8 +311,7 @@ namespace LibSterileSSH.Math
 			if (bi1 == 0)
 				throw new ArithmeticException(WouldReturnNegVal);
 
-			switch (Kernel.Compare(bi1, bi2))
-			{
+			switch (Kernel.Compare(bi1, bi2)) {
 
 				case Sign.Zero:
 					return 0;
@@ -445,8 +434,7 @@ namespace LibSterileSSH.Math
 			rng.GetBytes(random);
 			Buffer.BlockCopy(random, 0, ret.data, 0, (int)dwords << 2);
 
-			if (remBits != 0)
-			{
+			if (remBits != 0) {
 				uint mask = (uint)(0x01 << (remBits - 1));
 				ret.data[dwords - 1] |= mask;
 
@@ -488,8 +476,7 @@ namespace LibSterileSSH.Math
 			rng.GetBytes(random);
 			Buffer.BlockCopy(random, 0, data, 0, (int)dwords << 2);
 
-			if (remBits != 0)
-			{
+			if (remBits != 0) {
 				uint mask = (uint)(0x01 << (remBits - 1));
 				data[dwords - 1] |= mask;
 
@@ -523,8 +510,7 @@ namespace LibSterileSSH.Math
 			uint mask = 0x80000000;
 			uint bits = 32;
 
-			while (bits > 0 && (value & mask) == 0)
-			{
+			while (bits > 0 && (value & mask) == 0) {
 				bits--;
 				mask >>= 1;
 			}
@@ -572,8 +558,7 @@ namespace LibSterileSSH.Math
 		{
 			uint bytePos = bitNum >> 5;             // divide by 32
 
-			if (bytePos < this.length)
-			{
+			if (bytePos < this.length) {
 				uint mask = (uint)1 << (int)(bitNum & 0x1F);
 				if (val)
 					this.data[bytePos] |= mask;
@@ -609,11 +594,9 @@ namespace LibSterileSSH.Math
 				numBytesInWord = 4;
 
 			int pos = 0;
-			for (int i = (int)length - 1; i >= 0; i--)
-			{
+			for (int i = (int)length - 1; i >= 0; i--) {
 				uint val = data[i];
-				for (int j = numBytesInWord - 1; j >= 0; j--)
-				{
+				for (int j = numBytesInWord - 1; j >= 0; j--) {
 					result[pos + j] = (byte)(val & 0xFF);
 					val >>= 8;
 				}
@@ -711,8 +694,7 @@ namespace LibSterileSSH.Math
 
 			BigInteger a = new BigInteger(this);
 
-			while (a != 0)
-			{
+			while (a != 0) {
 				uint rem = Kernel.SingleByteDivideInPlace(a, radix);
 				result = charSet[(int)rem] + result;
 			}
@@ -802,8 +784,7 @@ namespace LibSterileSSH.Math
 		public bool isProbablePrime()
 		{
 
-			for (int p = 0; p < smallPrimes.Length; p++)
-			{
+			for (int p = 0; p < smallPrimes.Length; p++) {
 				if (this == smallPrimes[p])
 					return true;
 				if (this % smallPrimes[p] == 0)
@@ -857,8 +838,7 @@ namespace LibSterileSSH.Math
 			data[0] += 2;
 
 			// If there was no carry, nothing to do
-			if (data[0] < 2)
-			{
+			if (data[0] < 2) {
 
 				// Account for the first carry
 				data[++i]++;
@@ -936,12 +916,10 @@ namespace LibSterileSSH.Math
 
 				r2.Normalize();
 
-				if (r2 < x)
-				{
+				if (r2 < x) {
 					Kernel.MinusEq(x, r2);
 				}
-				else
-				{
+				else {
 					BigInteger val = new BigInteger(Sign.Positive, kPlusOne + 1);
 					val.data[kPlusOne] = 0x00000001;
 
@@ -981,8 +959,7 @@ namespace LibSterileSSH.Math
 				Sign cmp = Kernel.Compare(a, b);
 				BigInteger diff;
 
-				switch (cmp)
-				{
+				switch (cmp) {
 					case Sign.Zero:
 						return 0;
 					case Sign.Positive:
@@ -995,8 +972,7 @@ namespace LibSterileSSH.Math
 						throw new Exception();
 				}
 
-				if (diff >= mod)
-				{
+				if (diff >= mod) {
 					if (diff.length >= mod.length << 1)
 						diff %= mod;
 					else
@@ -1025,10 +1001,8 @@ namespace LibSterileSSH.Math
 				uint[] wkspace = new uint[mod.length << 1];
 
 				// perform squaring and multiply exponentiation
-				for (uint pos = 0; pos < totalBits; pos++)
-				{
-					if (exp.testBit(pos))
-					{
+				for (uint pos = 0; pos < totalBits; pos++) {
+					if (exp.testBit(pos)) {
 
 						Array.Clear(wkspace, 0, wkspace.Length);
 						Kernel.Multiply(resultNum.data, 0, resultNum.length, tempNum.data, 0, tempNum.length, wkspace, 0);
@@ -1043,8 +1017,7 @@ namespace LibSterileSSH.Math
 					Kernel.SquarePositive(tempNum, ref wkspace);
 					BarrettReduction(tempNum);
 
-					if (tempNum == 1)
-					{
+					if (tempNum == 1) {
 						return resultNum;
 					}
 				}
@@ -1062,10 +1035,8 @@ namespace LibSterileSSH.Math
 				uint[] wkspace = new uint[mod.length << 1];
 
 				// perform squaring and multiply exponentiation
-				for (uint pos = 0; pos < totalBits; pos++)
-				{
-					if (exp.testBit(pos))
-					{
+				for (uint pos = 0; pos < totalBits; pos++) {
+					if (exp.testBit(pos)) {
 
 						Array.Clear(wkspace, 0, wkspace.Length);
 						Kernel.Multiply(resultNum.data, 0, resultNum.length, tempNum.data, 0, tempNum.length, wkspace, 0);
@@ -1091,15 +1062,13 @@ namespace LibSterileSSH.Math
 			// checks it, but still would be nice
 			public BigInteger Pow(uint b, BigInteger exp)
 			{
-				if (b != 2)
-				{
+				if (b != 2) {
 					if ((mod.data[0] & 1) == 1)
 						return OddPow(b, exp);
 					else
 						return EvenPow(b, exp);
 				}
-				else
-				{
+				else {
 					if ((mod.data[0] & 1) == 1)
 						return OddModTwoPow(exp);
 					else
@@ -1123,16 +1092,14 @@ namespace LibSterileSSH.Math
 				// We know that the first itr will make the val b
 				//
 
-				do
-				{
+				do {
 					//
 					// r = r ^ 2 % m
 					//
 					Kernel.SquarePositive(resultNum, ref wkspace);
 					resultNum = Montgomery.Reduce(resultNum, mod, mPrime);
 
-					if (exp.testBit(pos))
-					{
+					if (exp.testBit(pos)) {
 
 						//
 						// r = r * b % m
@@ -1145,25 +1112,21 @@ namespace LibSterileSSH.Math
 							uint i = 0;
 							ulong mc = 0;
 
-							do
-							{
+							do {
 								mc += (ulong)u[i] * (ulong)b;
 								u[i] = (uint)mc;
 								mc >>= 32;
 							} while (++i < resultNum.length);
 
-							if (resultNum.length < mod.length)
-							{
-								if (mc != 0)
-								{
+							if (resultNum.length < mod.length) {
+								if (mc != 0) {
 									u[i] = (uint)mc;
 									resultNum.length++;
 									while (resultNum >= mod)
 										Kernel.MinusEq(resultNum, mod);
 								}
 							}
-							else if (mc != 0)
-							{
+							else if (mc != 0) {
 
 								//
 								// First, we estimate the quotient by dividing
@@ -1182,8 +1145,7 @@ namespace LibSterileSSH.Math
 
 								i = 0;
 								mc = 0;
-								do
-								{
+								do {
 									mc += (ulong)mod.data[i] * (ulong)divEstimate;
 									t = u[i];
 									u[i] -= (uint)mc;
@@ -1194,13 +1156,11 @@ namespace LibSterileSSH.Math
 								} while (i < resultNum.length);
 								cc -= (uint)mc;
 
-								if (cc != 0)
-								{
+								if (cc != 0) {
 
 									uint sc = 0, j = 0;
 									uint[] s = mod.data;
-									do
-									{
+									do {
 										uint a = s[j];
 										if (((a += sc) < sc) | ((u[j] -= a) > ~a))
 											sc = 1;
@@ -1213,8 +1173,7 @@ namespace LibSterileSSH.Math
 								while (resultNum >= mod)
 									Kernel.MinusEq(resultNum, mod);
 							}
-							else
-							{
+							else {
 								while (resultNum >= mod)
 									Kernel.MinusEq(resultNum, mod);
 							}
@@ -1239,8 +1198,7 @@ namespace LibSterileSSH.Math
 				// We know that the first itr will make the val b
 				//
 
-				do
-				{
+				do {
 					//
 					// r = r ^ 2 % m
 					//
@@ -1248,8 +1206,7 @@ namespace LibSterileSSH.Math
 					if (!(resultNum.length < mod.length))
 						BarrettReduction(resultNum);
 
-					if (exp.testBit(pos))
-					{
+					if (exp.testBit(pos)) {
 
 						//
 						// r = r * b % m
@@ -1262,25 +1219,21 @@ namespace LibSterileSSH.Math
 							uint i = 0;
 							ulong mc = 0;
 
-							do
-							{
+							do {
 								mc += (ulong)u[i] * (ulong)b;
 								u[i] = (uint)mc;
 								mc >>= 32;
 							} while (++i < resultNum.length);
 
-							if (resultNum.length < mod.length)
-							{
-								if (mc != 0)
-								{
+							if (resultNum.length < mod.length) {
+								if (mc != 0) {
 									u[i] = (uint)mc;
 									resultNum.length++;
 									while (resultNum >= mod)
 										Kernel.MinusEq(resultNum, mod);
 								}
 							}
-							else if (mc != 0)
-							{
+							else if (mc != 0) {
 
 								//
 								// First, we estimate the quotient by dividing
@@ -1299,8 +1252,7 @@ namespace LibSterileSSH.Math
 
 								i = 0;
 								mc = 0;
-								do
-								{
+								do {
 									mc += (ulong)mod.data[i] * (ulong)divEstimate;
 									t = u[i];
 									u[i] -= (uint)mc;
@@ -1311,13 +1263,11 @@ namespace LibSterileSSH.Math
 								} while (i < resultNum.length);
 								cc -= (uint)mc;
 
-								if (cc != 0)
-								{
+								if (cc != 0) {
 
 									uint sc = 0, j = 0;
 									uint[] s = mod.data;
-									do
-									{
+									do {
 										uint a = s[j];
 										if (((a += sc) < sc) | ((u[j] -= a) > ~a))
 											sc = 1;
@@ -1330,8 +1280,7 @@ namespace LibSterileSSH.Math
 								while (resultNum >= mod)
 									Kernel.MinusEq(resultNum, mod);
 							}
-							else
-							{
+							else {
 								while (resultNum >= mod)
 									Kernel.MinusEq(resultNum, mod);
 							}
@@ -1364,17 +1313,14 @@ namespace LibSterileSSH.Math
 
 				uint wPos = exp.length - 1;
 
-				do
-				{
+				do {
 					value = exp.data[wPos];
-					do
-					{
+					do {
 						Kernel.SquarePositive(resultNum, ref wkspace);
 						if (resultNum.length >= mod.length)
 							BarrettReduction(resultNum);
 
-						if ((value & mask) != 0)
-						{
+						if ((value & mask) != 0) {
 							//
 							// resultNum = (resultNum * 2) % mod
 							//
@@ -1387,8 +1333,7 @@ namespace LibSterileSSH.Math
 								uint uuidx = 0;
 								uint uuEidx = resultNum.length;
 								uint x, carry = 0;
-								while (uuidx < uuEidx)
-								{
+								while (uuidx < uuEidx) {
 									x = u[uuidx];
 									u[uuidx] = (x << 1) | carry;
 									carry = x >> (32 - 1);
@@ -1396,14 +1341,12 @@ namespace LibSterileSSH.Math
 								}
 
 								// subtraction inlined because we know it is square
-								if (carry != 0 || resultNum >= mod)
-								{
+								if (carry != 0 || resultNum >= mod) {
 									uuidx = 0;
 									uint c = 0;
 									uint[] s = mod.data;
 									uint i = 0;
-									do
-									{
+									do {
 										uint a = s[i];
 										if (((a += c) < c) | ((u[uuidx++] -= a) > ~a))
 											c = 1;
@@ -1436,13 +1379,11 @@ namespace LibSterileSSH.Math
 				//
 				uint pos = (uint)exp.bitCount() - 2;
 
-				do
-				{
+				do {
 					Kernel.SquarePositive(resultNum, ref wkspace);
 					resultNum = Montgomery.Reduce(resultNum, mod, mPrime);
 
-					if (exp.testBit(pos))
-					{
+					if (exp.testBit(pos)) {
 						//
 						// resultNum = (resultNum * 2) % mod
 						//
@@ -1455,8 +1396,7 @@ namespace LibSterileSSH.Math
 							uint uuidx = 0;
 							uint uuEidx = resultNum.length;
 							uint x, carry = 0;
-							while (uuidx < uuEidx)
-							{
+							while (uuidx < uuEidx) {
 								x = u[uuidx];
 								u[uuidx] = (x << 1) | carry;
 								carry = x >> (32 - 1);
@@ -1464,15 +1404,13 @@ namespace LibSterileSSH.Math
 							}
 
 							// subtraction inlined because we know it is square
-							if (carry != 0 || resultNum >= mod)
-							{
+							if (carry != 0 || resultNum >= mod) {
 								uint[] s = mod.data;
 								{
 									uuidx = 0;
 									uint c = 0;
 									uint ssidx = 0;
-									do
-									{
+									do {
 										uint a = s[ssidx++];
 										if (((a += c) < c) | ((u[uuidx++] -= a) > ~a))
 											c = 1;
@@ -1519,8 +1457,7 @@ namespace LibSterileSSH.Math
 				BigInteger A = n;
 				uint[] a = A.data, mm = m.data;
 				{
-					for (uint i = 0; i < m.length; i++)
-					{
+					for (uint i = 0; i < m.length; i++) {
 						// The mod here is taken care of by the CPU,
 						// since the multiply will overflow.
 						uint u_i = a[0] * mPrime /* % 2^32 */;
@@ -1540,8 +1477,7 @@ namespace LibSterileSSH.Math
 						uint j = 1;
 
 						// Multiply and add
-						for (; j < m.length; j++)
-						{
+						for (; j < m.length; j++) {
 							c += (ulong)u_i * (ulong)mm[mPidx++] + a[aSPidx++];
 							a[aDPidx++] = (uint)c;
 							c >>= 32;
@@ -1549,20 +1485,17 @@ namespace LibSterileSSH.Math
 
 						// Account for carry
 						// TODO: use a better loop here, we dont need the ulong stuff
-						for (; j < A.length; j++)
-						{
+						for (; j < A.length; j++) {
 							c += a[aSPidx++];
 							a[aDPidx++] = (uint)c;
 							c >>= 32;
-							if (c == 0)
-							{
+							if (c == 0) {
 								j++;
 								break;
 							}
 						}
 						// Copy the rest
-						for (; j < A.length; j++)
-						{
+						for (; j < A.length; j++) {
 							a[aDPidx++] = a[aSPidx++];
 						}
 
@@ -1605,15 +1538,13 @@ namespace LibSterileSSH.Math
 				uint yMax, xMax, i = 0;
 
 				// x should be bigger
-				if (bi1.length < bi2.length)
-				{
+				if (bi1.length < bi2.length) {
 					x = bi2.data;
 					xMax = bi2.length;
 					y = bi1.data;
 					yMax = bi1.length;
 				}
-				else
-				{
+				else {
 					x = bi1.data;
 					xMax = bi1.length;
 					y = bi2.data;
@@ -1627,8 +1558,7 @@ namespace LibSterileSSH.Math
 				ulong sum = 0;
 
 				// Add common parts of both numbers
-				do
-				{
+				do {
 					sum = ((ulong)x[i]) + ((ulong)y[i]) + sum;
 					r[i] = (uint)sum;
 					sum >>= 32;
@@ -1637,18 +1567,15 @@ namespace LibSterileSSH.Math
 				// Copy remainder of longer number while carry propagation is required
 				bool carry = (sum != 0);
 
-				if (carry)
-				{
+				if (carry) {
 
-					if (i < xMax)
-					{
+					if (i < xMax) {
 						do
 							carry = ((r[i] = x[i] + 1) == 0);
 						while (++i < xMax && carry);
 					}
 
-					if (carry)
-					{
+					if (carry) {
 						r[i] = 1;
 						result.length = ++i;
 						return result;
@@ -1656,8 +1583,7 @@ namespace LibSterileSSH.Math
 				}
 
 				// Copy the rest
-				if (i < xMax)
-				{
+				if (i < xMax) {
 					do
 						r[i] = x[i];
 					while (++i < xMax);
@@ -1674,8 +1600,7 @@ namespace LibSterileSSH.Math
 				uint[] r = result.data, b = big.data, s = small.data;
 				uint i = 0, c = 0;
 
-				do
-				{
+				do {
 
 					uint x = s[i];
 					if (((x += c) < c) | ((r[i] = b[i] - x) > ~x))
@@ -1688,8 +1613,7 @@ namespace LibSterileSSH.Math
 				if (i == big.length)
 					goto fixup;
 
-				if (c == 1)
-				{
+				if (c == 1) {
 					do
 						r[i] = b[i] - 1;
 					while (b[i++] == 0 && i < big.length);
@@ -1713,8 +1637,7 @@ namespace LibSterileSSH.Math
 				uint[] b = big.data, s = small.data;
 				uint i = 0, c = 0;
 
-				do
-				{
+				do {
 					uint x = s[i];
 					if (((x += c) < c) | ((b[i] -= x) > ~x))
 						c = 1;
@@ -1725,8 +1648,7 @@ namespace LibSterileSSH.Math
 				if (i == big.length)
 					goto fixup;
 
-				if (c == 1)
-				{
+				if (c == 1) {
 					do
 						b[i]--;
 					while (b[i++] == 0 && i < big.length);
@@ -1751,16 +1673,14 @@ namespace LibSterileSSH.Math
 				bool flag = false;
 
 				// x should be bigger
-				if (bi1.length < bi2.length)
-				{
+				if (bi1.length < bi2.length) {
 					flag = true;
 					x = bi2.data;
 					xMax = bi2.length;
 					y = bi1.data;
 					yMax = bi1.length;
 				}
-				else
-				{
+				else {
 					x = bi1.data;
 					xMax = bi1.length;
 					y = bi2.data;
@@ -1772,8 +1692,7 @@ namespace LibSterileSSH.Math
 				ulong sum = 0;
 
 				// Add common parts of both numbers
-				do
-				{
+				do {
 					sum += ((ulong)x[i]) + ((ulong)y[i]);
 					r[i] = (uint)sum;
 					sum >>= 32;
@@ -1782,18 +1701,15 @@ namespace LibSterileSSH.Math
 				// Copy remainder of longer number while carry propagation is required
 				bool carry = (sum != 0);
 
-				if (carry)
-				{
+				if (carry) {
 
-					if (i < xMax)
-					{
+					if (i < xMax) {
 						do
 							carry = ((r[i] = x[i] + 1) == 0);
 						while (++i < xMax && carry);
 					}
 
-					if (carry)
-					{
+					if (carry) {
 						r[i] = 1;
 						bi1.length = ++i;
 						return;
@@ -1801,8 +1717,7 @@ namespace LibSterileSSH.Math
 				}
 
 				// Copy the rest
-				if (flag && i < xMax - 1)
-				{
+				if (flag && i < xMax - 1) {
 					do
 						r[i] = x[i];
 					while (++i < xMax);
@@ -1878,8 +1793,7 @@ namespace LibSterileSSH.Math
 				ulong r = 0;
 				uint i = n.length;
 
-				while (i-- > 0)
-				{
+				while (i-- > 0) {
 					r <<= 32;
 					r |= n.data[i];
 					n.data[i] = (uint)(r / d);
@@ -1895,8 +1809,7 @@ namespace LibSterileSSH.Math
 				ulong r = 0;
 				uint i = n.length;
 
-				while (i-- > 0)
-				{
+				while (i-- > 0) {
 					r <<= 32;
 					r |= n.data[i];
 					r %= d;
@@ -1912,8 +1825,7 @@ namespace LibSterileSSH.Math
 				ulong r = 0;
 				uint i = n.length;
 
-				while (i-- > 0)
-				{
+				while (i-- > 0) {
 					r <<= 32;
 					r |= n.data[i];
 					ret.data[i] = (uint)(r / d);
@@ -1931,8 +1843,7 @@ namespace LibSterileSSH.Math
 				ulong r = 0;
 				uint i = n.length;
 
-				while (i-- > 0)
-				{
+				while (i-- > 0) {
 					r <<= 32;
 					r |= n.data[i];
 					ret.data[i] = (uint)(r / d);
@@ -1968,8 +1879,7 @@ namespace LibSterileSSH.Math
 				int shift = 0;
 				int resultPos = (int)bi1.length - (int)bi2.length;
 
-				while (mask != 0 && (val & mask) == 0)
-				{
+				while (mask != 0 && (val & mask) == 0) {
 					shift++;
 					mask >>= 1;
 				}
@@ -1987,19 +1897,16 @@ namespace LibSterileSSH.Math
 				uint firstDivisorByte = bi2.data[bi2.length - 1];
 				ulong secondDivisorByte = bi2.data[bi2.length - 2];
 
-				while (j > 0)
-				{
+				while (j > 0) {
 					ulong dividend = ((ulong)remainder[pos] << 32) + (ulong)remainder[pos - 1];
 
 					ulong q_hat = dividend / (ulong)firstDivisorByte;
 					ulong r_hat = dividend % (ulong)firstDivisorByte;
 
-					do
-					{
+					do {
 
 						if (q_hat == 0x100000000 ||
-							(q_hat * secondDivisorByte) > ((r_hat << 32) + remainder[pos - 2]))
-						{
+							(q_hat * secondDivisorByte) > ((r_hat << 32) + remainder[pos - 2])) {
 							q_hat--;
 							r_hat += (ulong)firstDivisorByte;
 
@@ -2021,8 +1928,7 @@ namespace LibSterileSSH.Math
 					int nPos = pos - divisorLen + 1;
 					ulong mc = 0;
 					uint uint_q_hat = (uint)q_hat;
-					do
-					{
+					do {
 						mc += (ulong)bi2.data[dPos] * (ulong)uint_q_hat;
 						t = remainder[nPos];
 						remainder[nPos] -= (uint)mc;
@@ -2037,13 +1943,11 @@ namespace LibSterileSSH.Math
 					dPos = 0;
 
 					// Overestimate
-					if (mc != 0)
-					{
+					if (mc != 0) {
 						uint_q_hat--;
 						ulong sum = 0;
 
-						do
-						{
+						do {
 							sum = ((ulong)remainder[nPos]) + ((ulong)bi2.data[dPos]) + sum;
 							remainder[nPos] = (uint)sum;
 							sum >>= 32;
@@ -2085,11 +1989,9 @@ namespace LibSterileSSH.Math
 				BigInteger ret = new BigInteger(Sign.Positive, bi.length + 1 + (uint)w);
 
 				uint i = 0, l = bi.length;
-				if (n != 0)
-				{
+				if (n != 0) {
 					uint x, carry = 0;
-					while (i < l)
-					{
+					while (i < l) {
 						x = bi.data[i];
 						ret.data[i + w] = (x << n) | carry;
 						carry = x >> (32 - n);
@@ -2097,10 +1999,8 @@ namespace LibSterileSSH.Math
 					}
 					ret.data[i + w] = carry;
 				}
-				else
-				{
-					while (i < l)
-					{
+				else {
+					while (i < l) {
 						ret.data[i + w] = bi.data[i];
 						i++;
 					}
@@ -2121,20 +2021,17 @@ namespace LibSterileSSH.Math
 				BigInteger ret = new BigInteger(Sign.Positive, bi.length - (uint)w + 1);
 				uint l = (uint)ret.data.Length - 1;
 
-				if (s != 0)
-				{
+				if (s != 0) {
 
 					uint x, carry = 0;
 
-					while (l-- > 0)
-					{
+					while (l-- > 0) {
 						x = bi.data[l + w];
 						ret.data[l] = (x >> n) | carry;
 						carry = x << (32 - n);
 					}
 				}
-				else
-				{
+				else {
 					while (l-- > 0)
 						ret.data[l] = bi.data[l + w];
 
@@ -2154,8 +2051,7 @@ namespace LibSterileSSH.Math
 				uint i = 0;
 				ulong c = 0;
 
-				do
-				{
+				do {
 					c += (ulong)n.data[i] * (ulong)f;
 					ret.data[i] = (uint)c;
 					c >>= 32;
@@ -2186,8 +2082,7 @@ namespace LibSterileSSH.Math
 						yE = yB + yLen,
 						dB = 0 + dOffset;
 
-					for (; xP < xE; xP++, dB++)
-					{
+					for (; xP < xE; xP++, dB++) {
 
 						if (xx[xP] == 0)
 							continue;
@@ -2195,8 +2090,7 @@ namespace LibSterileSSH.Math
 						ulong mcarry = 0;
 
 						uint dP = dB;
-						for (uint yP = yB; yP < yE; yP++, dP++)
-						{
+						for (uint yP = yB; yP < yE; yP++, dP++) {
 							mcarry += ((ulong)xx[xP] * (ulong)yy[yP]) + (ulong)dd[dP];
 
 							dd[dP] = (uint)mcarry;
@@ -2230,16 +2124,14 @@ namespace LibSterileSSH.Math
 						dB = (uint)(0 + dOffset),
 						dE = (uint)(dB + mod);
 
-					for (; xP < xE; xP++, dB++)
-					{
+					for (; xP < xE; xP++, dB++) {
 
 						if (xx[xP] == 0)
 							continue;
 
 						ulong mcarry = 0;
 						uint dP = dB;
-						for (uint yP = yB; yP < yE && dP < dE; yP++, dP++)
-						{
+						for (uint yP = yB; yP < yE && dP < dE; yP++, dP++) {
 							mcarry += ((ulong)xx[xP] * (ulong)yy[yP]) + (ulong)dd[dP];
 
 							dd[dP] = (uint)mcarry;
@@ -2270,8 +2162,7 @@ namespace LibSterileSSH.Math
 
 					uint dP = 0, tP = 0;
 
-					for (uint i = 0; i < dl; i++, dP++)
-					{
+					for (uint i = 0; i < dl; i++, dP++) {
 						if (dd[dP] == 0)
 							continue;
 
@@ -2280,8 +2171,7 @@ namespace LibSterileSSH.Math
 
 						uint dP2 = dP + 1, tP2 = tP + 2 * i + 1;
 
-						for (uint j = i + 1; j < dl; j++, tP2++, dP2++)
-						{
+						for (uint j = i + 1; j < dl; j++, tP2++, dP2++) {
 							// k = i + j
 							mcarry += ((ulong)bi1val * (ulong)dd[dP2]) + tt[tP2];
 
@@ -2298,8 +2188,7 @@ namespace LibSterileSSH.Math
 					tP = 0;
 
 					uint x, carry = 0;
-					while (tP < ttE)
-					{
+					while (tP < ttE) {
 						x = tt[tP];
 						tt[tP] = (x << 1) | carry;
 						carry = x >> (32 - 1);
@@ -2312,14 +2201,12 @@ namespace LibSterileSSH.Math
 
 					dP = 0;
 					tP = 0;
-					for (uint dE = dP + dl; (dP < dE); dP++, tP++)
-					{
+					for (uint dE = dP + dl; (dP < dE); dP++, tP++) {
 						ulong val = (ulong)dd[dP] * (ulong)dd[dP] + tt[tP];
 						tt[tP] = (uint)val;
 						val >>= 32;
 						tt[++tP] += (uint)val;
-						if (tt[tP] < (uint)val)
-						{
+						if (tt[tP] < (uint)val) {
 							uint tP3 = tP;
 							// Account for the first carry
 							tt[++tP3]++;
@@ -2344,8 +2231,7 @@ namespace LibSterileSSH.Math
 			{
 				uint x, carry = 0;
 				uint i = 0;
-				while (i < l)
-				{
+				while (i < l) {
 					x = u[i];
 					u[i] = (x << 1) | carry;
 					carry = x >> (32 - 1);
@@ -2367,8 +2253,7 @@ namespace LibSterileSSH.Math
 
 				BigInteger g = y;
 
-				while (x.length > 1)
-				{
+				while (x.length > 1) {
 					g = x;
 					x = y % x;
 					y = g;
@@ -2389,14 +2274,12 @@ namespace LibSterileSSH.Math
 
 				int t = 0;
 
-				while (((xx | yy) & 1) == 0)
-				{
+				while (((xx | yy) & 1) == 0) {
 					xx >>= 1;
 					yy >>= 1;
 					t++;
 				}
-				while (xx != 0)
-				{
+				while (xx != 0) {
 					while ((xx & 1) == 0)
 						xx >>= 1;
 					while ((yy & 1) == 0)
@@ -2415,8 +2298,7 @@ namespace LibSterileSSH.Math
 				uint a = modulus, b = bi % modulus;
 				uint p0 = 0, p1 = 1;
 
-				while (b != 0)
-				{
+				while (b != 0) {
 					if (b == 1)
 						return p1;
 					p0 += (a / b) * p1;
@@ -2450,11 +2332,9 @@ namespace LibSterileSSH.Math
 
 				ModulusRing mr = new ModulusRing(modulus);
 
-				while (b != 0)
-				{
+				while (b != 0) {
 
-					if (step > 1)
-					{
+					if (step > 1) {
 
 						BigInteger pval = mr.Difference(p[0], p[1] * q[0]);
 						p[0] = p[1];

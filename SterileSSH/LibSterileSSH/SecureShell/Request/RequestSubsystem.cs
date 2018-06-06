@@ -50,8 +50,7 @@ namespace LibSterileSSH.SecureShell
 			Packet packet = new Packet(buf);
 
 			bool reply = waitForReply();
-			if (reply)
-			{
+			if (reply) {
 				channel.reply = -1;
 			}
 
@@ -63,20 +62,15 @@ namespace LibSterileSSH.SecureShell
 			buf.putString(StringAux.getBytesUTF8(subsystem));
 			session.write(packet);
 
-			if (reply)
-			{
-				while (channel.reply == -1)
-				{
-					try
-					{
+			if (reply) {
+				while (channel.reply == -1) {
+					try {
 						ThreadAux.Sleep(10);
 					}
-					catch (System.Exception)
-					{
+					catch (System.Exception) {
 					}
 				}
-				if (channel.reply == 0)
-				{
+				if (channel.reply == 0) {
 					throw new SshClientException("failed to send subsystem request");
 				}
 			}

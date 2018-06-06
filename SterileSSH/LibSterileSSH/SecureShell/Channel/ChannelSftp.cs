@@ -138,7 +138,7 @@ namespace LibSterileSSH.SecureShell
 		public static int APPEND = 2;
 
 		//  private bool interactive=true;
-//		private bool interactive = false;
+		//		private bool interactive = false;
 		internal int seq = 1;
 		private int[] ackid = new int[1];
 		private Buffer buf;
@@ -184,8 +184,7 @@ namespace LibSterileSSH.SecureShell
 
 		public override void start()
 		{ //throws JSchException{
-			try
-			{
+			try {
 
 				PipedOutputStream pos = new PipedOutputStream();
 				io.setOutputStream(pos);
@@ -216,8 +215,7 @@ namespace LibSterileSSH.SecureShell
 				Header _header = new Header();
 				_header = header(buf, _header);
 				length = _header.length;
-				if (length > MAX_MSG_LENGTH)
-				{
+				if (length > MAX_MSG_LENGTH) {
 					throw new SftpException(SSH_FX_FAILURE, "Received message is too long: " + length);
 				}
 				type = _header.type;             // 2 -> SSH_FXP_VERSION
@@ -245,8 +243,7 @@ namespace LibSterileSSH.SecureShell
 
 				lcwd = Path.GetFullPath(".");
 			}
-			catch (RuntimeException e)
-			{
+			catch (RuntimeException e) {
 				//System.out.println(e);
 				//System.Console.WriteLine(e);
 				if (e is SshClientException)
@@ -266,14 +263,11 @@ namespace LibSterileSSH.SecureShell
 		public void lcd(String path)
 		{ //throws SftpException{
 			path = localAbsolutePath(path);
-			if (FileAux.IsDirectory(path))
-			{
-				try
-				{
+			if (FileAux.IsDirectory(path)) {
+				try {
 					path = Path.GetFullPath(path);
 				}
-				catch (RuntimeException)
-				{
+				catch (RuntimeException) {
 				}
 				lcwd = path;
 				return;
@@ -291,13 +285,11 @@ namespace LibSterileSSH.SecureShell
 		public void cd(String path)
 		{
 			//throws SftpException{
-			try
-			{
+			try {
 				path = remoteAbsolutePath(path);
 
 				ArrayList v = glob_remote(path);
-				if (v.Count != 1)
-				{
+				if (v.Count != 1) {
 					throw new SftpException(SSH_FX_FAILURE, v.ToString());
 				}
 				path = (String)(v[0]);
@@ -310,20 +302,17 @@ namespace LibSterileSSH.SecureShell
 				buf.rewind();
 				fill(buf.buffer, 0, length);
 
-				if (type != 101 && type != 104)
-				{
+				if (type != 101 && type != 104) {
 					throw new SftpException(SSH_FX_FAILURE, "");
 				}
 				int i;
-				if (type == 101)
-				{
+				if (type == 101) {
 					i = buf.getInt();
 					throwStatusError(buf, i);
 				}
 				i = buf.getInt();
 				byte[] str = buf.getString();
-				if (str != null && str[0] != '/')
-				{
+				if (str != null && str[0] != '/') {
 					str = StringAux.getBytesUTF8((cwd + "/" + StringAux.getString(str)));
 				}
 				str = buf.getString();         // logname
@@ -331,20 +320,17 @@ namespace LibSterileSSH.SecureShell
 
 				String newpwd = StringAux.getString(str);
 				SftpATTRS attr = _stat(newpwd);
-				if ((attr.getFlags() & SftpATTRS.SSH_FILEXFER_ATTR_PERMISSIONS) == 0)
-				{
+				if ((attr.getFlags() & SftpATTRS.SSH_FILEXFER_ATTR_PERMISSIONS) == 0) {
 					throw new SftpException(SSH_FX_FAILURE,
 											"Can't change directory: " + path);
 				}
-				if (!attr.isDir())
-				{
+				if (!attr.isDir()) {
 					throw new SftpException(SSH_FX_FAILURE,
 											"Can't change directory: " + path);
 				}
 				cwd = newpwd;
 			}
-			catch (RuntimeException e)
-			{
+			catch (RuntimeException e) {
 				if (e is SftpException)
 					throw (SftpException)e;
 				throw new SftpException(SSH_FX_FAILURE, "");
@@ -381,14 +367,11 @@ namespace LibSterileSSH.SecureShell
 			dst = remoteAbsolutePath(dst);
 
 			//System.err.println("src: "+src+", "+dst);
-			try
-			{
+			try {
 				ArrayList v = glob_remote(dst);
 				int vsize = v.Count;
-				if (vsize != 1)
-				{
-					if (vsize == 0)
-					{
+				if (vsize != 1) {
+					if (vsize == 0) {
 						if (isPattern(dst))
 							throw new SftpException(SSH_FX_FAILURE, dst);
 						else
@@ -396,8 +379,7 @@ namespace LibSterileSSH.SecureShell
 					}
 					throw new SftpException(SSH_FX_FAILURE, v.ToString());
 				}
-				else
-				{
+				else {
 					dst = (String)(v[0]);
 				}
 
@@ -410,25 +392,20 @@ namespace LibSterileSSH.SecureShell
 				vsize = v.Count;
 
 				StringBuilder dstsb = null;
-				if (_isRemoteDir)
-				{
-					if (!dst.EndsWith("/"))
-					{
+				if (_isRemoteDir) {
+					if (!dst.EndsWith("/")) {
 						dst += "/";
 					}
 					dstsb = new StringBuilder(dst);
 				}
-				else if (vsize > 1)
-				{
+				else if (vsize > 1) {
 					throw new SftpException(SSH_FX_FAILURE, "Copying multiple files, but destination is missing or a file.");
 				}
 
-				for (int j = 0; j < vsize; j++)
-				{
+				for (int j = 0; j < vsize; j++) {
 					String _src = (String)(v[j]);
 					String _dst = null;
-					if (_isRemoteDir)
-					{
+					if (_isRemoteDir) {
 						int i = _src.LastIndexOf(file_separatorc);
 						if (i == -1)
 							dstsb.Append(_src);
@@ -437,54 +414,43 @@ namespace LibSterileSSH.SecureShell
 						_dst = dstsb.ToString();
 						StringBuilderAux.delete(dstsb, dst.Length, _dst.Length);
 					}
-					else
-					{
+					else {
 						_dst = dst;
 					}
 					//System.err.println("_dst "+_dst);
 
 					long size_of_dst = 0;
-					if (mode == RESUME)
-					{
-						try
-						{
+					if (mode == RESUME) {
+						try {
 							SftpATTRS attr = _stat(_dst);
 							size_of_dst = attr.getSize();
 						}
-						catch (RuntimeException)
-						{
+						catch (RuntimeException) {
 							//System.err.println(eee);
 						}
 						long size_of_src = FileAux.Length(_src);
-						if (size_of_src < size_of_dst)
-						{
+						if (size_of_src < size_of_dst) {
 							throw new SftpException(SSH_FX_FAILURE, "failed to resume for " + _dst);
 						}
-						if (size_of_src == size_of_dst)
-						{
+						if (size_of_src == size_of_dst) {
 							return;
 						}
 					}
 
-					if (monitor != null)
-					{
+					if (monitor != null) {
 						monitor.init(SftpProgressMonitorDirectionMode.PUT, _src, _dst,
 									 FileAux.Length(_src));
-						if (mode == RESUME)
-						{
+						if (mode == RESUME) {
 							monitor.count(size_of_dst);
 						}
 					}
 					FileInputStream fis = null;
-					try
-					{
+					try {
 						fis = new FileInputStream(_src);
 						_put(fis, _dst, monitor, mode);
 					}
-					finally
-					{
-						if (fis != null)
-						{
+					finally {
+						if (fis != null) {
 							//	    try{
 							fis.close();
 							//	    }catch(Exception ee){};
@@ -492,8 +458,7 @@ namespace LibSterileSSH.SecureShell
 					}
 				}
 			}
-			catch (RuntimeException e)
-			{
+			catch (RuntimeException e) {
 				if (e is SftpException)
 					throw (SftpException)e;
 				throw new SftpException(SSH_FX_FAILURE, e.ToString());
@@ -515,15 +480,12 @@ namespace LibSterileSSH.SecureShell
 		public void put(AInputStream src, String dst,
 			ISftpProgressMonitor monitor, int mode)
 		{ //throws SftpException{
-			try
-			{
+			try {
 				dst = remoteAbsolutePath(dst);
 				ArrayList v = glob_remote(dst);
 				int vsize = v.Count;
-				if (vsize != 1)
-				{
-					if (vsize == 0)
-					{
+				if (vsize != 1) {
+					if (vsize == 0) {
 						if (isPattern(dst))
 							throw new SftpException(SSH_FX_FAILURE, dst);
 						else
@@ -531,18 +493,15 @@ namespace LibSterileSSH.SecureShell
 					}
 					throw new SftpException(SSH_FX_FAILURE, v.ToString());
 				}
-				else
-				{
+				else {
 					dst = (String)(v[0]);
 				}
-				if (isRemoteDir(dst))
-				{
+				if (isRemoteDir(dst)) {
 					throw new SftpException(SSH_FX_FAILURE, dst + " is a directory");
 				}
 				_put(src, dst, monitor, mode);
 			}
-			catch (RuntimeException e)
-			{
+			catch (RuntimeException e) {
 				if (e is SftpException)
 					throw (SftpException)e;
 				throw new SftpException(SSH_FX_FAILURE, e.ToString());
@@ -552,35 +511,27 @@ namespace LibSterileSSH.SecureShell
 		private void _put(AInputStream src, String dst,
 			ISftpProgressMonitor monitor, int mode)
 		{
-			try
-			{
+			try {
 				long skip = 0;
-				if (mode == RESUME || mode == APPEND)
-				{
-					try
-					{
+				if (mode == RESUME || mode == APPEND) {
+					try {
 						SftpATTRS attr = _stat(dst);
 						skip = attr.getSize();
 					}
-					catch (RuntimeException)
-					{
+					catch (RuntimeException) {
 						//System.err.println(eee);
 					}
 				}
-				if (mode == RESUME && skip > 0)
-				{
+				if (mode == RESUME && skip > 0) {
 					long skipped = src.skip(skip);
-					if (skipped < skip)
-					{
+					if (skipped < skip) {
 						throw new SftpException(SSH_FX_FAILURE, "failed to resume for " + dst);
 					}
 				}
-				if (mode == OVERWRITE)
-				{
+				if (mode == OVERWRITE) {
 					sendOPENW(StringAux.getBytesUTF8(dst));
 				}
-				else
-				{
+				else {
 					sendOPENA(StringAux.getBytesUTF8(dst));
 				}
 
@@ -591,12 +542,10 @@ namespace LibSterileSSH.SecureShell
 				buf.rewind();
 				fill(buf.buffer, 0, length);
 
-				if (type != SSH_FXP_STATUS && type != SSH_FXP_HANDLE)
-				{
+				if (type != SSH_FXP_STATUS && type != SSH_FXP_HANDLE) {
 					throw new SftpException(SSH_FX_FAILURE, "invalid type=" + type);
 				}
-				if (type == SSH_FXP_STATUS)
-				{
+				if (type == SSH_FXP_STATUS) {
 					int i = buf.getInt();
 					throwStatusError(buf, i);
 				}
@@ -605,8 +554,7 @@ namespace LibSterileSSH.SecureShell
 
 				bool dontcopy = true;
 
-				if (!dontcopy)
-				{
+				if (!dontcopy) {
 					data = new byte[buf.buffer.Length
 								  - (5 + 13 + 21 + handle.Length
 									+ 32 + 20 // padding and mac
@@ -615,38 +563,32 @@ namespace LibSterileSSH.SecureShell
 				}
 
 				long offset = 0;
-				if (mode == RESUME || mode == APPEND)
-				{
+				if (mode == RESUME || mode == APPEND) {
 					offset += skip;
 				}
 
 				int startid = seq;
 				int _ackid = seq;
 				int ackcount = 0;
-				while (true)
-				{
+				while (true) {
 					int nread = 0;
 					int s = 0;
 					int datalen = 0;
 					int count = 0;
 
-					if (!dontcopy)
-					{
+					if (!dontcopy) {
 						datalen = data.Length - s;
 					}
-					else
-					{
+					else {
 						data = buf.buffer;
 						s = 5 + 13 + 21 + handle.Length;
 						datalen = buf.buffer.Length - s
 								- 32 - 20; // padding and mac
 					}
 
-					do
-					{
+					do {
 						nread = src.read(data, s, datalen);
-						if (nread > 0)
-						{
+						if (nread > 0) {
 							s += nread;
 							datalen -= nread;
 							count += nread;
@@ -657,49 +599,38 @@ namespace LibSterileSSH.SecureShell
 						break;
 
 					int _i = count;
-					while (_i > 0)
-					{
+					while (_i > 0) {
 						_i -= sendWRITE(handle, offset, data, 0, _i);
 						if ((seq - 1) == startid ||
-						   StreamAux.available(io.ins) >= 1024)
-						{
-							while (StreamAux.available(io.ins) > 0)
-							{
-								if (checkStatus(ackid, _header))
-								{
+						   StreamAux.available(io.ins) >= 1024) {
+							while (StreamAux.available(io.ins) > 0) {
+								if (checkStatus(ackid, _header)) {
 									_ackid = ackid[0];
-									if (startid > _ackid || _ackid > seq - 1)
-									{
-										if (_ackid == seq)
-										{
+									if (startid > _ackid || _ackid > seq - 1) {
+										if (_ackid == seq) {
 											Console.Error.WriteLine("ack error: startid=" + startid + " seq=" + seq + " _ackid=" + _ackid);
 										}
-										else
-										{
+										else {
 											//throw new SftpException(SSH_FX_FAILURE, "ack error:");
 											throw new SftpException(SSH_FX_FAILURE, "ack error: startid=" + startid + " seq=" + seq + " _ackid=" + _ackid);
 										}
 									}
 									ackcount++;
 								}
-								else
-								{
+								else {
 									break;
 								}
 							}
 						}
 					}
 					offset += count;
-					if (monitor != null && !monitor.count(count))
-					{
+					if (monitor != null && !monitor.count(count)) {
 						break;
 					}
 				}
 				int _ackcount = seq - startid;
-				while (_ackcount > ackcount)
-				{
-					if (!checkStatus(null, _header))
-					{
+				while (_ackcount > ackcount) {
+					if (!checkStatus(null, _header)) {
 						break;
 					}
 					ackcount++;
@@ -709,8 +640,7 @@ namespace LibSterileSSH.SecureShell
 				_sendCLOSE(handle, _header);
 				//System.err.println("start end "+startid+" "+endid);
 			}
-			catch (RuntimeException e)
-			{
+			catch (RuntimeException e) {
 				if (e is SftpException)
 					throw (SftpException)e;
 				throw new SftpException(SSH_FX_FAILURE, e.ToString());
@@ -719,8 +649,7 @@ namespace LibSterileSSH.SecureShell
 
 		private SftpATTRS _stat(String path)
 		{
-			try
-			{
+			try {
 				sendSTAT(StringAux.getBytesUTF8(path));
 
 				Header _header = new Header();
@@ -730,10 +659,8 @@ namespace LibSterileSSH.SecureShell
 				buf.rewind();
 				fill(buf.buffer, 0, length);
 
-				if (type != SSH_FXP_ATTRS)
-				{
-					if (type == SSH_FXP_STATUS)
-					{
+				if (type != SSH_FXP_ATTRS) {
+					if (type == SSH_FXP_STATUS) {
 						int i = buf.getInt();
 						throwStatusError(buf, i);
 					}
@@ -742,8 +669,7 @@ namespace LibSterileSSH.SecureShell
 				SftpATTRS attr = SftpATTRS.getATTR(buf);
 				return attr;
 			}
-			catch (RuntimeException e)
-			{
+			catch (RuntimeException e) {
 				if (e is SftpException)
 					throw (SftpException)e;
 				throw new SftpException(SSH_FX_FAILURE, "");
@@ -768,39 +694,31 @@ namespace LibSterileSSH.SecureShell
 		public AOutputStream put(String dst, ISftpProgressMonitor monitor, int mode, long offset)
 		{
 			dst = remoteAbsolutePath(dst);
-			try
-			{
+			try {
 				ArrayList v = glob_remote(dst);
-				if (v.Count != 1)
-				{
+				if (v.Count != 1) {
 					throw new SftpException(SSH_FX_FAILURE, v.ToString());
 				}
 				dst = (String)(v[0]);
-				if (isRemoteDir(dst))
-				{
+				if (isRemoteDir(dst)) {
 					throw new SftpException(SSH_FX_FAILURE, dst + " is a directory");
 				}
 
 				long skip = 0;
-				if (mode == RESUME || mode == APPEND)
-				{
-					try
-					{
+				if (mode == RESUME || mode == APPEND) {
+					try {
 						SftpATTRS attr = stat(dst);
 						skip = attr.getSize();
 					}
-					catch (RuntimeException)
-					{
+					catch (RuntimeException) {
 						//System.out.println(eee);
 					}
 				}
 
-				if (mode == OVERWRITE)
-				{
+				if (mode == OVERWRITE) {
 					sendOPENW(StringAux.getBytesUTF8(dst));
 				}
-				else
-				{
+				else {
 					sendOPENA(StringAux.getBytesUTF8(dst));
 				}
 
@@ -812,12 +730,10 @@ namespace LibSterileSSH.SecureShell
 				buf.rewind();
 				fill(buf.buffer, 0, length);
 
-				if (type != SSH_FXP_STATUS && type != SSH_FXP_HANDLE)
-				{
+				if (type != SSH_FXP_STATUS && type != SSH_FXP_HANDLE) {
 					throw new SftpException(SSH_FX_FAILURE, "");
 				}
-				if (type == SSH_FXP_STATUS)
-				{
+				if (type == SSH_FXP_STATUS) {
 					int i = buf.getInt();
 					throwStatusError(buf, i);
 				}
@@ -825,8 +741,7 @@ namespace LibSterileSSH.SecureShell
 				byte[] handle = buf.getString();         // filename
 
 				//long offset=0;
-				if (mode == RESUME || mode == APPEND)
-				{
+				if (mode == RESUME || mode == APPEND) {
 					offset += skip;
 				}
 
@@ -907,8 +822,7 @@ namespace LibSterileSSH.SecureShell
 				//};
 				return outs;
 			}
-			catch (RuntimeException e)
-			{
+			catch (RuntimeException e) {
 				if (e is SftpException)
 					throw (SftpException)e;
 				throw new SftpException(SSH_FX_FAILURE, "");
@@ -931,44 +845,36 @@ namespace LibSterileSSH.SecureShell
 			//throws SftpException{
 			src = remoteAbsolutePath(src);
 			dst = localAbsolutePath(dst);
-			try
-			{
+			try {
 				ArrayList v = glob_remote(src);
 				int vsize = v.Count;
-				if (vsize == 0)
-				{
+				if (vsize == 0) {
 					throw new SftpException(SSH_FX_NO_SUCH_FILE, "No such file");
 				}
 
 				//JFile dstFile=new JFile(dst);
 				bool isDstDir = FileAux.IsDirectory(dst);
 				StringBuilder dstsb = null;
-				if (isDstDir)
-				{
-					if (!dst.EndsWith(file_separator))
-					{
+				if (isDstDir) {
+					if (!dst.EndsWith(file_separator)) {
 						dst += file_separator;
 					}
 					dstsb = new StringBuilder(dst);
 				}
-				else if (vsize > 1)
-				{
+				else if (vsize > 1) {
 					throw new SftpException(SSH_FX_FAILURE, "Copying multiple files, but destination is missing or a file.");
 				}
 
-				for (int j = 0; j < vsize; j++)
-				{
+				for (int j = 0; j < vsize; j++) {
 					String _src = (String)(v[j]);
 
 					SftpATTRS attr = _stat(_src);
-					if (attr.isDir())
-					{
+					if (attr.isDir()) {
 						throw new SftpException(SSH_FX_FAILURE, "not supported to get directory " + _src);
 					}
 
 					String _dst = null;
-					if (isDstDir)
-					{
+					if (isDstDir) {
 						int i = _src.LastIndexOf('/');
 						if (i == -1)
 							dstsb.Append(_src);
@@ -977,40 +883,32 @@ namespace LibSterileSSH.SecureShell
 						_dst = dstsb.ToString();
 						StringBuilderAux.delete(dstsb, dst.Length, _dst.Length);
 					}
-					else
-					{
+					else {
 						_dst = dst;
 					}
 
-					if (mode == RESUME)
-					{
+					if (mode == RESUME) {
 						long size_of_src = attr.getSize();
 						long size_of_dst = FileAux.Length(_dst);
-						if (size_of_dst > size_of_src)
-						{
+						if (size_of_dst > size_of_src) {
 							throw new SftpException(SSH_FX_FAILURE, "failed to resume for " + _dst);
 						}
-						if (size_of_dst == size_of_src)
-						{
+						if (size_of_dst == size_of_src) {
 							return;
 						}
 					}
 
-					if (monitor != null)
-					{
+					if (monitor != null) {
 						monitor.init(SftpProgressMonitorDirectionMode.GET, _src, _dst, attr.getSize());
-						if (mode == RESUME)
-						{
+						if (mode == RESUME) {
 							monitor.count(FileAux.Length(_dst));
 						}
 					}
 					FileOutputStream fos = null;
-					if (mode == OVERWRITE)
-					{
+					if (mode == OVERWRITE) {
 						fos = new FileOutputStream(_dst);
 					}
-					else
-					{
+					else {
 						fos = new FileOutputStream(_dst, true); // append
 					}
 
@@ -1019,8 +917,7 @@ namespace LibSterileSSH.SecureShell
 					fos.close();
 				}
 			}
-			catch (RuntimeException e)
-			{
+			catch (RuntimeException e) {
 				if (e is SftpException)
 					throw (SftpException)e;
 				throw new SftpException(SSH_FX_FAILURE, "");
@@ -1039,29 +936,24 @@ namespace LibSterileSSH.SecureShell
 			ISftpProgressMonitor monitor, int mode, long skip)
 		{
 			//throws SftpException{
-			try
-			{
+			try {
 				src = remoteAbsolutePath(src);
 				ArrayList v = glob_remote(src);
-				if (v.Count != 1)
-				{
+				if (v.Count != 1) {
 					throw new SftpException(SSH_FX_FAILURE, v.ToString());
 				}
 				src = (String)(v[0]);
 
-				if (monitor != null)
-				{
+				if (monitor != null) {
 					SftpATTRS attr = _stat(src);
 					monitor.init(SftpProgressMonitorDirectionMode.GET, src, "??", attr.getSize());
-					if (mode == RESUME)
-					{
+					if (mode == RESUME) {
 						monitor.count(skip);
 					}
 				}
 				_get(src, dst, monitor, mode, skip);
 			}
-			catch (RuntimeException e)
-			{
+			catch (RuntimeException e) {
 				if (e is SftpException)
 					throw (SftpException)e;
 				throw new SftpException(SSH_FX_FAILURE, "");
@@ -1073,8 +965,7 @@ namespace LibSterileSSH.SecureShell
 			ISftpProgressMonitor monitor, int mode, long skip)
 		{ //throws SftpException{
 			//System.out.println("_get: "+src+", "+dst);
-			try
-			{
+			try {
 				sendOPENR(StringAux.getBytesUTF8(src));
 
 
@@ -1087,14 +978,12 @@ namespace LibSterileSSH.SecureShell
 
 				fill(buf.buffer, 0, length);
 
-				if (type != SSH_FXP_STATUS && type != SSH_FXP_HANDLE)
-				{
+				if (type != SSH_FXP_STATUS && type != SSH_FXP_HANDLE) {
 					//System.Console.WriteLine("Type is "+type);
 					throw new SftpException(SSH_FX_FAILURE, "Type is " + type);
 				}
 
-				if (type == SSH_FXP_STATUS)
-				{
+				if (type == SSH_FXP_STATUS) {
 					int i = buf.getInt();
 					throwStatusError(buf, i);
 				}
@@ -1102,19 +991,16 @@ namespace LibSterileSSH.SecureShell
 				byte[] handle = buf.getString();         // filename
 
 				long offset = 0;
-				if (mode == RESUME)
-				{
+				if (mode == RESUME) {
 					offset += skip;
 				}
 
 				int request_len = 0;
-			//loop:
-				while (true)
-				{
+				//loop:
+				while (true) {
 
 					request_len = buf.buffer.Length - 13;
-					if (server_version == 0)
-					{
+					if (server_version == 0) {
 						request_len = 1024;
 					}
 					sendREAD(handle, offset, request_len);
@@ -1124,20 +1010,17 @@ namespace LibSterileSSH.SecureShell
 					type = _header.type;
 
 					int i;
-					if (type == SSH_FXP_STATUS)
-					{
+					if (type == SSH_FXP_STATUS) {
 						buf.rewind();
 						fill(buf.buffer, 0, length);
 						i = buf.getInt();
-						if (i == SSH_FX_EOF)
-						{
+						if (i == SSH_FX_EOF) {
 							goto BREAK;
 						}
 						throwStatusError(buf, i);
 					}
 
-					if (type != SSH_FXP_DATA)
-					{
+					if (type != SSH_FXP_DATA) {
 						goto BREAK;
 					}
 
@@ -1146,16 +1029,13 @@ namespace LibSterileSSH.SecureShell
 					length -= 4;
 					i = buf.getInt();   // length of data 
 					int foo = i;
-					while (foo > 0)
-					{
+					while (foo > 0) {
 						int bar = foo;
-						if (bar > buf.buffer.Length)
-						{
+						if (bar > buf.buffer.Length) {
 							bar = buf.buffer.Length;
 						}
 						i = io.ins.Read(buf.buffer, 0, bar);
-						if (i < 0)
-						{
+						if (i < 0) {
 							goto BREAK;
 						}
 						int data_len = i;
@@ -1164,12 +1044,9 @@ namespace LibSterileSSH.SecureShell
 						offset += data_len;
 						foo -= data_len;
 
-						if (monitor != null)
-						{
-							if (!monitor.count(data_len))
-							{
-								while (foo > 0)
-								{
+						if (monitor != null) {
+							if (!monitor.count(data_len)) {
+								while (foo > 0) {
 									i = io.ins.Read(buf.buffer,
 										0,
 										(buf.buffer.Length < foo ? buf.buffer.Length : foo));
@@ -1190,8 +1067,7 @@ namespace LibSterileSSH.SecureShell
 					monitor.end();
 				_sendCLOSE(handle, _header);
 			}
-			catch (RuntimeException e)
-			{
+			catch (RuntimeException e) {
 				//System.Console.WriteLine(e);
 				if (e is SftpException)
 					throw (SftpException)e;
@@ -1213,23 +1089,19 @@ namespace LibSterileSSH.SecureShell
 		}
 		public AInputStream get(String src, ISftpProgressMonitor monitor, int mode)
 		{ //throws SftpException{
-			if (mode == RESUME)
-			{
+			if (mode == RESUME) {
 				throw new SftpException(SSH_FX_FAILURE, "faile to resume from " + src);
 			}
 			src = remoteAbsolutePath(src);
-			try
-			{
+			try {
 				ArrayList v = glob_remote(src);
-				if (v.Count != 1)
-				{
+				if (v.Count != 1) {
 					throw new SftpException(SSH_FX_FAILURE, v.ToString());
 				}
 				src = (String)(v[0]);
 
 				SftpATTRS attr = _stat(src);
-				if (monitor != null)
-				{
+				if (monitor != null) {
 					monitor.init(SftpProgressMonitorDirectionMode.GET, src, "??", attr.getSize());
 				}
 
@@ -1242,12 +1114,10 @@ namespace LibSterileSSH.SecureShell
 				buf.rewind();
 				fill(buf.buffer, 0, length);
 
-				if (type != SSH_FXP_STATUS && type != SSH_FXP_HANDLE)
-				{
+				if (type != SSH_FXP_STATUS && type != SSH_FXP_HANDLE) {
 					throw new SftpException(SSH_FX_FAILURE, "");
 				}
-				if (type == SSH_FXP_STATUS)
-				{
+				if (type == SSH_FXP_STATUS) {
 					int i = buf.getInt();
 					throwStatusError(buf, i);
 				}
@@ -1368,8 +1238,7 @@ namespace LibSterileSSH.SecureShell
 				//};
 				return ins;
 			}
-			catch (RuntimeException e)
-			{
+			catch (RuntimeException e) {
 				if (e is SftpException)
 					throw (SftpException)e;
 				throw new SftpException(SSH_FX_FAILURE, "");
@@ -1378,16 +1247,14 @@ namespace LibSterileSSH.SecureShell
 
 		public ArrayList ls(String path)
 		{ //throws SftpException{
-			try
-			{
+			try {
 				path = remoteAbsolutePath(path);
 
 				String dir = path;
 				byte[] pattern = null;
 				SftpATTRS attr = null;
 				if (isPattern(dir) ||
-					((attr = stat(dir)) != null && !attr.isDir()))
-				{
+					((attr = stat(dir)) != null && !attr.isDir())) {
 					int foo = path.LastIndexOf('/');
 					dir = path.Substring(0, ((foo == 0) ? 1 : foo));
 					pattern = StringAux.getBytesUTF8(path.Substring(foo + 1));
@@ -1402,12 +1269,10 @@ namespace LibSterileSSH.SecureShell
 				buf.rewind();
 				fill(buf.buffer, 0, length);
 
-				if (type != SSH_FXP_STATUS && type != SSH_FXP_HANDLE)
-				{
+				if (type != SSH_FXP_STATUS && type != SSH_FXP_HANDLE) {
 					throw new SftpException(SSH_FX_FAILURE, "");
 				}
-				if (type == SSH_FXP_STATUS)
-				{
+				if (type == SSH_FXP_STATUS) {
 					int i = buf.getInt();
 					throwStatusError(buf, i);
 				}
@@ -1415,19 +1280,16 @@ namespace LibSterileSSH.SecureShell
 				byte[] handle = buf.getString();         // filename
 
 				ArrayList v = new ArrayList();
-				while (true)
-				{
+				while (true) {
 					sendREADDIR(handle);
 
 					_header = header(buf, _header);
 					length = _header.length;
 					type = _header.type;
-					if (type != SSH_FXP_STATUS && type != SSH_FXP_NAME)
-					{
+					if (type != SSH_FXP_STATUS && type != SSH_FXP_NAME) {
 						throw new SftpException(SSH_FX_FAILURE, "");
 					}
-					if (type == SSH_FXP_STATUS)
-					{
+					if (type == SSH_FXP_STATUS) {
 						buf.rewind();
 						fill(buf.buffer, 0, length);
 						int i = buf.getInt();
@@ -1445,10 +1307,8 @@ namespace LibSterileSSH.SecureShell
 					//int flags;
 
 					buf.reset();
-					while (count > 0)
-					{
-						if (length > 0)
-						{
+					while (count > 0) {
+						if (length > 0) {
 							buf.shift();
 							int j = (buf.buffer.Length > (buf.index + length)) ? length : (buf.buffer.Length - buf.index);
 							int i = fill(buf.buffer, buf.index, j);
@@ -1460,8 +1320,7 @@ namespace LibSterileSSH.SecureShell
 						String longname = StringAux.getString(str);
 
 						SftpATTRS attrs = SftpATTRS.getATTR(buf);
-						if (pattern == null || StringAux.glob(pattern, filename))
-						{
+						if (pattern == null || StringAux.glob(pattern, filename)) {
 							v.Add(new LsEntry(StringAux.getString(filename), longname, attrs));
 						}
 
@@ -1471,8 +1330,7 @@ namespace LibSterileSSH.SecureShell
 				_sendCLOSE(handle, _header);
 				return v;
 			}
-			catch (RuntimeException e)
-			{
+			catch (RuntimeException e) {
 				if (e is SftpException)
 					throw (SftpException)e;
 				throw new SftpException(SSH_FX_FAILURE, "");
@@ -1482,12 +1340,10 @@ namespace LibSterileSSH.SecureShell
 		public String readlink(String path)
 		{
 			// throws SftpException{
-			try
-			{
+			try {
 				path = remoteAbsolutePath(path);
 				ArrayList v = glob_remote(path);
-				if (v.Count != 1)
-				{
+				if (v.Count != 1) {
 					throw new SftpException(SSH_FX_FAILURE, v.ToString());
 				}
 				path = (String)(v[0]);
@@ -1501,18 +1357,15 @@ namespace LibSterileSSH.SecureShell
 				buf.rewind();
 				fill(buf.buffer, 0, length);
 
-				if (type != SSH_FXP_STATUS && type != SSH_FXP_NAME)
-				{
+				if (type != SSH_FXP_STATUS && type != SSH_FXP_NAME) {
 					throw new SftpException(SSH_FX_FAILURE, "");
 				}
 				int i;
-				if (type == SSH_FXP_NAME)
-				{
+				if (type == SSH_FXP_NAME) {
 					int count = buf.getInt();       // count
 					byte[] filename = null;
 					byte[] longname = null;
-					for (i = 0; i < count; i++)
-					{
+					for (i = 0; i < count; i++) {
 						filename = buf.getString();
 						longname = buf.getString();
 						SftpATTRS.getATTR(buf);
@@ -1523,8 +1376,7 @@ namespace LibSterileSSH.SecureShell
 				i = buf.getInt();
 				throwStatusError(buf, i);
 			}
-			catch (RuntimeException e)
-			{
+			catch (RuntimeException e) {
 				if (e is SftpException)
 					throw (SftpException)e;
 				throw new SftpException(SSH_FX_FAILURE, "");
@@ -1536,27 +1388,23 @@ namespace LibSterileSSH.SecureShell
 		public void symlink(String oldpath, String newpath)
 		{
 			//throws SftpException{
-			if (server_version < 3)
-			{
+			if (server_version < 3) {
 				throw new SftpException(SSH_FX_FAILURE,
 										"The remote sshd is too old to support symlink operation.");
 			}
 
-			try
-			{
+			try {
 				oldpath = remoteAbsolutePath(oldpath);
 				newpath = remoteAbsolutePath(newpath);
 
 				ArrayList v = glob_remote(oldpath);
 				int vsize = v.Count;
-				if (vsize != 1)
-				{
+				if (vsize != 1) {
 					throw new SftpException(SSH_FX_FAILURE, v.ToString());
 				}
 				oldpath = (String)(v[0]);
 
-				if (isPattern(newpath))
-				{
+				if (isPattern(newpath)) {
 					throw new SftpException(SSH_FX_FAILURE, v.ToString());
 				}
 
@@ -1571,8 +1419,7 @@ namespace LibSterileSSH.SecureShell
 				buf.rewind();
 				fill(buf.buffer, 0, length);
 
-				if (type != SSH_FXP_STATUS)
-				{
+				if (type != SSH_FXP_STATUS) {
 					throw new SftpException(SSH_FX_FAILURE, "");
 				}
 
@@ -1581,8 +1428,7 @@ namespace LibSterileSSH.SecureShell
 					return;
 				throwStatusError(buf, i);
 			}
-			catch (RuntimeException e)
-			{
+			catch (RuntimeException e) {
 				if (e is SftpException)
 					throw (SftpException)e;
 				throw new SftpException(SSH_FX_FAILURE, "");
@@ -1591,36 +1437,30 @@ namespace LibSterileSSH.SecureShell
 		public void rename(String oldpath, String newpath)
 		{
 			//throws SftpException{
-			if (server_version < 2)
-			{
+			if (server_version < 2) {
 				throw new SftpException(SSH_FX_FAILURE,
 										"The remote sshd is too old to support rename operation.");
 			}
-			try
-			{
+			try {
 				oldpath = remoteAbsolutePath(oldpath);
 				newpath = remoteAbsolutePath(newpath);
 
 				ArrayList v = glob_remote(oldpath);
 				int vsize = v.Count;
-				if (vsize != 1)
-				{
+				if (vsize != 1) {
 					throw new SftpException(SSH_FX_FAILURE, v.ToString());
 				}
 				oldpath = (String)(v[0]);
 
 				v = glob_remote(newpath);
 				vsize = v.Count;
-				if (vsize >= 2)
-				{
+				if (vsize >= 2) {
 					throw new SftpException(SSH_FX_FAILURE, v.ToString());
 				}
-				if (vsize == 1)
-				{
+				if (vsize == 1) {
 					newpath = (String)(v[0]);
 				}
-				else
-				{  // vsize==0
+				else {  // vsize==0
 					if (isPattern(newpath))
 						throw new SftpException(SSH_FX_FAILURE, newpath);
 					newpath = StringAux.unquote(newpath);
@@ -1635,8 +1475,7 @@ namespace LibSterileSSH.SecureShell
 				buf.rewind();
 				fill(buf.buffer, 0, length);
 
-				if (type != SSH_FXP_STATUS)
-				{
+				if (type != SSH_FXP_STATUS) {
 					throw new SftpException(SSH_FX_FAILURE, "");
 				}
 
@@ -1645,8 +1484,7 @@ namespace LibSterileSSH.SecureShell
 					return;
 				throwStatusError(buf, i);
 			}
-			catch (RuntimeException e)
-			{
+			catch (RuntimeException e) {
 				if (e is SftpException)
 					throw (SftpException)e;
 				throw new SftpException(SSH_FX_FAILURE, "");
@@ -1655,15 +1493,13 @@ namespace LibSterileSSH.SecureShell
 		public void rm(String path)
 		{
 			//throws SftpException{
-			try
-			{
+			try {
 				path = remoteAbsolutePath(path);
 				ArrayList v = glob_remote(path);
 				int vsize = v.Count;
 				Header _header = new Header();
 
-				for (int j = 0; j < vsize; j++)
-				{
+				for (int j = 0; j < vsize; j++) {
 					path = (String)(v[j]);
 					sendREMOVE(StringAux.getBytesUTF8(path));
 
@@ -1673,19 +1509,16 @@ namespace LibSterileSSH.SecureShell
 					buf.rewind();
 					fill(buf.buffer, 0, length);
 
-					if (type != SSH_FXP_STATUS)
-					{
+					if (type != SSH_FXP_STATUS) {
 						throw new SftpException(SSH_FX_FAILURE, "");
 					}
 					int i = buf.getInt();
-					if (i != SSH_FX_OK)
-					{
+					if (i != SSH_FX_OK) {
 						throwStatusError(buf, i);
 					}
 				}
 			}
-			catch (RuntimeException e)
-			{
+			catch (RuntimeException e) {
 				if (e is SftpException)
 					throw (SftpException)e;
 				throw new SftpException(SSH_FX_FAILURE, "");
@@ -1693,8 +1526,7 @@ namespace LibSterileSSH.SecureShell
 		}
 		private bool isRemoteDir(String path)
 		{
-			try
-			{
+			try {
 				sendSTAT(StringAux.getBytesUTF8(path));
 
 				Header _header = new Header();
@@ -1704,15 +1536,13 @@ namespace LibSterileSSH.SecureShell
 				buf.rewind();
 				fill(buf.buffer, 0, length);
 
-				if (type != SSH_FXP_ATTRS)
-				{
+				if (type != SSH_FXP_ATTRS) {
 					return false;
 				}
 				SftpATTRS attr = SftpATTRS.getATTR(buf);
 				return attr.isDir();
 			}
-			catch (RuntimeException)
-			{
+			catch (RuntimeException) {
 			}
 			return false;
 		}
@@ -1724,14 +1554,12 @@ namespace LibSterileSSH.SecureShell
 		*/
 		public void chgrp(int gid, String path)
 		{ //throws SftpException{
-			try
-			{
+			try {
 				path = remoteAbsolutePath(path);
 
 				ArrayList v = glob_remote(path);
 				int vsize = v.Count;
-				for (int j = 0; j < vsize; j++)
-				{
+				for (int j = 0; j < vsize; j++) {
 					path = (String)(v[j]);
 
 					SftpATTRS attr = _stat(path);
@@ -1741,8 +1569,7 @@ namespace LibSterileSSH.SecureShell
 					_setStat(path, attr);
 				}
 			}
-			catch (RuntimeException e)
-			{
+			catch (RuntimeException e) {
 				if (e is SftpException)
 					throw (SftpException)e;
 				throw new SftpException(SSH_FX_FAILURE, "");
@@ -1750,14 +1577,12 @@ namespace LibSterileSSH.SecureShell
 		}
 		public void chown(int uid, String path)
 		{ //throws SftpException{
-			try
-			{
+			try {
 				path = remoteAbsolutePath(path);
 
 				ArrayList v = glob_remote(path);
 				int vsize = v.Count;
-				for (int j = 0; j < vsize; j++)
-				{
+				for (int j = 0; j < vsize; j++) {
 					path = (String)(v[j]);
 
 					SftpATTRS attr = _stat(path);
@@ -1767,8 +1592,7 @@ namespace LibSterileSSH.SecureShell
 					_setStat(path, attr);
 				}
 			}
-			catch (RuntimeException e)
-			{
+			catch (RuntimeException e) {
 				if (e is SftpException)
 					throw (SftpException)e;
 				throw new SftpException(SSH_FX_FAILURE, "");
@@ -1776,14 +1600,12 @@ namespace LibSterileSSH.SecureShell
 		}
 		public void chmod(int permissions, String path)
 		{ //throws SftpException{
-			try
-			{
+			try {
 				path = remoteAbsolutePath(path);
 
 				ArrayList v = glob_remote(path);
 				int vsize = v.Count;
-				for (int j = 0; j < vsize; j++)
-				{
+				for (int j = 0; j < vsize; j++) {
 					path = (String)(v[j]);
 
 					SftpATTRS attr = _stat(path);
@@ -1793,8 +1615,7 @@ namespace LibSterileSSH.SecureShell
 					_setStat(path, attr);
 				}
 			}
-			catch (RuntimeException e)
-			{
+			catch (RuntimeException e) {
 				if (e is SftpException)
 					throw (SftpException)e;
 				throw new SftpException(SSH_FX_FAILURE, "");
@@ -1802,14 +1623,12 @@ namespace LibSterileSSH.SecureShell
 		}
 		public void setMtime(String path, int mtime)
 		{ //throws SftpException{
-			try
-			{
+			try {
 				path = remoteAbsolutePath(path);
 
 				ArrayList v = glob_remote(path);
 				int vsize = v.Count;
-				for (int j = 0; j < vsize; j++)
-				{
+				for (int j = 0; j < vsize; j++) {
 					path = (String)(v[j]);
 
 					SftpATTRS attr = _stat(path);
@@ -1819,8 +1638,7 @@ namespace LibSterileSSH.SecureShell
 					_setStat(path, attr);
 				}
 			}
-			catch (RuntimeException e)
-			{
+			catch (RuntimeException e) {
 				if (e is SftpException)
 					throw (SftpException)e;
 				throw new SftpException(SSH_FX_FAILURE, "");
@@ -1829,16 +1647,14 @@ namespace LibSterileSSH.SecureShell
 		public void rmdir(String path)
 		{
 			//throws SftpException{
-			try
-			{
+			try {
 				path = remoteAbsolutePath(path);
 
 				ArrayList v = glob_remote(path);
 				int vsize = v.Count;
 				Header _header = new Header();
 
-				for (int j = 0; j < vsize; j++)
-				{
+				for (int j = 0; j < vsize; j++) {
 					path = (String)(v[j]);
 					sendRMDIR(StringAux.getBytesUTF8(path));
 
@@ -1848,20 +1664,17 @@ namespace LibSterileSSH.SecureShell
 					buf.rewind();
 					fill(buf.buffer, 0, length);
 
-					if (type != SSH_FXP_STATUS)
-					{
+					if (type != SSH_FXP_STATUS) {
 						throw new SftpException(SSH_FX_FAILURE, "");
 					}
 
 					int i = buf.getInt();
-					if (i != SSH_FX_OK)
-					{
+					if (i != SSH_FX_OK) {
 						throwStatusError(buf, i);
 					}
 				}
 			}
-			catch (RuntimeException e)
-			{
+			catch (RuntimeException e) {
 				if (e is SftpException)
 					throw (SftpException)e;
 				throw new SftpException(SSH_FX_FAILURE, "");
@@ -1871,8 +1684,7 @@ namespace LibSterileSSH.SecureShell
 		public void mkdir(String path)
 		{
 			//throws SftpException{
-			try
-			{
+			try {
 				path = remoteAbsolutePath(path);
 
 				sendMKDIR(StringAux.getBytesUTF8(path), null);
@@ -1884,8 +1696,7 @@ namespace LibSterileSSH.SecureShell
 				buf.rewind();
 				fill(buf.buffer, 0, length);
 
-				if (type != SSH_FXP_STATUS)
-				{
+				if (type != SSH_FXP_STATUS) {
 					throw new SftpException(SSH_FX_FAILURE, "");
 				}
 
@@ -1894,8 +1705,7 @@ namespace LibSterileSSH.SecureShell
 					return;
 				throwStatusError(buf, i);
 			}
-			catch (RuntimeException e)
-			{
+			catch (RuntimeException e) {
 				if (e is SftpException)
 					throw (SftpException)e;
 				throw new SftpException(SSH_FX_FAILURE, "");
@@ -1905,20 +1715,17 @@ namespace LibSterileSSH.SecureShell
 		public SftpATTRS stat(String path)
 		{
 			//throws SftpException{
-			try
-			{
+			try {
 				path = remoteAbsolutePath(path);
 
 				ArrayList v = glob_remote(path);
-				if (v.Count != 1)
-				{
+				if (v.Count != 1) {
 					throw new SftpException(SSH_FX_FAILURE, v.ToString());
 				}
 				path = (String)(v[0]);
 				return _stat(path);
 			}
-			catch (RuntimeException e)
-			{
+			catch (RuntimeException e) {
 				if (e is SftpException)
 					throw (SftpException)e;
 				throw new SftpException(SSH_FX_FAILURE, "");
@@ -1928,21 +1735,18 @@ namespace LibSterileSSH.SecureShell
 		public SftpATTRS lstat(String path)
 		{
 			//throws SftpException{
-			try
-			{
+			try {
 				path = remoteAbsolutePath(path);
 
 				ArrayList v = glob_remote(path);
-				if (v.Count != 1)
-				{
+				if (v.Count != 1) {
 					throw new SftpException(SSH_FX_FAILURE, v.ToString());
 				}
 				path = (String)(v[0]);
 
 				return _lstat(path);
 			}
-			catch (RuntimeException e)
-			{
+			catch (RuntimeException e) {
 				if (e is SftpException)
 					throw (SftpException)e;
 				throw new SftpException(SSH_FX_FAILURE, "");
@@ -1952,8 +1756,7 @@ namespace LibSterileSSH.SecureShell
 		private SftpATTRS _lstat(String path)
 		{
 			//throws SftpException{
-			try
-			{
+			try {
 				sendLSTAT(StringAux.getBytesUTF8(path));
 
 				Header _header = new Header();
@@ -1963,10 +1766,8 @@ namespace LibSterileSSH.SecureShell
 				buf.rewind();
 				fill(buf.buffer, 0, length);
 
-				if (type != SSH_FXP_ATTRS)
-				{
-					if (type == SSH_FXP_STATUS)
-					{
+				if (type != SSH_FXP_ATTRS) {
+					if (type == SSH_FXP_STATUS) {
 						int i = buf.getInt();
 						throwStatusError(buf, i);
 					}
@@ -1975,8 +1776,7 @@ namespace LibSterileSSH.SecureShell
 				SftpATTRS attr = SftpATTRS.getATTR(buf);
 				return attr;
 			}
-			catch (RuntimeException e)
-			{
+			catch (RuntimeException e) {
 				if (e is SftpException)
 					throw (SftpException)e;
 				throw new SftpException(SSH_FX_FAILURE, "");
@@ -1986,20 +1786,17 @@ namespace LibSterileSSH.SecureShell
 
 		public void setStat(String path, SftpATTRS attr)
 		{ //throws SftpException{
-			try
-			{
+			try {
 				path = remoteAbsolutePath(path);
 
 				ArrayList v = glob_remote(path);
 				int vsize = v.Count;
-				for (int j = 0; j < vsize; j++)
-				{
+				for (int j = 0; j < vsize; j++) {
 					path = (String)(v[j]);
 					_setStat(path, attr);
 				}
 			}
-			catch (RuntimeException e)
-			{
+			catch (RuntimeException e) {
 				if (e is SftpException)
 					throw (SftpException)e;
 				throw new SftpException(SSH_FX_FAILURE, "");
@@ -2008,8 +1805,7 @@ namespace LibSterileSSH.SecureShell
 		private void _setStat(String path, SftpATTRS attr)
 		{
 			//throws SftpException{
-			try
-			{
+			try {
 				sendSETSTAT(StringAux.getBytesUTF8(path), attr);
 
 				Header _header = new Header();
@@ -2019,18 +1815,15 @@ namespace LibSterileSSH.SecureShell
 				buf.rewind();
 				fill(buf.buffer, 0, length);
 
-				if (type != SSH_FXP_STATUS)
-				{
+				if (type != SSH_FXP_STATUS) {
 					throw new SftpException(SSH_FX_FAILURE, "");
 				}
 				int i = buf.getInt();
-				if (i != SSH_FX_OK)
-				{
+				if (i != SSH_FX_OK) {
 					throwStatusError(buf, i);
 				}
 			}
-			catch (RuntimeException e)
-			{
+			catch (RuntimeException e) {
 				if (e is SftpException)
 					throw (SftpException)e;
 				throw new SftpException(SSH_FX_FAILURE, "");
@@ -2057,11 +1850,9 @@ namespace LibSterileSSH.SecureShell
 		private void read(byte[] buf, int s, int l)
 		{ //throws IOException, SftpException{
 			int i = 0;
-			while (l > 0)
-			{
+			while (l > 0) {
 				i = io.ins.Read(buf, s, l);
-				if (i <= 0)
-				{
+				if (i <= 0) {
 					throw new SftpException(SSH_FX_FAILURE, "");
 				}
 				s += i;
@@ -2078,13 +1869,11 @@ namespace LibSterileSSH.SecureShell
 			buf.rewind();
 			fill(buf.buffer, 0, length);
 
-			if (type != SSH_FXP_STATUS)
-			{
+			if (type != SSH_FXP_STATUS) {
 				throw new SftpException(SSH_FX_FAILURE, "");
 			}
 			int i = buf.getInt();
-			if (i != SSH_FX_OK)
-			{
+			if (i != SSH_FX_OK) {
 				throwStatusError(buf, i);
 			}
 			return true;
@@ -2221,8 +2010,7 @@ namespace LibSterileSSH.SecureShell
 			packet.reset();
 			if (buf.buffer.Length < buf.index + 13 + 21 + handle.Length + length
 				+ 32 + 20  // padding and mac
-				)
-			{
+				) {
 				_length = buf.buffer.Length - (buf.index + 13 + 21 + handle.Length
 					+ 32 + 20  // padding and mac
 					);
@@ -2232,12 +2020,10 @@ namespace LibSterileSSH.SecureShell
 			buf.putInt(seq++);                                    //  4
 			buf.putString(handle);                                  //  4+handle.length
 			buf.putLong(offset);                                    //  8
-			if (buf.buffer != data)
-			{
+			if (buf.buffer != data) {
 				buf.putString(data, start, _length);                    //  4+_length
 			}
-			else
-			{
+			else {
 				buf.putInt(_length);
 				buf.skip(_length);
 			}
@@ -2270,30 +2056,25 @@ namespace LibSterileSSH.SecureShell
 			//System.err.println("glob_remote: "+_path);
 			ArrayList v = new ArrayList();
 			byte[] path = StringAux.getBytesUTF8(_path);
-			if (!isPattern(path))
-			{
+			if (!isPattern(path)) {
 				v.Add(StringAux.unquote(_path));
 				return v;
 			}
 			int i = path.Length - 1;
-			while (i >= 0)
-			{
+			while (i >= 0) {
 				if (path[i] == '/')
 					break;
 				i--;
 			}
-			if (i < 0)
-			{
+			if (i < 0) {
 				v.Add(StringAux.unquote(_path));
 				return v;
 			}
 			byte[] dir;
-			if (i == 0)
-			{
+			if (i == 0) {
 				dir = new byte[] { (byte)'/' };
 			}
-			else
-			{
+			else {
 				dir = new byte[i];
 				System.Array.Copy(path, 0, dir, 0, i);
 			}
@@ -2311,31 +2092,26 @@ namespace LibSterileSSH.SecureShell
 			buf.rewind();
 			fill(buf.buffer, 0, length);
 
-			if (type != SSH_FXP_STATUS && type != SSH_FXP_HANDLE)
-			{
+			if (type != SSH_FXP_STATUS && type != SSH_FXP_HANDLE) {
 				throw new SftpException(SSH_FX_FAILURE, "");
 			}
-			if (type == SSH_FXP_STATUS)
-			{
+			if (type == SSH_FXP_STATUS) {
 				i = buf.getInt();
 				throwStatusError(buf, i);
 			}
 
 			byte[] handle = buf.getString();         // filename
 
-			while (true)
-			{
+			while (true) {
 				sendREADDIR(handle);
 				_header = header(buf, _header);
 				length = _header.length;
 				type = _header.type;
 
-				if (type != SSH_FXP_STATUS && type != SSH_FXP_NAME)
-				{
+				if (type != SSH_FXP_STATUS && type != SSH_FXP_NAME) {
 					throw new SftpException(SSH_FX_FAILURE, "");
 				}
-				if (type == SSH_FXP_STATUS)
-				{
+				if (type == SSH_FXP_STATUS) {
 					buf.rewind();
 					fill(buf.buffer, 0, length);
 					break;
@@ -2350,10 +2126,8 @@ namespace LibSterileSSH.SecureShell
 				//int flags;
 
 				buf.reset();
-				while (count > 0)
-				{
-					if (length > 0)
-					{
+				while (count > 0) {
+					if (length > 0) {
 						buf.shift();
 						int j = (buf.buffer.Length > (buf.index + length)) ? length : (buf.buffer.Length - buf.index);
 						i = io.ins.Read(buf.buffer, buf.index, j);
@@ -2368,8 +2142,7 @@ namespace LibSterileSSH.SecureShell
 					str = buf.getString();
 					SftpATTRS attrs = SftpATTRS.getATTR(buf);
 
-					if (StringAux.glob(pattern, filename))
-					{
+					if (StringAux.glob(pattern, filename)) {
 						v.Add(StringAux.getString(dir) + "/" + StringAux.getString(filename));
 					}
 					count--;
@@ -2386,69 +2159,57 @@ namespace LibSterileSSH.SecureShell
 			ArrayList v = new ArrayList();
 			byte[] path = StringAux.getBytesUTF8(_path);
 			int i = path.Length - 1;
-			while (i >= 0)
-			{
+			while (i >= 0) {
 				if (path[i] == '*' || path[i] == '?')
 					break;
 				i--;
 			}
-			if (i < 0)
-			{
+			if (i < 0) {
 				v.Add(_path);
 				return v;
 			}
-			while (i >= 0)
-			{
+			while (i >= 0) {
 				if (path[i] == file_separatorc)
 					break;
 				i--;
 			}
-			if (i < 0)
-			{
+			if (i < 0) {
 				v.Add(_path);
 				return v;
 			}
 			byte[] dir;
-			if (i == 0)
-			{
+			if (i == 0) {
 				dir = new byte[] { (byte)file_separatorc };
 			}
-			else
-			{
+			else {
 				dir = new byte[i];
 				System.Array.Copy(path, 0, dir, 0, i);
 			}
 			byte[] pattern = new byte[path.Length - i - 1];
 			System.Array.Copy(path, i + 1, pattern, 0, pattern.Length);
 			//System.out.println("dir: "+new String(dir)+" pattern: "+new String(pattern));
-			try
-			{
+			try {
 				String[] children = FileAux.DirList(StringAux.getString(dir));
-				for (int j = 0; j < children.Length; j++)
-				{
+				for (int j = 0; j < children.Length; j++) {
 					//System.out.println("children: "+children[j]);
-					if (StringAux.glob(pattern, StringAux.getBytesUTF8(children[j])))
-					{
+					if (StringAux.glob(pattern, StringAux.getBytesUTF8(children[j]))) {
 						v.Add(StringAux.getString(dir) + file_separator + children[j]);
 					}
 				}
 			}
-			catch (RuntimeException)
-			{
+			catch (RuntimeException) {
 			}
 			return v;
 		}
 
 		private void throwStatusError(Buffer buf, int i)
 		{ //throws SftpException{
-			if (server_version >= 3)
-			{
+			if (server_version >= 3) {
 				byte[] str = buf.getString();
 				//byte[] tag=buf.getString();
 				throw new SftpException(i, StringAux.getString(str));
 			}
-			else
-			{
+			else {
 				throw new SftpException(i, "Failure");
 			}
 		}
@@ -2483,8 +2244,7 @@ namespace LibSterileSSH.SecureShell
 		{
 			if (threadList == null)
 				return;
-			for (int t = 0; t < threadList.Count; t++)
-			{
+			for (int t = 0; t < threadList.Count; t++) {
 				ThreadAux thread = (ThreadAux)threadList[t];
 				if (thread != null)
 					if (thread.isAlive())
@@ -2499,16 +2259,12 @@ namespace LibSterileSSH.SecureShell
 		private bool isPattern(byte[] path)
 		{
 			int i = path.Length - 1;
-			while (i >= 0)
-			{
-				if (path[i] == '*' || path[i] == '?')
-				{
-					if (i > 0 && path[i - 1] == '\\')
-					{
+			while (i >= 0) {
+				if (path[i] == '*' || path[i] == '?') {
+					if (i > 0 && path[i - 1] == '\\') {
 						i--;
 					}
-					else
-					{
+					else {
 						break;
 					}
 				}
@@ -2522,11 +2278,9 @@ namespace LibSterileSSH.SecureShell
 		{
 			int i = 0;
 			int foo = s;
-			while (len > 0)
-			{
+			while (len > 0) {
 				i = io.ins.Read(buf, s, len);
-				if (i <= 0)
-				{
+				if (i <= 0) {
 					throw new System.IO.IOException("inputstream is closed");
 					//return (s-foo)==0 ? i : s-foo;
 				}
@@ -2539,8 +2293,7 @@ namespace LibSterileSSH.SecureShell
 		//tamir: some functions from SecureShell-0.1.30
 		private void skip(long foo)
 		{
-			while (foo > 0)
-			{
+			while (foo > 0) {
 				long bar = StreamAux.skip(io.ins, foo);
 				if (bar <= 0)
 					break;
@@ -2654,12 +2407,10 @@ namespace LibSterileSSH.SecureShell
 				if (closed)
 					return -1;
 				int i = read(_data, 0, 1);
-				if (i == -1)
-				{
+				if (i == -1) {
 					return -1;
 				}
-				else
-				{
+				else {
 					return _data[0] & 0xff;
 				}
 			}
@@ -2675,34 +2426,27 @@ namespace LibSterileSSH.SecureShell
 					return -1;
 				int i;
 				int foo;
-				if (d == null)
-				{
+				if (d == null) {
 					throw new System.NullReferenceException();
 				}
-				if (s < 0 || len < 0 || s + len > d.Length)
-				{
+				if (s < 0 || len < 0 || s + len > d.Length) {
 					throw new System.IndexOutOfRangeException();
 				}
-				if (len == 0)
-				{
+				if (len == 0) {
 					return 0;
 				}
 
-				if (rest_length > 0)
-				{
+				if (rest_length > 0) {
 					foo = rest_length;
 					if (foo > len)
 						foo = len;
 					System.Array.Copy(rest_byte, 0, d, s, foo);
-					if (foo != rest_length)
-					{
+					if (foo != rest_length) {
 						System.Array.Copy(rest_byte, foo,
 							rest_byte, 0, rest_length - foo);
 					}
-					if (monitor != null)
-					{
-						if (!monitor.count(foo))
-						{
+					if (monitor != null) {
+						if (!monitor.count(foo)) {
 							close();
 							return -1;
 						}
@@ -2712,21 +2456,17 @@ namespace LibSterileSSH.SecureShell
 					return foo;
 				}
 
-				if (sftp.buf.buffer.Length - 13 < len)
-				{
+				if (sftp.buf.buffer.Length - 13 < len) {
 					len = sftp.buf.buffer.Length - 13;
 				}
-				if (sftp.server_version == 0 && len > 1024)
-				{
+				if (sftp.server_version == 0 && len > 1024) {
 					len = 1024;
 				}
 
-				try
-				{
+				try {
 					sftp.sendREAD(handle, offset, len);
 				}
-				catch (RuntimeException)
-				{
+				catch (RuntimeException) {
 					throw new System.IO.IOException("error");
 				}
 
@@ -2735,18 +2475,15 @@ namespace LibSterileSSH.SecureShell
 				int type = header.type;
 				int id = header.rid;
 
-				if (type != SSH_FXP_STATUS && type != SSH_FXP_DATA)
-				{
+				if (type != SSH_FXP_STATUS && type != SSH_FXP_DATA) {
 					throw new System.IO.IOException("error");
 				}
-				if (type == SSH_FXP_STATUS)
-				{
+				if (type == SSH_FXP_STATUS) {
 					sftp.buf.rewind();
 					sftp.fill(sftp.buf.buffer, 0, rest_length);
 					i = sftp.buf.getInt();
 					rest_length = 0;
-					if (i == SSH_FX_EOF)
-					{
+					if (i == SSH_FX_EOF) {
 						close();
 						return -1;
 					}
@@ -2760,31 +2497,25 @@ namespace LibSterileSSH.SecureShell
 
 				offset += rest_length;
 				foo = i;
-				if (foo > 0)
-				{
+				if (foo > 0) {
 					int bar = rest_length;
-					if (bar > len)
-					{
+					if (bar > len) {
 						bar = len;
 					}
 					i = sftp.io.ins.Read(d, s, bar);
-					if (i < 0)
-					{
+					if (i < 0) {
 						return -1;
 					}
 					rest_length -= i;
 
-					if (rest_length > 0)
-					{
-						if (rest_byte.Length < rest_length)
-						{
+					if (rest_length > 0) {
+						if (rest_byte.Length < rest_length) {
 							rest_byte = new byte[rest_length];
 						}
 						int _s = 0;
 						int _len = rest_length;
 						int j;
-						while (_len > 0)
-						{
+						while (_len > 0) {
 							j = sftp.io.ins.Read(rest_byte, _s, _len);
 							if (j <= 0)
 								break;
@@ -2793,10 +2524,8 @@ namespace LibSterileSSH.SecureShell
 						}
 					}
 
-					if (monitor != null)
-					{
-						if (!monitor.count(i))
-						{
+					if (monitor != null) {
+						if (!monitor.count(i)) {
 							close();
 							return -1;
 						}
@@ -2822,12 +2551,10 @@ namespace LibSterileSSH.SecureShell
 						*/
 				if (monitor != null)
 					monitor.end();
-				try
-				{
+				try {
 					sftp._sendCLOSE(handle, header);
 				}
-				catch (RuntimeException)
-				{
+				catch (RuntimeException) {
 					throw new System.IO.IOException("error");
 				}
 			}

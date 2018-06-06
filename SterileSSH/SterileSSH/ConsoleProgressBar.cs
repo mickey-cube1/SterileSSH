@@ -20,7 +20,7 @@ namespace SterileSSH
 		COORD barCoord;
 
 		[StructLayout(LayoutKind.Sequential)]
-			public struct COORD
+		public struct COORD
 		{
 			public short X;
 			public short Y;
@@ -32,7 +32,7 @@ namespace SterileSSH
 		}
 
 		[StructLayout(LayoutKind.Sequential)]
-			struct SMALL_RECT
+		struct SMALL_RECT
 		{
 			public short Left;
 			public short Top;
@@ -41,7 +41,7 @@ namespace SterileSSH
 		}
 
 		[StructLayout(LayoutKind.Sequential)]
-			struct CONSOLE_SCREEN_BUFFER_INFO
+		struct CONSOLE_SCREEN_BUFFER_INFO
 		{
 			public COORD dwSize;
 			public COORD dwCursorPosition;
@@ -50,13 +50,13 @@ namespace SterileSSH
 			public COORD dwMaximumWindowSize;
 		}
 
-		[DllImport("kernel32.dll", EntryPoint="GetStdHandle", SetLastError=true, CharSet=CharSet.Auto, CallingConvention=CallingConvention.StdCall)]
+		[DllImport("kernel32.dll", EntryPoint = "GetStdHandle", SetLastError = true, CharSet = CharSet.Auto, CallingConvention = CallingConvention.StdCall)]
 		private static extern int GetStdHandle(int nStdHandle);
 
-		[DllImport("kernel32.dll", EntryPoint="GetConsoleScreenBufferInfo", SetLastError=true, CharSet=CharSet.Auto, CallingConvention=CallingConvention.StdCall)]
+		[DllImport("kernel32.dll", EntryPoint = "GetConsoleScreenBufferInfo", SetLastError = true, CharSet = CharSet.Auto, CallingConvention = CallingConvention.StdCall)]
 		private static extern int GetConsoleScreenBufferInfo(int hConsoleOutput, out CONSOLE_SCREEN_BUFFER_INFO lpConsoleScreenBufferInfo);
 
-		[DllImport("kernel32.dll", EntryPoint="SetConsoleCursorPosition", SetLastError=true, CharSet=CharSet.Auto, CallingConvention=CallingConvention.StdCall)]
+		[DllImport("kernel32.dll", EntryPoint = "SetConsoleCursorPosition", SetLastError = true, CharSet = CharSet.Auto, CallingConvention = CallingConvention.StdCall)]
 		private static extern int SetConsoleCursorPosition(int hConsoleOutput, COORD dwCursorPosition);
 
 		/// <summary>Cosntructor</summary>
@@ -66,7 +66,7 @@ namespace SterileSSH
 			// TODO: Add constructor logic here.
 			//
 			mHConsoleHandle = GetStdHandle(STD_OUTPUT_HANDLE);
-			
+
 			barCoord = this.GetCursorPos();
 			Console.WriteLine();
 			Console.WriteLine();
@@ -84,7 +84,7 @@ namespace SterileSSH
 			GetConsoleScreenBufferInfo(mHConsoleHandle, out res);
 			return res.dwCursorPosition;
 		}
-		
+
 		StringBuilder progressBar = new StringBuilder();
 		/// <summary>
 		/// Updates this ProgressBar with the task's progress
@@ -96,37 +96,36 @@ namespace SterileSSH
 		{
 			COORD cur = this.GetCursorPos();
 			this.SetCursorPos(barCoord.X, barCoord.Y);
-			
+
 			int progress;
-			if(totalBytes!=0)
-				progress = (int)(transferredBytes*100.0/totalBytes);
+			if (totalBytes != 0)
+				progress = (int)(transferredBytes * 100.0 / totalBytes);
 			else
 				progress = 0;
 
-			progressBar.Length=0;
-			progressBar.Append( progress );
-			progressBar.Append( "% [" );
+			progressBar.Length = 0;
+			progressBar.Append(progress);
+			progressBar.Append("% [");
 
-			for(double i=0; i<50; i++)
-			{
-				if (i*2<progress) progressBar.Append( "#" );
-				else progressBar.Append( "-" );
+			for (double i = 0; i < 50; i++) {
+				if (i * 2 < progress)
+					progressBar.Append("#");
+				else
+					progressBar.Append("-");
 			}
 
-			progressBar.Append( "] ");
-			
-			if(totalBytes!=0)
-			{
-				int transferredKB = (int)(transferredBytes/1000.0);
-				int totalKB = (int)(totalBytes/1000.0);
-				progressBar.Append( (comma(transferredKB)+"K/"+comma(totalKB)+"K\n") );
+			progressBar.Append("] ");
+
+			if (totalBytes != 0) {
+				int transferredKB = (int)(transferredBytes / 1000.0);
+				int totalKB = (int)(totalBytes / 1000.0);
+				progressBar.Append((comma(transferredKB) + "K/" + comma(totalKB) + "K\n"));
 			}
-			else
-			{
-				progressBar.Append( "0.0K\n" );
+			else {
+				progressBar.Append("0.0K\n");
 			}
-			progressBar.Append( message );
-			progressBar.Append( "                        \n");
+			progressBar.Append(message);
+			progressBar.Append("                        \n");
 
 			Console.Write(progressBar);
 			this.SetCursorPos(cur.X, cur.Y);
@@ -138,8 +137,7 @@ namespace SterileSSH
 		private string comma(int n)
 		{
 			string s = n.ToString();
-			for(int i=s.Length-3; i>0; i=i-3)
-			{
+			for (int i = s.Length - 3; i > 0; i = i - 3) {
 				s = s.Insert(i, ",");
 			}
 			return s;

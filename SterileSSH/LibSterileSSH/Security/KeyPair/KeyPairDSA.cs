@@ -55,8 +55,7 @@ namespace LibSterileSSH.Security
 		internal override void generate(int key_size)
 		{
 			this.key_size = key_size;
-			try
-			{
+			try {
 				Type t = Type.GetType(jsch.getConfig("keypairgen.dsa"));
 				IKeyPairGenDSA keypairgen = (IKeyPairGenDSA)(Activator.CreateInstance(t));
 				keypairgen.init(key_size);
@@ -68,8 +67,7 @@ namespace LibSterileSSH.Security
 
 				keypairgen = null;
 			}
-			catch (Exception e)
-			{
+			catch (Exception e) {
 				Console.Error.WriteLine("KeyPairDSA: " + e);
 				throw new SshClientException(e.ToString());
 			}
@@ -114,13 +112,10 @@ namespace LibSterileSSH.Security
 
 		internal override bool parse(byte[] plain)
 		{
-			try
-			{
+			try {
 
-				if (vendor == VENDOR_FSECURE)
-				{
-					if (plain[0] != 0x30)
-					{              // FSecure
+				if (vendor == VENDOR_FSECURE) {
+					if (plain[0] != 0x30) {              // FSecure
 						LibSterileSSH.SecureShell.Buffer buf = new LibSterileSSH.SecureShell.Buffer(plain);
 						buf.getInt();
 						P_array = buf.getMPIntBits();
@@ -140,12 +135,10 @@ namespace LibSterileSSH.Security
 					return false;
 				index++; // SEQUENCE
 				Length = plain[index++] & 0xff;
-				if ((Length & 0x80) != 0)
-				{
+				if ((Length & 0x80) != 0) {
 					int foo = Length & 0x7f;
 					Length = 0;
-					while (foo-- > 0)
-					{
+					while (foo-- > 0) {
 						Length = (Length << 8) + (plain[index++] & 0xff);
 					}
 				}
@@ -154,12 +147,10 @@ namespace LibSterileSSH.Security
 					return false;
 				index++; // INTEGER
 				Length = plain[index++] & 0xff;
-				if ((Length & 0x80) != 0)
-				{
+				if ((Length & 0x80) != 0) {
 					int foo = Length & 0x7f;
 					Length = 0;
-					while (foo-- > 0)
-					{
+					while (foo-- > 0) {
 						Length = (Length << 8) + (plain[index++] & 0xff);
 					}
 				}
@@ -167,12 +158,10 @@ namespace LibSterileSSH.Security
 
 				index++;
 				Length = plain[index++] & 0xff;
-				if ((Length & 0x80) != 0)
-				{
+				if ((Length & 0x80) != 0) {
 					int foo = Length & 0x7f;
 					Length = 0;
-					while (foo-- > 0)
-					{
+					while (foo-- > 0) {
 						Length = (Length << 8) + (plain[index++] & 0xff);
 					}
 				}
@@ -182,12 +171,10 @@ namespace LibSterileSSH.Security
 
 				index++;
 				Length = plain[index++] & 0xff;
-				if ((Length & 0x80) != 0)
-				{
+				if ((Length & 0x80) != 0) {
 					int foo = Length & 0x7f;
 					Length = 0;
-					while (foo-- > 0)
-					{
+					while (foo-- > 0) {
 						Length = (Length << 8) + (plain[index++] & 0xff);
 					}
 				}
@@ -197,12 +184,10 @@ namespace LibSterileSSH.Security
 
 				index++;
 				Length = plain[index++] & 0xff;
-				if ((Length & 0x80) != 0)
-				{
+				if ((Length & 0x80) != 0) {
 					int foo = Length & 0x7f;
 					Length = 0;
-					while (foo-- > 0)
-					{
+					while (foo-- > 0) {
 						Length = (Length << 8) + (plain[index++] & 0xff);
 					}
 				}
@@ -212,12 +197,10 @@ namespace LibSterileSSH.Security
 
 				index++;
 				Length = plain[index++] & 0xff;
-				if ((Length & 0x80) != 0)
-				{
+				if ((Length & 0x80) != 0) {
 					int foo = Length & 0x7f;
 					Length = 0;
-					while (foo-- > 0)
-					{
+					while (foo-- > 0) {
 						Length = (Length << 8) + (plain[index++] & 0xff);
 					}
 				}
@@ -227,12 +210,10 @@ namespace LibSterileSSH.Security
 
 				index++;
 				Length = plain[index++] & 0xff;
-				if ((Length & 0x80) != 0)
-				{
+				if ((Length & 0x80) != 0) {
 					int foo = Length & 0x7f;
 					Length = 0;
-					while (foo-- > 0)
-					{
+					while (foo-- > 0) {
 						Length = (Length << 8) + (plain[index++] & 0xff);
 					}
 				}

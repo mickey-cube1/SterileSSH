@@ -21,13 +21,11 @@ namespace SterileSSH
 
 			Console.Write("Use publickey authentication? [Yes|No] :");
 			string resp = Console.ReadLine();
-			if(resp.ToLower().StartsWith("y"))
-			{
+			if (resp.ToLower().StartsWith("y")) {
 				Console.Write("Enter identity key filename: ");
 				info.IdentityFile = Console.ReadLine();
 			}
-			else
-			{
+			else {
 				Console.Write("Enter Password: ");
 				info.Pass = Console.ReadLine();
 			}

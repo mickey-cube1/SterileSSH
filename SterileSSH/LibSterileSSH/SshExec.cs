@@ -84,8 +84,7 @@ namespace LibSterileSSH
 			byte[] buff = new byte[1024];
 			StringBuilder res = new StringBuilder();
 			int c = 0;
-			while (true)
-			{
+			while (true) {
 				c = s.Read(buff, 0, buff.Length);
 				if (c == -1)
 					break;
@@ -109,8 +108,7 @@ namespace LibSterileSSH
 			StringBuilder sbStdErr = new StringBuilder();
 			int o = 0;
 			int e = 0;
-			while (true)
-			{
+			while (true) {
 				if (o != -1)
 					o = stdout.Read(buff, 0, buff.Length);
 				if (o != -1)

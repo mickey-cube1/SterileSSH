@@ -42,15 +42,12 @@ namespace LibSterileSSH.SecureShell
 		{
 			TcpSocket socket = null;
 			String message = "";
-			if (timeout == 0)
-			{
-				try
-				{
+			if (timeout == 0) {
+				try {
 					socket = new TcpSocket(host, port);
 					return socket;
 				}
-				catch (Exception e)
-				{
+				catch (Exception e) {
 					message = e.ToString();
 					throw new SshClientException(message);
 				}
@@ -65,23 +62,18 @@ namespace LibSterileSSH.SecureShell
 			Thread tmp = new Thread(new ThreadStart(runnable.run));
 			tmp.Name = "Opening Socket " + host;
 			tmp.Start();
-			try
-			{
+			try {
 				tmp.Join(timeout);
 				message = "timeout: ";
 			}
-			catch (ThreadInterruptedException)
-			{
+			catch (ThreadInterruptedException) {
 			}
-			if (sockp[0] != null && sockp[0].isConnected())
-			{
+			if (sockp[0] != null && sockp[0].isConnected()) {
 				socket = sockp[0];
 			}
-			else
-			{
+			else {
 				message += "socket is not established";
-				if (ee[0] != null)
-				{
+				if (ee[0] != null) {
 					message = ee[0].ToString();
 				}
 				tmp.Interrupt();
@@ -109,21 +101,16 @@ namespace LibSterileSSH.SecureShell
 			public void run()
 			{
 				sockp[0] = null;
-				try
-				{
+				try {
 					sockp[0] = new TcpSocket(_host, _port);
 				}
-				catch (Exception e)
-				{
+				catch (Exception e) {
 					ee[0] = e;
-					if (sockp[0] != null && sockp[0].isConnected())
-					{
-						try
-						{
+					if (sockp[0] != null && sockp[0].isConnected()) {
+						try {
 							sockp[0].close();
 						}
-						catch (Exception)
-						{
+						catch (Exception) {
 						}
 					}
 					sockp[0] = null;

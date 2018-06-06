@@ -73,12 +73,10 @@ namespace LibSterileSSH
 		protected override void OnChannelReceived()
 		{
 			base.OnChannelReceived();
-			if (m_redirectToConsole)
-			{
+			if (m_redirectToConsole) {
 				SetStream(Console.OpenStandardInput(), Console.OpenStandardOutput());
 			}
-			else
-			{
+			else {
 				m_sshIO = GetStream();
 			}
 		}
@@ -165,8 +163,7 @@ namespace LibSterileSSH
 		{
 			get
 			{
-				if (m_channel != null)
-				{
+				if (m_channel != null) {
 					return !m_channel.isClosed();
 				}
 				return false;
@@ -177,8 +174,7 @@ namespace LibSterileSSH
 		{
 			get
 			{
-				if (m_channel != null)
-				{
+				if (m_channel != null) {
 					return m_channel.isConnected();
 				}
 				return false;
@@ -244,8 +240,7 @@ namespace LibSterileSSH
 			byte[] buff = new byte[1024];
 			Match match;
 
-			do
-			{
+			do {
 				readCount = IO.Read(buff, 0, buff.Length);
 				if (readCount == -1)
 					break;

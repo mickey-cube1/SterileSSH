@@ -64,7 +64,7 @@ namespace LibSterileSSH.SecureShell
 
 		private byte[] I_C; // the payload of the client's SSH_MSG_KEXINIT
 		private byte[] I_S; // the payload of the server's SSH_MSG_KEXINIT
-//		private byte[] K_S; // the host key
+		//		private byte[] K_S; // the host key
 
 		private byte[] session_id;
 
@@ -137,54 +137,43 @@ namespace LibSterileSSH.SecureShell
 
 		public void connect(int connectTimeout)
 		{
-			if (_isConnected)
-			{
+			if (_isConnected) {
 				throw new SshClientException("session is already connected");
 			}
 			io = new IO();
-			if (random == null)
-			{
-				try
-				{
+			if (random == null) {
+				try {
 					System.Type c = System.Type.GetType(getConfig("random"));
 					random = (IRandom)(System.Activator.CreateInstance(c));
 				}
-				catch (Exception e)
-				{
+				catch (Exception e) {
 					System.Console.Error.WriteLine("connect: random " + e);
 				}
 			}
 			Packet.setRandom(random);
 
-			try
-			{
+			try {
 				int i, j;
 				//int pad=0;
 
-				if (proxy == null)
-				{
+				if (proxy == null) {
 					proxy = jsch.getProxy(host);
-					if (proxy != null)
-					{
-						lock (proxy)
-						{
+					if (proxy != null) {
+						lock (proxy) {
 							proxy.close();
 						}
 					}
 				}
 
-				if (proxy == null)
-				{
+				if (proxy == null) {
 					Stream In;
 					Stream Out;
-					if (socket_factory == null)
-					{
+					if (socket_factory == null) {
 						socket = TcpSocketCreator.CreateSocket(host, port, connectTimeout);
 						In = socket.getInputStream();
 						Out = socket.getOutputStream();
 					}
-					else
-					{
+					else {
 						socket = socket_factory.createSocket(host, port);
 						In = socket_factory.getInputStream(socket);
 						Out = socket_factory.getOutputStream(socket);
@@ -194,10 +183,8 @@ namespace LibSterileSSH.SecureShell
 					io.setInputStream(In);
 					io.setOutputStream(Out);
 				}
-				else
-				{
-					lock (proxy)
-					{
+				else {
+					lock (proxy) {
 						proxy.connect(socket_factory, host, port, connectTimeout);
 						io.setInputStream(proxy.getInputStream());
 						io.setOutputStream(proxy.getOutputStream());
@@ -205,20 +192,17 @@ namespace LibSterileSSH.SecureShell
 					}
 				}
 
-				if (connectTimeout > 0 && socket != null)
-				{
+				if (connectTimeout > 0 && socket != null) {
 					socket.setSoTimeout(connectTimeout);
 				}
 
 				_isConnected = true;
 
-				while (true)
-				{
+				while (true) {
 
 					i = 0;
 					j = 0;
-					while (i < buf.buffer.Length)
-					{
+					while (i < buf.buffer.Length) {
 						j = io.getByte();
 						if (j < 0)
 							break;
@@ -227,24 +211,20 @@ namespace LibSterileSSH.SecureShell
 						if (j == 10)
 							break;
 					}
-					if (j < 0)
-					{
+					if (j < 0) {
 						throw new SshClientException("connection is closed by foreign host");
 					}
 
-					if (buf.buffer[i - 1] == 10)
-					{    // 0x0a
+					if (buf.buffer[i - 1] == 10) {    // 0x0a
 						i--;
-						if (buf.buffer[i - 1] == 13)
-						{  // 0x0d
+						if (buf.buffer[i - 1] == 13) {  // 0x0d
 							i--;
 						}
 					}
 
 					if (i > 4 && (i != buf.buffer.Length) &&
 						(buf.buffer[0] != 'S' || buf.buffer[1] != 'S' ||
-						buf.buffer[2] != 'H' || buf.buffer[3] != '-'))
-					{
+						buf.buffer[2] != 'H' || buf.buffer[3] != '-')) {
 						//System.err.println(new String(buf.buffer, 0, i);
 						continue;
 					}
@@ -252,8 +232,7 @@ namespace LibSterileSSH.SecureShell
 					if (i == buf.buffer.Length ||
 						i < 7 ||                                      // SSH-1.99 or SSH-2.0
 						(buf.buffer[4] == '1' && buf.buffer[6] != '9')  // SSH-1.5
-						)
-					{
+						) {
 						throw new SshClientException("invalid server's version String");
 					}
 					break;
@@ -274,42 +253,34 @@ namespace LibSterileSSH.SecureShell
 
 				buf = read(buf);
 				//System.Console.WriteLine("read: 20 ? "+buf.buffer[5]);
-				if (buf.buffer[5] != SSH_MSG_KEXINIT)
-				{
+				if (buf.buffer[5] != SSH_MSG_KEXINIT) {
 					throw new SshClientException("invalid protocol: " + buf.buffer[5]);
 				}
 				KeyExchange kex = receive_kexinit(buf);
 
-				while (true)
-				{
+				while (true) {
 					buf = read(buf);
-					if (kex.getState() == buf.buffer[5])
-					{
+					if (kex.getState() == buf.buffer[5]) {
 						bool result = kex.next(buf);
-						if (!result)
-						{
+						if (!result) {
 							//System.Console.WriteLine("verify: "+result);
 							in_kex = false;
 							throw new SshClientException("verify: " + result);
 						}
 					}
-					else
-					{
+					else {
 						in_kex = false;
 						throw new SshClientException("invalid protocol(kex): " + buf.buffer[5]);
 					}
-					if (kex.getState() == KeyExchange.STATE_END)
-					{
+					if (kex.getState() == KeyExchange.STATE_END) {
 						break;
 					}
 				}
 
-				try
-				{
+				try {
 					checkHost(host, kex);
 				}
-				catch (SshClientException ee)
-				{
+				catch (SshClientException ee) {
 					in_kex = false;
 					throw ee;
 				}
@@ -319,12 +290,10 @@ namespace LibSterileSSH.SecureShell
 				// receive SSH_MSG_NEWKEYS(21)
 				buf = read(buf);
 				//System.Console.WriteLine("read: 21 ? "+buf.buffer[5]);
-				if (buf.buffer[5] == SSH_MSG_NEWKEYS)
-				{
+				if (buf.buffer[5] == SSH_MSG_NEWKEYS) {
 					receive_newkeys(buf, kex);
 				}
-				else
-				{
+				else {
 					in_kex = false;
 					throw new SshClientException("invalid protocol(newkyes): " + buf.buffer[5]);
 				}
@@ -336,81 +305,64 @@ namespace LibSterileSSH.SecureShell
 				auth = usn.start(this);
 
 				String methods = null;
-				if (!auth)
-				{
+				if (!auth) {
 					methods = usn.getMethods();
-					if (methods != null)
-					{
+					if (methods != null) {
 						methods = methods.ToLower();
 					}
-					else
-					{
+					else {
 						// methods: publickey,password,keyboard-interactive
 						methods = "publickey,password,keyboard-interactive";
 					}
 				}
 
-			//loop:
-				while (true)
-				{
+				//loop:
+				while (true) {
 
 					//System.Console.WriteLine("methods: "+methods);
 
 					while (!auth &&
-						methods != null && methods.Length > 0)
-					{
+						methods != null && methods.Length > 0) {
 
 						//System.Console.WriteLine("  methods: "+methods);
 
 						UserAuth us = null;
-						if (methods.StartsWith("publickey"))
-						{
+						if (methods.StartsWith("publickey")) {
 							//System.Console.WriteLine("   SecureShell.identities.size()="+SecureShell.identities.size());
-							lock (jsch.identities)
-							{
-								if (jsch.identities.Count > 0)
-								{
+							lock (jsch.identities) {
+								if (jsch.identities.Count > 0) {
 									us = new UserAuthPublicKey(userinfo);
 								}
 							}
 						}
-						else if (methods.StartsWith("keyboard-interactive"))
-						{
-							if (userinfo is IUIKeyboardInteractive)
-							{
+						else if (methods.StartsWith("keyboard-interactive")) {
+							if (userinfo is IUIKeyboardInteractive) {
 								us = new UserAuthKeyboardInteractive(userinfo);
 							}
 						}
-						else if (methods.StartsWith("password"))
-						{
+						else if (methods.StartsWith("password")) {
 							us = new UserAuthPassword(userinfo);
 						}
-						if (us != null)
-						{
-							try
-							{
+						if (us != null) {
+							try {
 								auth = us.start(this);
 								auth_cancel = false;
 							}
-							catch (SshClientAuthCancelException)
-							{
+							catch (SshClientAuthCancelException) {
 								//System.Console.WriteLine(ee);
 								auth_cancel = true;
 							}
-							catch (SshClientPartialAuthException ee)
-							{
+							catch (SshClientPartialAuthException ee) {
 								methods = ee.getMethods();
 								//System.Console.WriteLine("PartialAuth: "+methods);
 								auth_cancel = false;
 								continue;//loop;
 							}
-							catch (Exception ee)
-							{
+							catch (Exception ee) {
 								System.Console.WriteLine("ee: " + ee); // SSH_MSG_DISCONNECT: 2 Too many authentication failures
 							}
 						}
-						if (!auth)
-						{
+						if (!auth) {
 							int comma = methods.IndexOf(",");
 							if (comma == -1)
 								break;
@@ -420,13 +372,11 @@ namespace LibSterileSSH.SecureShell
 					break;
 				}
 
-				if (connectTimeout > 0 || timeout > 0)
-				{
+				if (connectTimeout > 0 || timeout > 0) {
 					socket.setSoTimeout(timeout);
 				}
 
-				if (auth)
-				{
+				if (auth) {
 					isAuthed = true;
 					connectThread = new ThreadAux(this);
 					connectThread.setName("Connect thread " + host + " session");
@@ -437,13 +387,10 @@ namespace LibSterileSSH.SecureShell
 					throw new SshClientException("Auth cancel");
 				throw new SshClientException("Auth fail");
 			}
-			catch (Exception e)
-			{
+			catch (Exception e) {
 				in_kex = false;
-				if (_isConnected)
-				{
-					try
-					{
+				if (_isConnected) {
+					try {
 						packet.reset();
 						buf.putByte((byte)SSH_MSG_DISCONNECT);
 						buf.putInt(3);
@@ -452,8 +399,7 @@ namespace LibSterileSSH.SecureShell
 						write(packet);
 						disconnect();
 					}
-					catch (Exception)
-					{
+					catch (Exception) {
 					}
 				}
 				_isConnected = false;
@@ -467,13 +413,11 @@ namespace LibSterileSSH.SecureShell
 		private KeyExchange receive_kexinit(Buffer buf)
 		{
 			int j = buf.getInt();
-			if (j != buf.getLength())
-			{    // packet was compressed and
+			if (j != buf.getLength()) {    // packet was compressed and
 				buf.getByte();           // j is the size of deflated packet.
 				I_S = new byte[buf.index - 5];
 			}
-			else
-			{
+			else {
 				I_S = new byte[j - 1 - buf.getByte()];
 			}
 			System.Array.Copy(buf.buffer, buf.s, I_S, 0, I_S.Length);
@@ -504,26 +448,22 @@ namespace LibSterileSSH.SecureShell
 
 			send_kexinit();
 			String[] guess = KeyExchange.guess(I_S, I_C);
-			if (guess == null)
-			{
+			if (guess == null) {
 				throw new SshClientException("Algorithm negotiation fail");
 			}
 
 			if (!isAuthed &&
 				(guess[KeyExchange.PROPOSAL_ENC_ALGS_CTOS].Equals("none") ||
-				(guess[KeyExchange.PROPOSAL_ENC_ALGS_STOC].Equals("none"))))
-			{
+				(guess[KeyExchange.PROPOSAL_ENC_ALGS_STOC].Equals("none")))) {
 				throw new SshClientException("NONE Cipher should not be chosen before authentification is successed.");
 			}
 
 			KeyExchange kex = null;
-			try
-			{
+			try {
 				System.Type c = System.Type.GetType(getConfig(guess[KeyExchange.PROPOSAL_KEX_ALGS]));
 				kex = (KeyExchange)(System.Activator.CreateInstance(c));
 			}
-			catch (Exception e)
-			{
+			catch (Exception e) {
 				System.Console.Error.WriteLine("kex: " + e);
 			}
 			kex._guess = guess;
@@ -556,8 +496,7 @@ namespace LibSterileSSH.SecureShell
 			// String    languages_server_to_client
 			packet.reset();
 			buf.putByte((byte)SSH_MSG_KEXINIT);
-			lock (random)
-			{
+			lock (random) {
 				random.fill(buf.buffer, buf.index, 16);
 				buf.skip(16);
 			}
@@ -603,23 +542,19 @@ namespace LibSterileSSH.SecureShell
 
 			IHostKeyRepository hkr = jsch.getHostKeyRepository();
 			int i = 0;
-			lock (hkr)
-			{
+			lock (hkr) {
 				i = hkr.check(host, K_S);
 			}
 
 			bool insert = false;
 
 			if ((shkc.Equals("ask") || shkc.Equals("yes")) &&
-				i == HostKeyRepositoryCheckResult.CHANGED)
-			{
+				i == HostKeyRepositoryCheckResult.CHANGED) {
 				String file = null;
-				lock (hkr)
-				{
+				lock (hkr) {
 					file = hkr.getKnownHostsRepositoryID();
 				}
-				if (file == null)
-				{
+				if (file == null) {
 					file = "known_hosts";
 				}
 				String message =
@@ -634,21 +569,17 @@ namespace LibSterileSSH.SecureShell
 
 				bool b = false;
 
-				if (userinfo != null)
-				{
+				if (userinfo != null) {
 					//userinfo.showMessage(message);
 					b = userinfo.promptYesNo(message +
 						"\nDo you want to delete the old key and insert the new key?");
 				}
 				//throw new JSchException("HostKey has been changed: "+host);
-				if (!b)
-				{
+				if (!b) {
 					throw new SshClientException("HostKey has been changed: " + host);
 				}
-				else
-				{
-					lock (hkr)
-					{
+				else {
+					lock (hkr) {
 						hkr.remove(host,
 								  (key_type.Equals("DSA") ? "ssh-dss" : "ssh-rsa"),
 								   null);
@@ -660,28 +591,23 @@ namespace LibSterileSSH.SecureShell
 			//    bool insert=false;
 
 			if ((shkc.Equals("ask") || shkc.Equals("yes")) &&
-				(i != HostKeyRepositoryCheckResult.OK) && !insert)
-			{
-				if (shkc.Equals("yes"))
-				{
+				(i != HostKeyRepositoryCheckResult.OK) && !insert) {
+				if (shkc.Equals("yes")) {
 					throw new SshClientException("reject HostKey: " + host);
 				}
 				//System.Console.WriteLine("finger-print: "+key_fprint);
-				if (userinfo != null)
-				{
+				if (userinfo != null) {
 					bool foo = userinfo.promptYesNo(
 						"The authenticity of host '" + host + "' can't be established.\n" +
 						key_type + " key fingerprint is " + key_fprint + ".\n" +
 						"Are you sure you want to continue connecting?"
 						);
-					if (!foo)
-					{
+					if (!foo) {
 						throw new SshClientException("reject HostKey: " + host);
 					}
 					insert = true;
 				}
-				else
-				{
+				else {
 					if (i == HostKeyRepositoryCheckResult.NOT_INCLUDED)
 						throw new SshClientException("UnknownHostKey: " + host + ". " + key_type + " key fingerprint is " + key_fprint);
 					else
@@ -690,15 +616,12 @@ namespace LibSterileSSH.SecureShell
 			}
 
 			if (shkc.Equals("no") &&
-				HostKeyRepositoryCheckResult.NOT_INCLUDED == i)
-			{
+				HostKeyRepositoryCheckResult.NOT_INCLUDED == i) {
 				insert = true;
 			}
 
-			if (insert)
-			{
-				lock (hkr)
-				{
+			if (insert) {
+				lock (hkr) {
 					hkr.add(host, K_S, userinfo);
 				}
 			}
@@ -709,19 +632,16 @@ namespace LibSterileSSH.SecureShell
 
 		public AChannel openChannel(String type)
 		{
-			if (!_isConnected)
-			{
+			if (!_isConnected) {
 				throw new SshClientException("session is down");
 			}
-			try
-			{
+			try {
 				AChannel channel = AChannel.getChannel(type);
 				addChannel(channel);
 				channel.init();
 				return channel;
 			}
-			catch (Exception e)
-			{
+			catch (Exception e) {
 				System.Console.WriteLine(e);
 			}
 			return null;
@@ -735,38 +655,31 @@ namespace LibSterileSSH.SecureShell
 			//if(packet.buffer.buffer[5]==96){
 			//Thread.dumpStack();
 			//}
-			if (deflater != null)
-			{
+			if (deflater != null) {
 				packet.buffer.index = deflater.compress(packet.buffer.buffer,
 					5, packet.buffer.index);
 			}
-			if (c2scipher != null)
-			{
+			if (c2scipher != null) {
 				packet.padding(c2scipher.getIVSize());
 				int pad = packet.buffer.buffer[4];
-				lock (random)
-				{
+				lock (random) {
 					random.fill(packet.buffer.buffer, packet.buffer.index - pad, pad);
 				}
 			}
-			else
-			{
+			else {
 				packet.padding(8);
 			}
 			byte[] mac = null;
-			if (c2smac != null)
-			{
+			if (c2smac != null) {
 				c2smac.update(seqo);
 				c2smac.update(packet.buffer.buffer, 0, packet.buffer.index);
 				mac = c2smac.doFinal();
 			}
-			if (c2scipher != null)
-			{
+			if (c2scipher != null) {
 				byte[] buf = packet.buffer.buffer;
 				c2scipher.update(buf, 0, packet.buffer.index, buf, 0);
 			}
-			if (mac != null)
-			{
+			if (mac != null) {
 				packet.buffer.putByte(mac);
 			}
 		}
@@ -777,57 +690,47 @@ namespace LibSterileSSH.SecureShell
 		public Buffer read(Buffer buf)
 		{
 			int j = 0;
-			while (true)
-			{
+			while (true) {
 				buf.reset();
 				io.getByte(buf.buffer, buf.index, cipher_size);
 				buf.index += cipher_size;
-				if (s2ccipher != null)
-				{
+				if (s2ccipher != null) {
 					s2ccipher.update(buf.buffer, 0, cipher_size, buf.buffer, 0);
 				}
 				j = StringAux.ToInt32(buf.buffer, 0);
 				j = j - 4 - cipher_size + 8;
-				if (j < 0 || (buf.index + j) > buf.buffer.Length)
-				{
+				if (j < 0 || (buf.index + j) > buf.buffer.Length) {
 					throw new IOException("invalid data");
 				}
-				if (j > 0)
-				{
+				if (j > 0) {
 					io.getByte(buf.buffer, buf.index, j);
 					buf.index += (j);
-					if (s2ccipher != null)
-					{
+					if (s2ccipher != null) {
 						s2ccipher.update(buf.buffer, cipher_size, j, buf.buffer, cipher_size);
 					}
 				}
 
-				if (s2cmac != null)
-				{
+				if (s2cmac != null) {
 					s2cmac.update(seqi);
 					s2cmac.update(buf.buffer, 0, buf.index);
 					byte[] result = s2cmac.doFinal();
 					io.getByte(mac_buf, 0, mac_buf.Length);
-					if (!result.SequenceEqual(mac_buf))
-					{
+					if (!result.SequenceEqual(mac_buf)) {
 						throw new IOException("MAC Error");
 					}
 				}
 				seqi++;
 
-				if (inflater != null)
-				{
+				if (inflater != null) {
 					//inflater.uncompress(buf);
 					int pad = buf.buffer[4];
 					uncompress_len[0] = buf.index - 5 - pad;
 					byte[] foo = inflater.uncompress(buf.buffer, 5, uncompress_len);
-					if (foo != null)
-					{
+					if (foo != null) {
 						buf.buffer = foo;
 						buf.index = 5 + uncompress_len[0];
 					}
-					else
-					{
+					else {
 						System.Console.Error.WriteLine("fail in inflater");
 						break;
 					}
@@ -835,8 +738,7 @@ namespace LibSterileSSH.SecureShell
 
 				int type = buf.buffer[5] & 0xff;
 				//System.Console.WriteLine("read: "+type);
-				if (type == SSH_MSG_DISCONNECT)
-				{
+				if (type == SSH_MSG_DISCONNECT) {
 					buf.rewind();
 					buf.getInt();
 					buf.getShort();
@@ -855,11 +757,9 @@ namespace LibSterileSSH.SecureShell
 						" " + StringAux.getString(language_tag));
 					//break;
 				}
-				else if (type == SSH_MSG_IGNORE)
-				{
+				else if (type == SSH_MSG_IGNORE) {
 				}
-				else if (type == SSH_MSG_DEBUG)
-				{
+				else if (type == SSH_MSG_DEBUG) {
 					buf.rewind();
 					buf.getInt();
 					buf.getShort();
@@ -872,22 +772,18 @@ namespace LibSterileSSH.SecureShell
 								   " "+new String(language_tag));
 					*/
 				}
-				else if (type == SSH_MSG_CHANNEL_WINDOW_ADJUST)
-				{
+				else if (type == SSH_MSG_CHANNEL_WINDOW_ADJUST) {
 					buf.rewind();
 					buf.getInt();
 					buf.getShort();
 					AChannel c = AChannel.getChannel(buf.getInt(), this);
-					if (c == null)
-					{
+					if (c == null) {
 					}
-					else
-					{
+					else {
 						c.addRemoteWindowSize(buf.getInt());
 					}
 				}
-				else
-				{
+				else {
 					break;
 				}
 			}
@@ -914,8 +810,7 @@ namespace LibSterileSSH.SecureShell
 
 			String[] guess = kex._guess;
 
-			if (session_id == null)
-			{
+			if (session_id == null) {
 				session_id = new byte[H.Length];
 				System.Array.Copy(H, 0, session_id, 0, H.Length);
 			}
@@ -959,14 +854,12 @@ namespace LibSterileSSH.SecureShell
 			hash.update(buf.buffer, 0, buf.index);
 			MACs2c = hash.digest();
 
-			try
-			{
+			try {
 				System.Type c;
 
 				c = System.Type.GetType(getConfig(guess[KeyExchange.PROPOSAL_ENC_ALGS_STOC]));
 				s2ccipher = (ICipher)(System.Activator.CreateInstance(c));
-				while (s2ccipher.getBlockSize() > Es2c.Length)
-				{
+				while (s2ccipher.getBlockSize() > Es2c.Length) {
 					buf.reset();
 					buf.putMPInt(K);
 					buf.putByte(H);
@@ -987,8 +880,7 @@ namespace LibSterileSSH.SecureShell
 
 				c = System.Type.GetType(getConfig(guess[KeyExchange.PROPOSAL_ENC_ALGS_CTOS]));
 				c2scipher = (ICipher)(System.Activator.CreateInstance(c));
-				while (c2scipher.getBlockSize() > Ec2s.Length)
-				{
+				while (c2scipher.getBlockSize() > Ec2s.Length) {
 					buf.reset();
 					buf.putMPInt(K);
 					buf.putByte(H);
@@ -1006,94 +898,72 @@ namespace LibSterileSSH.SecureShell
 				c2smac = (IHMAC)(System.Activator.CreateInstance(c));
 				c2smac.init(MACc2s);
 
-				if (!guess[KeyExchange.PROPOSAL_COMP_ALGS_CTOS].Equals("none"))
-				{
+				if (!guess[KeyExchange.PROPOSAL_COMP_ALGS_CTOS].Equals("none")) {
 					String foo = getConfig(guess[KeyExchange.PROPOSAL_COMP_ALGS_CTOS]);
-					if (foo != null)
-					{
-						try
-						{
+					if (foo != null) {
+						try {
 							c = System.Type.GetType(foo);
 							deflater = (ICompression)(System.Activator.CreateInstance(c));
 							int level = 6;
-							try
-							{
+							try {
 								level = int.Parse(getConfig("compression_level"));
 							}
-							catch(Exception)
-							{
+							catch (Exception) {
 							}
 							deflater.init(CompressionMode.DEFLATER, level);
 						}
-						catch(Exception)
-						{
+						catch (Exception) {
 							System.Console.Error.WriteLine(foo + " isn't accessible.");
 						}
 					}
 				}
-				else
-				{
-					if (deflater != null)
-					{
+				else {
+					if (deflater != null) {
 						deflater = null;
 					}
 				}
-				if (!guess[KeyExchange.PROPOSAL_COMP_ALGS_STOC].Equals("none"))
-				{
+				if (!guess[KeyExchange.PROPOSAL_COMP_ALGS_STOC].Equals("none")) {
 					String foo = getConfig(guess[KeyExchange.PROPOSAL_COMP_ALGS_STOC]);
-					if (foo != null)
-					{
-						try
-						{
+					if (foo != null) {
+						try {
 							c = System.Type.GetType(foo);
 							inflater = (ICompression)(System.Activator.CreateInstance(c));
 							inflater.init(CompressionMode.INFLATER, 0);
 						}
-						catch(Exception)
-						{
+						catch (Exception) {
 							System.Console.Error.WriteLine(foo + " isn't accessible.");
 						}
 					}
 				}
-				else
-				{
-					if (inflater != null)
-					{
+				else {
+					if (inflater != null) {
 						inflater = null;
 					}
 				}
 			}
-			catch (Exception e)
-			{
+			catch (Exception e) {
 				System.Console.Error.WriteLine("updatekeys: " + e);
 			}
 		}
 
 		public void write(Packet packet, AChannel c, int length)
 		{
-			while (true)
-			{
-				if (in_kex)
-				{
-					try
-					{
+			while (true) {
+				if (in_kex) {
+					try {
 						ThreadAux.Sleep(10);
 					}
-					catch (ThreadInterruptedException)
-					{
+					catch (ThreadInterruptedException) {
 					};
 					continue;
 				}
-				lock (c)
-				{
-					if (c.rwsize >= length)
-					{
+				lock (c) {
+					if (c.rwsize >= length) {
 						c.rwsize -= length;
 						break;
 					}
 				}
-				if (c._close || !c.isConnected())
-				{
+				if (c._close || !c.isConnected()) {
 					throw new IOException("channel is broken");
 				}
 
@@ -1101,17 +971,13 @@ namespace LibSterileSSH.SecureShell
 				int s = 0;
 				byte command = 0;
 				int recipient = -1;
-				lock (c)
-				{
-					if (c.rwsize > 0)
-					{
+				lock (c) {
+					if (c.rwsize > 0) {
 						int len = c.rwsize;
-						if (len > length)
-						{
+						if (len > length) {
 							len = length;
 						}
-						if (len != length)
-						{
+						if (len != length) {
 							s = packet.shift(len, (c2smac != null ? c2smac.getBlockSize() : 0));
 						}
 						command = packet.buffer.buffer[5];
@@ -1121,30 +987,24 @@ namespace LibSterileSSH.SecureShell
 						sendit = true;
 					}
 				}
-				if (sendit)
-				{
+				if (sendit) {
 					_write(packet);
-					if (length == 0)
-					{
+					if (length == 0) {
 						return;
 					}
 					packet.unshift(command, recipient, s, length);
-					lock (c)
-					{
-						if (c.rwsize >= length)
-						{
+					lock (c) {
+						if (c.rwsize >= length) {
 							c.rwsize -= length;
 							break;
 						}
 					}
 				}
 
-				try
-				{
+				try {
 					ThreadAux.Sleep(100);
 				}
-				catch (ThreadInterruptedException)
-				{
+				catch (ThreadInterruptedException) {
 				};
 			}
 			_write(packet);
@@ -1161,8 +1021,7 @@ namespace LibSterileSSH.SecureShell
 		public void write(Packet packet)
 		{
 			// System.Console.WriteLine("in_kex="+in_kex+" "+(packet.buffer.buffer[5]));
-			while (in_kex)
-			{
+			while (in_kex) {
 				byte command = packet.buffer.buffer[5];
 				//System.Console.WriteLine("command: "+command);
 				if (command == SSH_MSG_KEXINIT ||
@@ -1173,16 +1032,13 @@ namespace LibSterileSSH.SecureShell
 					command == SSH_MSG_KEX_DH_GEX_GROUP ||
 					command == SSH_MSG_KEX_DH_GEX_INIT ||
 					command == SSH_MSG_KEX_DH_GEX_REPLY ||
-					command == SSH_MSG_KEX_DH_GEX_REQUEST)
-				{
+					command == SSH_MSG_KEX_DH_GEX_REQUEST) {
 					break;
 				}
-				try
-				{
+				try {
 					ThreadAux.Sleep(10);
 				}
-				catch (ThreadInterruptedException)
-				{
+				catch (ThreadInterruptedException) {
 				};
 			}
 			_write(packet);
@@ -1191,8 +1047,7 @@ namespace LibSterileSSH.SecureShell
 		private void _write(Packet packet)
 		{
 			encode(packet);
-			if (io != null)
-			{
+			if (io != null) {
 				io.put(packet);
 				seqo++;
 			}
@@ -1212,28 +1067,23 @@ namespace LibSterileSSH.SecureShell
 			int[] length = new int[1];
 			KeyExchange kex = null;
 
-			try
-			{
+			try {
 				while (_isConnected &&
-					thread != null)
-				{
+					thread != null) {
 					buf = read(buf);
 					int msgType = buf.buffer[5] & 0xff;
 					//      if(msgType!=94)
 					//System.Console.WriteLine("read: 94 ? "+msgType);
 
-					if (kex != null && kex.getState() == msgType)
-					{
+					if (kex != null && kex.getState() == msgType) {
 						bool result = kex.next(buf);
-						if (!result)
-						{
+						if (!result) {
 							throw new SshClientException("verify: " + result);
 						}
 						continue;
 					}
 
-					switch (msgType)
-					{
+					switch (msgType) {
 						case SSH_MSG_KEXINIT:
 							//System.Console.WriteLine("KEXINIT");
 							kex = receive_kexinit(buf);
@@ -1253,30 +1103,24 @@ namespace LibSterileSSH.SecureShell
 							i = buf.getInt();
 							channel = AChannel.getChannel(i, this);
 							foo = buf.getString(start, length);
-							if (channel == null)
-							{
+							if (channel == null) {
 								break;
 							}
-							try
-							{
+							try {
 								channel.write(foo, start[0], length[0]);
 							}
-							catch (Exception)
-							{
+							catch (Exception) {
 								//System.Console.WriteLine(e);
-								try
-								{
+								try {
 									channel.disconnect();
 								}
-								catch (Exception)
-								{
+								catch (Exception) {
 								}
 								break;
 							}
 							int len = length[0];
 							channel.setLocalWindowSize(channel.lwsize - len);
-							if (channel.lwsize < channel.lwsize_max / 2)
-							{
+							if (channel.lwsize < channel.lwsize_max / 2) {
 								packet.reset();
 								buf.putByte((byte)SSH_MSG_CHANNEL_WINDOW_ADJUST);
 								buf.putInt(channel.getRecipient());
@@ -1294,8 +1138,7 @@ namespace LibSterileSSH.SecureShell
 							buf.getInt();                   // data_type_code == 1
 							foo = buf.getString(start, length);
 							//System.Console.WriteLine("stderr: "+new String(foo,start[0],length[0]));
-							if (channel == null)
-							{
+							if (channel == null) {
 								break;
 							}
 							//channel.write(foo, start[0], length[0]);
@@ -1303,8 +1146,7 @@ namespace LibSterileSSH.SecureShell
 
 							len = length[0];
 							channel.setLocalWindowSize(channel.lwsize - len);
-							if (channel.lwsize < channel.lwsize_max / 2)
-							{
+							if (channel.lwsize < channel.lwsize_max / 2) {
 								packet.reset();
 								buf.putByte((byte)SSH_MSG_CHANNEL_WINDOW_ADJUST);
 								buf.putInt(channel.getRecipient());
@@ -1319,8 +1161,7 @@ namespace LibSterileSSH.SecureShell
 							buf.getShort();
 							i = buf.getInt();
 							channel = AChannel.getChannel(i, this);
-							if (channel == null)
-							{
+							if (channel == null) {
 								break;
 							}
 							channel.addRemoteWindowSize(buf.getInt());
@@ -1331,8 +1172,7 @@ namespace LibSterileSSH.SecureShell
 							buf.getShort();
 							i = buf.getInt();
 							channel = AChannel.getChannel(i, this);
-							if (channel != null)
-							{
+							if (channel != null) {
 								//channel._eof_remote=true;
 								//channel.eof();
 								channel.eof_remote();
@@ -1349,8 +1189,7 @@ namespace LibSterileSSH.SecureShell
 							buf.getShort();
 							i = buf.getInt();
 							channel = AChannel.getChannel(i, this);
-							if (channel != null)
-							{
+							if (channel != null) {
 								//	      channel.close();
 								channel.disconnect();
 							}
@@ -1365,8 +1204,7 @@ namespace LibSterileSSH.SecureShell
 							buf.getShort();
 							i = buf.getInt();
 							channel = AChannel.getChannel(i, this);
-							if (channel == null)
-							{
+							if (channel == null) {
 								//break;
 							}
 							channel.setRecipient(buf.getInt());
@@ -1378,8 +1216,7 @@ namespace LibSterileSSH.SecureShell
 							buf.getShort();
 							i = buf.getInt();
 							channel = AChannel.getChannel(i, this);
-							if (channel == null)
-							{
+							if (channel == null) {
 								//break;
 							}
 							int reason_code = buf.getInt();
@@ -1397,27 +1234,23 @@ namespace LibSterileSSH.SecureShell
 							foo = buf.getString();
 							bool reply = (buf.getByte() != 0);
 							channel = AChannel.getChannel(i, this);
-							if (channel != null)
-							{
+							if (channel != null) {
 								byte reply_type = (byte)SSH_MSG_CHANNEL_FAILURE;
-								if (StringAux.getString(foo).Equals("exit-status"))
-								{
+								if (StringAux.getString(foo).Equals("exit-status")) {
 									i = buf.getInt();             // exit-status
 									channel.setExitStatus(i);
 									//	    System.Console.WriteLine("exit-stauts: "+i);
 									//          channel.close();
 									reply_type = (byte)SSH_MSG_CHANNEL_SUCCESS;
 								}
-								if (reply)
-								{
+								if (reply) {
 									packet.reset();
 									buf.putByte(reply_type);
 									buf.putInt(channel.getRecipient());
 									write(packet);
 								}
 							}
-							else
-							{
+							else {
 							}
 							break;
 						case SSH_MSG_CHANNEL_OPEN:
@@ -1427,13 +1260,11 @@ namespace LibSterileSSH.SecureShell
 							String ctyp = StringAux.getString(foo);
 							//System.Console.WriteLine("type="+ctyp);
 							if (!"forwarded-tcpip".Equals(ctyp) &&
-								!("x11".Equals(ctyp) && x11_forwarding))
-							{
+								!("x11".Equals(ctyp) && x11_forwarding)) {
 								System.Console.WriteLine("Session.run: CHANNEL OPEN " + ctyp);
 								throw new IOException("Session.run: CHANNEL OPEN " + ctyp);
 							}
-							else
-							{
+							else {
 								channel = AChannel.getChannel(ctyp);
 								addChannel(channel);
 								channel.getData(buf);
@@ -1456,8 +1287,7 @@ namespace LibSterileSSH.SecureShell
 							buf.getShort();
 							i = buf.getInt();
 							channel = AChannel.getChannel(i, this);
-							if (channel == null)
-							{
+							if (channel == null) {
 								break;
 							}
 							channel.reply = 1;
@@ -1467,8 +1297,7 @@ namespace LibSterileSSH.SecureShell
 							buf.getShort();
 							i = buf.getInt();
 							channel = AChannel.getChannel(i, this);
-							if (channel == null)
-							{
+							if (channel == null) {
 								break;
 							}
 							channel.reply = 0;
@@ -1478,8 +1307,7 @@ namespace LibSterileSSH.SecureShell
 							buf.getShort();
 							foo = buf.getString();       // request name
 							reply = (buf.getByte() != 0);
-							if (reply)
-							{
+							if (reply) {
 								packet.reset();
 								buf.putByte((byte)SSH_MSG_REQUEST_FAILURE);
 								write(packet);
@@ -1488,8 +1316,7 @@ namespace LibSterileSSH.SecureShell
 						case SSH_MSG_REQUEST_FAILURE:
 						case SSH_MSG_REQUEST_SUCCESS:
 							ThreadAux t = grr.getThread();
-							if (t != null)
-							{
+							if (t != null) {
 								grr.setReply(msgType == SSH_MSG_REQUEST_SUCCESS ? 1 : 0);
 								t.interrupt();
 							}
@@ -1500,22 +1327,18 @@ namespace LibSterileSSH.SecureShell
 					}
 				}
 			}
-			catch (Exception)
-			{
+			catch (Exception) {
 				//System.Console.WriteLine("# Session.run");
 				//e.printStackTrace();
 			}
-			try
-			{
+			try {
 				disconnect();
 			}
-			catch (NullReferenceException)
-			{
+			catch (NullReferenceException) {
 				//System.Console.WriteLine("@1");
 				//e.printStackTrace();
 			}
-			catch (Exception)
-			{
+			catch (Exception) {
 				//System.Console.WriteLine("@2");
 				//e.printStackTrace();
 			}
@@ -1554,17 +1377,14 @@ namespace LibSterileSSH.SecureShell
 			PortWatcher.delPort(this);
 			ChannelForwardedTCPIP.delPort(this);
 
-			lock (connectThread)
-			{
+			lock (connectThread) {
 				connectThread.yield();
 				connectThread.interrupt();
 				connectThread = null;
 			}
 			thread = null;
-			try
-			{
-				if (io != null)
-				{
+			try {
+				if (io != null) {
 					if (io.ins != null)
 						io.ins.Close();
 					if (io.outs != null)
@@ -1572,22 +1392,18 @@ namespace LibSterileSSH.SecureShell
 					if (io.outs_ext != null)
 						io.outs_ext.Close();
 				}
-				if (proxy == null)
-				{
+				if (proxy == null) {
 					if (socket != null)
 						socket.close();
 				}
-				else
-				{
-					lock (proxy)
-					{
+				else {
+					lock (proxy) {
 						proxy.close();
 					}
 					proxy = null;
 				}
 			}
-			catch (Exception)
-			{
+			catch (Exception) {
 				//      e.printStackTrace();
 			}
 			io = null;
@@ -1674,13 +1490,11 @@ namespace LibSterileSSH.SecureShell
 		private GlobalRequestReply grr = new GlobalRequestReply();
 		private void setPortForwarding(int rport)
 		{
-			lock (grr)
-			{
+			lock (grr) {
 				Buffer buf = new Buffer(100); // ??
 				Packet packet = new Packet(buf);
 
-				try
-				{
+				try {
 					// byte SSH_MSG_GLOBAL_REQUEST 80
 					// String "tcpip-forward"
 					// bool want_reply
@@ -1695,23 +1509,19 @@ namespace LibSterileSSH.SecureShell
 					buf.putInt(rport);
 					write(packet);
 				}
-				catch (Exception e)
-				{
+				catch (Exception e) {
 					throw new SshClientException(e.ToString());
 				}
 
 				grr.setThread(ThreadAux.currentThread());
-				try
-				{
+				try {
 					ThreadAux.Sleep(10000);
 				}
-				catch(Exception)
-				{
+				catch (Exception) {
 				}
 				int reply = grr.getReply();
 				grr.setThread(null);
-				if (reply == 0)
-				{
+				if (reply == 0) {
 					throw new SshClientException("remote port forwarding failed for listen port " + rport);
 				}
 			}
@@ -1728,8 +1538,7 @@ namespace LibSterileSSH.SecureShell
 		public String getConfig(object name)
 		{
 			System.Object foo = null;
-			if (config != null)
-			{
+			if (config != null) {
 				foo = config[name];
 				if (foo is String)
 					return (String)foo;
@@ -1799,8 +1608,7 @@ namespace LibSterileSSH.SecureShell
 			if (config == null)
 				config = new Hashtable();
 			IEnumerator ee = foo.Keys.GetEnumerator();
-			while (ee.MoveNext())
-			{
+			while (ee.MoveNext()) {
 				object key = ee.Current;
 				config.Add(key, foo[key]);
 
@@ -1827,22 +1635,18 @@ namespace LibSterileSSH.SecureShell
 		}
 		public void setTimeout(int foo)
 		{
-			if (socket == null)
-			{
-				if (foo < 0)
-				{
+			if (socket == null) {
+				if (foo < 0) {
 					throw new SshClientException("invalid timeout value");
 				}
 				this.timeout = foo;
 				return;
 			}
-			try
-			{
+			try {
 				socket.setSoTimeout(foo);
 				timeout = foo;
 			}
-			catch (Exception e)
-			{
+			catch (Exception e) {
 				throw new SshClientException(e.ToString());
 			}
 		}

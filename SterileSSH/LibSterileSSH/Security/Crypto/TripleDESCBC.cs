@@ -57,21 +57,18 @@ namespace LibSterileSSH.Security
 			//String pad="NoPadding";      
 			//if(padding) pad="PKCS5Padding";
 			byte[] tmp;
-			if (iv.Length > ivsize)
-			{
+			if (iv.Length > ivsize) {
 				tmp = new byte[ivsize];
 				Array.Copy(iv, 0, tmp, 0, tmp.Length);
 				iv = tmp;
 			}
-			if (key.Length > bsize)
-			{
+			if (key.Length > bsize) {
 				tmp = new byte[bsize];
 				Array.Copy(key, 0, tmp, 0, tmp.Length);
 				key = tmp;
 			}
 
-			try
-			{
+			try {
 				//      cipher=javax.crypto.Cipher.getInstance("DESede/CBC/"+pad);
 				/*
 					  // The following code does not work on IBM's JDK 1.4.1
@@ -92,8 +89,7 @@ namespace LibSterileSSH.Security
 					triDes.CreateEncryptor(key, iv) :
 					triDes.CreateDecryptor(key, iv));
 			}
-			catch (Exception e)
-			{
+			catch (Exception e) {
 				Console.WriteLine(e);
 				cipher = null;
 			}

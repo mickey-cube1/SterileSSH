@@ -104,7 +104,7 @@ namespace LibSterileSSH
 		 */
 		public PipedInputStream()
 		{
-//			int i = 0;
+			//			int i = 0;
 		}
 
 		/**
@@ -150,14 +150,12 @@ namespace LibSterileSSH
 			writeSide = Thread.CurrentThread;
 			if (m_in == m_out)
 				awaitSpace();
-			if (m_in < 0)
-			{
+			if (m_in < 0) {
 				m_in = 0;
 				m_out = 0;
 			}
 			buffer[m_in++] = (byte)(b & 0xFF);
-			if (m_in >= buffer.Length)
-			{
+			if (m_in >= buffer.Length) {
 				m_in = 0;
 			}
 		}
@@ -176,24 +174,19 @@ namespace LibSterileSSH
 			checkStateForReceive();
 			writeSide = Thread.CurrentThread;
 			int bytesToTransfer = len;
-			while (bytesToTransfer > 0)
-			{
+			while (bytesToTransfer > 0) {
 				if (m_in == m_out)
 					awaitSpace();
 				int nextTransferAmount = 0;
-				if (m_out < m_in)
-				{
+				if (m_out < m_in) {
 					nextTransferAmount = buffer.Length - m_in;
 				}
-				else if (m_in < m_out)
-				{
-					if (m_in == -1)
-					{
+				else if (m_in < m_out) {
+					if (m_in == -1) {
 						m_in = m_out = 0;
 						nextTransferAmount = buffer.Length - m_in;
 					}
-					else
-					{
+					else {
 						nextTransferAmount = m_out - m_in;
 					}
 				}
@@ -204,8 +197,7 @@ namespace LibSterileSSH
 				bytesToTransfer -= nextTransferAmount;
 				off += nextTransferAmount;
 				m_in += nextTransferAmount;
-				if (m_in >= buffer.Length)
-				{
+				if (m_in >= buffer.Length) {
 					m_in = 0;
 				}
 			}
@@ -213,38 +205,31 @@ namespace LibSterileSSH
 
 		private void checkStateForReceive()
 		{
-			if (!connected)
-			{
+			if (!connected) {
 				throw new IOException("Pipe not connected");
 			}
-			else if (closedByWriter || closedByReader)
-			{
+			else if (closedByWriter || closedByReader) {
 				throw new IOException("Pipe closed");
 			}
-			else if (readSide != null && !readSide.IsAlive)
-			{
+			else if (readSide != null && !readSide.IsAlive) {
 				throw new IOException("Read end dead");
 			}
 		}
 
 		private void awaitSpace()
 		{
-			while (m_in == m_out)
-			{
-				if ((readSide != null) && !readSide.IsAlive)
-				{
+			while (m_in == m_out) {
+				if ((readSide != null) && !readSide.IsAlive) {
 					throw new IOException("Pipe broken");
 				}
 				/* full: kick any waiting readers */
 				//java: notifyAll();
 				Monitor.PulseAll(this);
-				try
-				{
+				try {
 					//java: wait(1000);
 					Monitor.Wait(this, 1000);
 				}
-				catch (ThreadInterruptedException ex)
-				{
+				catch (ThreadInterruptedException ex) {
 					throw ex;
 				}
 			}
@@ -282,51 +267,41 @@ namespace LibSterileSSH
 		[MethodImpl(MethodImplOptions.Synchronized)]
 		public override int read()
 		{
-			if (!connected)
-			{
+			if (!connected) {
 				throw new IOException("Pipe not connected");
 			}
-			else if (closedByReader)
-			{
+			else if (closedByReader) {
 				throw new IOException("Pipe closed");
 			}
 			else if (writeSide != null && !writeSide.IsAlive
-				&& !closedByWriter && (m_in < 0))
-			{
+				&& !closedByWriter && (m_in < 0)) {
 				throw new IOException("Write end dead");
 			}
 
 			readSide = Thread.CurrentThread;
 			int trials = 2;
-			while (m_in < 0)
-			{
-				if (closedByWriter)
-				{
+			while (m_in < 0) {
+				if (closedByWriter) {
 					/* closed by writer, return EOF */
 					return -1;
 				}
-				if ((writeSide != null) && (!writeSide.IsAlive) && (--trials < 0))
-				{
+				if ((writeSide != null) && (!writeSide.IsAlive) && (--trials < 0)) {
 					throw new IOException("Pipe broken");
 				}
 				/* might be a writer waiting */
 				Monitor.PulseAll(this);
-				try
-				{
+				try {
 					Monitor.Wait(this, 1000);
 				}
-				catch (ThreadInterruptedException ex)
-				{
+				catch (ThreadInterruptedException ex) {
 					throw ex;
 				}
 			}
 			int ret = buffer[m_out++] & 0xFF;
-			if (m_out >= buffer.Length)
-			{
+			if (m_out >= buffer.Length) {
 				m_out = 0;
 			}
-			if (m_in == m_out)
-			{
+			if (m_in == m_out) {
 				/* now empty */
 				m_in = -1;
 			}
@@ -354,38 +329,31 @@ namespace LibSterileSSH
 		[MethodImpl(MethodImplOptions.Synchronized)]
 		public override int read(byte[] b, int off, int len)
 		{
-			if (b == null)
-			{
+			if (b == null) {
 				throw new NullReferenceException();
 			}
 			else if ((off < 0) || (off > b.Length) || (len < 0) ||
-				((off + len) > b.Length) || ((off + len) < 0))
-			{
+				((off + len) > b.Length) || ((off + len) < 0)) {
 				throw new IndexOutOfRangeException();
 			}
-			else if (len == 0)
-			{
+			else if (len == 0) {
 				return 0;
 			}
 
 			/* possibly wait on the first character */
 			int c = read();
-			if (c < 0)
-			{
+			if (c < 0) {
 				return -1;
 			}
 			b[off] = (byte)c;
 			int rlen = 1;
-			while ((m_in >= 0) && (--len > 0))
-			{
+			while ((m_in >= 0) && (--len > 0)) {
 				b[off + rlen] = buffer[m_out++];
 				rlen++;
-				if (m_out >= buffer.Length)
-				{
+				if (m_out >= buffer.Length) {
 					m_out = 0;
 				}
-				if (m_in == m_out)
-				{
+				if (m_in == m_out) {
 					/* now empty */
 					m_in = -1;
 				}
@@ -425,8 +393,7 @@ namespace LibSterileSSH
 		public override void close()
 		{
 			closedByReader = true;
-			lock (this)
-			{
+			lock (this) {
 				m_in = -1;
 			}
 		}
@@ -493,8 +460,7 @@ namespace LibSterileSSH
 			{
 				if (m_in > m_out)
 					return (m_in - m_out);
-				else
-				{
+				else {
 					return (buffer.Length - m_out + m_in);
 				}
 			}

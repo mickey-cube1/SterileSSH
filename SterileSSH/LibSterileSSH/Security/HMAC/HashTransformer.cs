@@ -68,8 +68,7 @@ namespace LibSterileSSH.Security
 		{
 			if (hash == null)
 				throw new ArgumentNullException();
-			if (rgbKey == null)
-			{
+			if (rgbKey == null) {
 				rgbKey = new byte[hash.HashSize / 8];
 				new RNGCryptoServiceProvider().GetBytes(rgbKey);
 			}
@@ -104,8 +103,7 @@ namespace LibSterileSSH.Security
 		{
 			if (m_IsDisposed)
 				throw new ObjectDisposedException(this.GetType().FullName);
-			if (!m_IsHashing)
-			{
+			if (!m_IsHashing) {
 				byte[] key;
 				if (this.Key.Length > 64)
 					key = m_HashAlgorithm.ComputeHash(this.Key);
@@ -160,12 +158,10 @@ namespace LibSterileSSH.Security
 			m_IsDisposed = true;
 			base.Dispose(true);
 			m_HashAlgorithm.Clear();
-			try
-			{
+			try {
 				GC.SuppressFinalize(this);
 			}
-			catch
-			{
+			catch {
 			}
 		}
 		/// <summary>

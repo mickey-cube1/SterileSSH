@@ -29,7 +29,8 @@ namespace LibSterileSSH.Security
 		/// Initializes a new <see cref="DiffieHellmanManaged"/> instance.
 		/// </summary>
 		/// <remarks>The default length of the shared secret is 1024 bits.</remarks>
-		public DiffieHellmanManaged() : this(1024, 160, DHKeyGeneration.Static)
+		public DiffieHellmanManaged()
+			: this(1024, 160, DHKeyGeneration.Static)
 		{
 		}
 		/// <summary>
@@ -95,15 +96,12 @@ namespace LibSterileSSH.Security
 				secretLen = p.bitCount();
 			m_P = p;
 			m_G = g;
-			if (x == null)
-			{
+			if (x == null) {
 				BigInteger pm1 = m_P - 1;
-				for (m_X = BigInteger.genRandom(secretLen); m_X >= pm1 || m_X == 0; m_X = BigInteger.genRandom(secretLen))
-				{
+				for (m_X = BigInteger.genRandom(secretLen); m_X >= pm1 || m_X == 0; m_X = BigInteger.genRandom(secretLen)) {
 				}
 			}
-			else
-			{
+			else {
 				m_X = x;
 			}
 		}
@@ -159,8 +157,7 @@ namespace LibSterileSSH.Security
 		/// <param name="disposing"><b>true</b> to release both managed and unmanaged resources; <b>false</b> to release only unmanaged resources.</param>
 		protected override void Dispose(bool disposing)
 		{
-			if (!m_Disposed)
-			{
+			if (!m_Disposed) {
 				if (m_P != null)
 					m_P.Clear();
 				if (m_G != null)
@@ -180,8 +177,7 @@ namespace LibSterileSSH.Security
 			DHParameters ret = new DHParameters();
 			ret.P = m_P.getBytes();
 			ret.G = m_G.getBytes();
-			if (includePrivateParameters)
-			{
+			if (includePrivateParameters) {
 				ret.X = m_X.getBytes();
 			}
 			return ret;
@@ -199,8 +195,7 @@ namespace LibSterileSSH.Security
 				throw new CryptographicException("Missing G value.");
 
 			BigInteger p = new BigInteger(parameters.P), g = new BigInteger(parameters.G), x = null;
-			if (parameters.X != null)
-			{
+			if (parameters.X != null) {
 				x = new BigInteger(parameters.X);
 			}
 			Initialize(p, g, x, 0, true);
@@ -216,8 +211,7 @@ namespace LibSterileSSH.Security
 		//TODO: implement DH key generation methods
 		private void GenerateKey(int bitlen, DHKeyGeneration keygen, out BigInteger p, out BigInteger g)
 		{
-			if (keygen == DHKeyGeneration.Static)
-			{
+			if (keygen == DHKeyGeneration.Static) {
 				if (bitlen == 768)
 					p = new BigInteger(m_OAKLEY768);
 				else if (bitlen == 1024)
@@ -236,8 +230,7 @@ namespace LibSterileSSH.Security
 				// 4. If g = 1 go to step 2
 				//	BigInteger j = (p - 1) / q;
 			}
-			else
-			{ // random
+			else { // random
 				p = BigInteger.genPseudoPrime(bitlen);
 				g = new BigInteger(3); // always use 3 as a generator
 			}

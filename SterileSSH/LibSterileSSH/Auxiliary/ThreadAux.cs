@@ -50,12 +50,10 @@ namespace LibSterileSSH
 
 		public void interrupt()
 		{
-			try
-			{
+			try {
 				t.Interrupt();
 			}
-			catch
-			{
+			catch {
 			}
 		}
 

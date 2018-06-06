@@ -85,19 +85,17 @@ namespace LibSterileSSH
 		[MethodImpl(MethodImplOptions.Synchronized)]
 		public virtual void connect(PipedInputStream snk)
 		{
-			if (snk == null)
-			{
+			if (snk == null) {
 				throw new NullReferenceException();
 			}
-			else if (sink != null || snk.connected)
-			{
+			else if (sink != null || snk.connected) {
 				throw new IOException("Already connected");
 			}
 			sink = snk;
 			snk.m_in = -1;
 			snk.m_out = 0;
 			snk.connected = true;
-//			int t = 0;
+			//			int t = 0;
 		}
 
 		/**
@@ -113,8 +111,7 @@ namespace LibSterileSSH
 		 */
 		public virtual void write(int b)
 		{
-			if (sink == null)
-			{
+			if (sink == null) {
 				throw new IOException("Pipe not connected");
 			}
 			sink.receive(b);
@@ -134,21 +131,17 @@ namespace LibSterileSSH
 		 */
 		public override void write(byte[] b, int off, int len)
 		{
-			if (sink == null)
-			{
+			if (sink == null) {
 				throw new IOException("Pipe not connected");
 			}
-			else if (b == null)
-			{
+			else if (b == null) {
 				throw new NullReferenceException();
 			}
 			else if ((off < 0) || (off > b.Length) || (len < 0) ||
-				((off + len) > b.Length) || ((off + len) < 0))
-			{
+				((off + len) > b.Length) || ((off + len) < 0)) {
 				throw new IndexOutOfRangeException();
 			}
-			else if (len == 0)
-			{
+			else if (len == 0) {
 				return;
 			}
 			sink.receive(b, off, len);
@@ -169,10 +162,8 @@ namespace LibSterileSSH
 		[MethodImpl(MethodImplOptions.Synchronized)]
 		public override void flush()
 		{
-			if (sink != null)
-			{
-				lock (sink)
-				{
+			if (sink != null) {
+				lock (sink) {
 					//sink.notifyAll();
 					System.Threading.Monitor.PulseAll(sink);
 				}
@@ -188,8 +179,7 @@ namespace LibSterileSSH
 		 */
 		public override void close()
 		{
-			if (sink != null)
-			{
+			if (sink != null) {
 				sink.receivedLast();
 			}
 		}

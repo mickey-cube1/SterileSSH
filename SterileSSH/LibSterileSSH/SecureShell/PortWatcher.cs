@@ -54,20 +54,16 @@ namespace LibSterileSSH.SecureShell
 		internal static String[] getPortForwarding(Session session)
 		{
 			ArrayList foo = new ArrayList();
-			lock (pool)
-			{
-				for (int i = 0; i < pool.Count; i++)
-				{
+			lock (pool) {
+				for (int i = 0; i < pool.Count; i++) {
 					PortWatcher p = (PortWatcher)(pool[i]);
-					if (p.session == session)
-					{
+					if (p.session == session) {
 						foo.Add(p.lport + ":" + p.host + ":" + p.rport);
 					}
 				}
 			}
 			String[] bar = new String[foo.Count];
-			for (int i = 0; i < foo.Count; i++)
-			{
+			for (int i = 0; i < foo.Count; i++) {
 				bar[i] = (String)(foo[i]);
 			}
 			return bar;
@@ -75,21 +71,16 @@ namespace LibSterileSSH.SecureShell
 		internal static PortWatcher getPort(Session session, String address, int lport)
 		{
 			IPAddress addr;
-			try
-			{
+			try {
 				addr = Dns.GetHostEntry(address).AddressList[0];
 			}
-			catch (Exception)
-			{
+			catch (Exception) {
 				throw new SshClientException("PortForwardingL: invalid address " + address + " specified.");
 			}
-			lock (pool)
-			{
-				for (int i = 0; i < pool.Count; i++)
-				{
+			lock (pool) {
+				for (int i = 0; i < pool.Count; i++) {
 					PortWatcher p = (PortWatcher)(pool[i]);
-					if (p.session == session && p.lport == lport)
-					{
+					if (p.session == session && p.lport == lport) {
 						if (IPAddress.IsLoopback(p.boundaddress) ||
 							p.boundaddress.ToString().Equals(addr.ToString()))
 							return p;
@@ -100,8 +91,7 @@ namespace LibSterileSSH.SecureShell
 		}
 		internal static PortWatcher addPort(Session session, String address, int lport, String host, int rport, ITcpListenerFactory ssf)
 		{
-			if (getPort(session, address, lport) != null)
-			{
+			if (getPort(session, address, lport) != null) {
 				throw new SshClientException("PortForwardingL: local port " + address + ":" + lport + " is already registered.");
 			}
 			PortWatcher pw = new PortWatcher(session, address, lport, host, rport, ssf);
@@ -111,8 +101,7 @@ namespace LibSterileSSH.SecureShell
 		internal static void delPort(Session session, String address, int lport)
 		{
 			PortWatcher pw = getPort(session, address, lport);
-			if (pw == null)
-			{
+			if (pw == null) {
 				throw new SshClientException("PortForwardingL: local port " + address + ":" + lport + " is not registered.");
 			}
 			pw.delete();
@@ -120,21 +109,17 @@ namespace LibSterileSSH.SecureShell
 		}
 		internal static void delPort(Session session)
 		{
-			lock (pool)
-			{
+			lock (pool) {
 				PortWatcher[] foo = new PortWatcher[pool.Count];
 				int count = 0;
-				for (int i = 0; i < pool.Count; i++)
-				{
+				for (int i = 0; i < pool.Count; i++) {
 					PortWatcher p = (PortWatcher)(pool[i]);
-					if (p.session == session)
-					{
+					if (p.session == session) {
 						p.delete();
 						foo[count++] = p;
 					}
 				}
-				for (int i = 0; i < count; i++)
-				{
+				for (int i = 0; i < count; i++) {
 					PortWatcher p = foo[i];
 					pool.Remove(p);
 				}
@@ -149,27 +134,23 @@ namespace LibSterileSSH.SecureShell
 			this.lport = lport;
 			this.host = host;
 			this.rport = rport;
-			try
-			{
+			try {
 				boundaddress = Dns.GetHostEntry(address).AddressList[0];
 #if false
 				ss=(factory==null) ? 
 					new JTcpListener(lport, 0, boundaddress) :
 					factory.createServerSocket(lport, 0, boundaddress);
 #else
-				if (factory == null)
-				{
+				if (factory == null) {
 					ss = new TcpListener(boundaddress, lport);
 					ss.Start();
 				}
-				else
-				{
+				else {
 					ss = factory.createServerSocket(lport, 0, boundaddress);
 				}
 #endif
 			}
-			catch (Exception e)
-			{
+			catch (Exception e) {
 				Console.WriteLine(e);
 				throw new SshClientException("PortForwardingL: local port " + address + ":" + lport + " cannot be bound.");
 			}
@@ -180,10 +161,8 @@ namespace LibSterileSSH.SecureShell
 			Buffer buf = new Buffer(300); // ??
 			Packet packet = new Packet(buf);
 			thread = this;
-			try
-			{
-				while (thread != null)
-				{
+			try {
+				while (thread != null) {
 					TcpSocket socket = new LibSterileSSH.TcpSocket(ss.AcceptSocket());
 					socket.setTcpNoDelay(true);
 					Stream In = socket.getInputStream();
@@ -198,13 +177,11 @@ namespace LibSterileSSH.SecureShell
 					((ChannelDirectTCPIP)channel).setOrgIPAddress(socket.getInetAddress().ToString());
 					((ChannelDirectTCPIP)channel).setOrgPort(socket.getPort());
 					channel.connect();
-					if (channel.exitstatus != -1)
-					{
+					if (channel.exitstatus != -1) {
 					}
 				}
 			}
-			catch (Exception)
-			{
+			catch (Exception) {
 				//System.out.println("! "+e);
 			}
 
@@ -214,14 +191,12 @@ namespace LibSterileSSH.SecureShell
 		internal void delete()
 		{
 			thread = null;
-			try
-			{
+			try {
 				if (ss != null)
 					ss.Stop();
 				ss = null;
 			}
-			catch(Exception)
-			{
+			catch (Exception) {
 			}
 		}
 	}

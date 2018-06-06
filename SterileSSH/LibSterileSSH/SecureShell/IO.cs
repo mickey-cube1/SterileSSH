@@ -48,12 +48,10 @@ namespace LibSterileSSH.SecureShell
 
 		public void setOutputStream(Stream outs)
 		{
-			if (outs != null)
-			{
+			if (outs != null) {
 				this.outs = outs;
 			}
-			else
-			{
+			else {
 				this.outs = null;
 			}
 		}
@@ -64,12 +62,10 @@ namespace LibSterileSSH.SecureShell
 		}
 		public void setExtOutputStream(Stream outs)
 		{
-			if (outs != null)
-			{
+			if (outs != null) {
 				this.outs_ext = outs;
 			}
-			else
-			{
+			else {
 				this.outs_ext = null;
 			}
 		}
@@ -81,20 +77,16 @@ namespace LibSterileSSH.SecureShell
 		public void setInputStream(Stream ins)
 		{
 			//ConsoleStream low buffer patch
-			if (ins != null)
-			{
-				if (ins.GetType() == Type.GetType("System.IO.__ConsoleStream"))
-				{
+			if (ins != null) {
+				if (ins.GetType() == Type.GetType("System.IO.__ConsoleStream")) {
 					ins = new LibSterileSSH.ProtectedConsoleStream(ins);
 				}
-				else if (ins.GetType() == Type.GetType("System.IO.FileStream"))
-				{
+				else if (ins.GetType() == Type.GetType("System.IO.FileStream")) {
 					ins = new LibSterileSSH.ProtectedConsoleStream(ins);
 				}
 				this.ins = ins;
 			}
-			else
-			{
+			else {
 				this.ins = null;
 			}
 		}
@@ -133,11 +125,9 @@ namespace LibSterileSSH.SecureShell
 
 		internal void getByte(byte[] array, int begin, int length)
 		{
-			do
-			{
+			do {
 				int completed = ins.Read(array, begin, length);
-				if (completed <= 0)
-				{
+				if (completed <= 0) {
 					throw new IOException("End of IO Stream Read");
 				}
 				begin += completed;
@@ -148,32 +138,26 @@ namespace LibSterileSSH.SecureShell
 
 		public void close()
 		{
-			try
-			{
+			try {
 				if (ins != null && !in_dontclose)
 					ins.Close();
 				ins = null;
 			}
-			catch(Exception)
-			{
+			catch (Exception) {
 			}
-			try
-			{
+			try {
 				if (outs != null && !out_dontclose)
 					outs.Close();
 				outs = null;
 			}
-			catch(Exception)
-			{
+			catch (Exception) {
 			}
-			try
-			{
+			try {
 				if (outs_ext != null && !outs_ext_dontclose)
 					outs_ext.Close();
 				outs_ext = null;
 			}
-			catch(Exception)
-			{
+			catch (Exception) {
 			}
 		}
 

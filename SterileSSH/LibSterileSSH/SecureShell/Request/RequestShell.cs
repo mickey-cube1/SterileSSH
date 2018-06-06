@@ -35,10 +35,10 @@ namespace LibSterileSSH.SecureShell
 {
 	class RequestShell : IRequest
 	{
-		public void request(Session session, AChannel channel) 
+		public void request(Session session, AChannel channel)
 		{
-			Buffer buf=new Buffer();
-			Packet packet=new Packet(buf);
+			Buffer buf = new Buffer();
+			Packet packet = new Packet(buf);
 
 			// send
 			// byte     SSH_MSG_CHANNEL_REQUEST(98)
@@ -46,13 +46,16 @@ namespace LibSterileSSH.SecureShell
 			// string request type       // "shell"
 			// boolean want reply        // 0
 			packet.reset();
-			buf.putByte((byte) Session.SSH_MSG_CHANNEL_REQUEST);
+			buf.putByte((byte)Session.SSH_MSG_CHANNEL_REQUEST);
 			buf.putInt(channel.getRecipient());
 			buf.putString(StringAux.getBytes("shell"));
 			buf.putByte((byte)(waitForReply() ? 1 : 0));
 			session.write(packet);
 		}
-		public bool waitForReply(){ return false; }
+		public bool waitForReply()
+		{
+			return false;
+		}
 	}
 
 }

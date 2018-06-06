@@ -58,22 +58,18 @@ namespace LibSterileSSH.SecureShell
 
 		public override void init()
 		{
-			try
-			{
+			try {
 				io = new IO();
 			}
-			catch (Exception e)
-			{
+			catch (Exception e) {
 				Console.WriteLine(e);
 			}
 		}
 
 		public override void connect()
 		{
-			try
-			{
-				if (!session.isConnected())
-				{
+			try {
+				if (!session.isConnected()) {
 					throw new SshClientException("session is down");
 				}
 				Buffer buf = new Buffer(150);
@@ -98,28 +94,23 @@ namespace LibSterileSSH.SecureShell
 				session.write(packet);
 
 				int retry = 1000;
-				try
-				{
+				try {
 					while (this.getRecipient() == -1 &&
 						session.isConnected() &&
 						retry > 0 &&
-						!_eof_remote)
-					{
+						!_eof_remote) {
 						//Thread.sleep(500);
 						ThreadAux.Sleep(50);
 						retry--;
 					}
 				}
-				catch
-				{
+				catch {
 				}
 
-				if (!session.isConnected())
-				{
+				if (!session.isConnected()) {
 					throw new SshClientException("session is down");
 				}
-				if (retry == 0 || this._eof_remote)
-				{
+				if (retry == 0 || this._eof_remote) {
 					throw new SshClientException("channel is not opened.");
 				}
 				/*
@@ -134,13 +125,11 @@ namespace LibSterileSSH.SecureShell
 				thread = new ThreadAux(this);
 				thread.start();
 			}
-			catch (Exception e)
-			{
+			catch (Exception e) {
 				io.close();
 				io = null;
 				AChannel.del(this);
-				if (e is SshClientException)
-				{
+				if (e is SshClientException) {
 					throw (SshClientException)e;
 				}
 			}
@@ -154,20 +143,17 @@ namespace LibSterileSSH.SecureShell
 			//    Buffer buf=new Buffer(lmpsize);
 			Packet packet = new Packet(buf);
 			int i = 0;
-			try
-			{
+			try {
 				while (isConnected() &&
 					thread != null &&
 					io != null &&
-					io.ins != null)
-				{
+					io.ins != null) {
 					i = io.ins.Read(buf.buffer,
 						14,
 						buf.buffer.Length - 14
 						- 32 - 20 // padding and mac
 						);
-					if (i <= 0)
-					{
+					if (i <= 0) {
 						eof();
 						break;
 					}
@@ -181,8 +167,7 @@ namespace LibSterileSSH.SecureShell
 					session.write(packet, this, i);
 				}
 			}
-			catch
-			{
+			catch {
 			}
 			disconnect();
 			//System.out.println("connect end");

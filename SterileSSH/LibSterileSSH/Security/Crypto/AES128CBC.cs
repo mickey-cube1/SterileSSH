@@ -58,21 +58,18 @@ namespace LibSterileSSH.Security
 			rijndael.Padding = PaddingMode.None;
 			//String pad="NoPadding";      
 			byte[] tmp;
-			if (iv.Length > ivsize)
-			{
+			if (iv.Length > ivsize) {
 				tmp = new byte[ivsize];
 				Array.Copy(iv, 0, tmp, 0, tmp.Length);
 				iv = tmp;
 			}
-			if (key.Length > bsize)
-			{
+			if (key.Length > bsize) {
 				tmp = new byte[bsize];
 				Array.Copy(key, 0, tmp, 0, tmp.Length);
 				key = tmp;
 			}
 
-			try
-			{
+			try {
 				//      SecretKeySpec keyspec=new SecretKeySpec(key, "AES");
 				//		cipher=javax.crypto.Cipher.getInstance("AES/CBC/"+pad);
 
@@ -84,8 +81,7 @@ namespace LibSterileSSH.Security
 					rijndael.CreateEncryptor(key, iv) :
 					rijndael.CreateDecryptor(key, iv));
 			}
-			catch (Exception e)
-			{
+			catch (Exception e) {
 				Console.WriteLine(e);
 				cipher = null;
 			}

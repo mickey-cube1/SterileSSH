@@ -163,42 +163,34 @@ namespace LibSterileSSH
 			Stream server = null;
 			m_cancelled = false;
 
-			try
-			{
+			try {
 				//if we are sending a single file
-				if (File.Exists(localPath))
-				{
+				if (File.Exists(localPath)) {
 					SCP_ConnectTo(out channel, out server, remotePath, _recursive);
 					SCP_SendFile(server, localPath, remotePath);
 					channel.disconnect();
 				}
 				//else, if we are sending a local directory
-				else if (Directory.Exists(localPath))
-				{
-					if (!_recursive)
-					{
+				else if (Directory.Exists(localPath)) {
+					if (!_recursive) {
 						throw new SshTransferException(Path.GetFileName("'" + localPath) + "' is a directory, you should use recursive transfer.");
 					}
 					SCP_ConnectTo(out channel, out server, remotePath, true);
 					ToRecursive(server, localPath, remotePath);
 					channel.disconnect();
 				}
-				else
-				{
+				else {
 					throw new SshTransferException("File not found: " + localPath);
 				}
 			}
-			catch (Exception e)
-			{
+			catch (Exception e) {
 				if (Verbos)
 					Console.WriteLine("Error: " + e.Message);
 				//SendEndMessage(remoteFile, localFile, filesize,filesize, "Transfer ended with an error.");
-				try
-				{
+				try {
 					channel.disconnect();
 				}
-				catch
-				{
+				catch {
 				}
 				throw e;
 			}
@@ -212,29 +204,23 @@ namespace LibSterileSSH
 		/// <param name="dst">Destination path</param>
 		private void ToRecursive(Stream server, string src, string dst)
 		{
-			if (Directory.Exists(src))
-			{
+			if (Directory.Exists(src)) {
 				SCP_EnterIntoDir(server, Path.GetFileName(dst));
-				foreach (string file in Directory.GetFiles(src))
-				{
+				foreach (string file in Directory.GetFiles(src)) {
 					SCP_SendFile(server, file, Path.GetFileName(file));
 				}
-				if (m_cancelled)
-				{
+				if (m_cancelled) {
 					return;
 				}
-				foreach (string dir in Directory.GetDirectories(src))
-				{
+				foreach (string dir in Directory.GetDirectories(src)) {
 					ToRecursive(server, dir, Path.GetFileName(dir));
 				}
 				SCP_EnterIntoParent(server);
 			}
-			else if (File.Exists(src))
-			{
+			else if (File.Exists(src)) {
 				SCP_SendFile(server, src, Path.GetFileName(src));
 			}
-			else
-			{
+			else {
 				throw new SshTransferException("File not found: " + src);
 			}
 		}
@@ -266,11 +252,9 @@ namespace LibSterileSSH
 			String filename = null;
 			string cmd = null;
 
-			try
-			{
+			try {
 				String dir = null;
-				if (Directory.Exists(localPath))
-				{
+				if (Directory.Exists(localPath)) {
 					dir = Path.GetFullPath(localPath);
 				}
 
@@ -283,14 +267,12 @@ namespace LibSterileSSH
 				int c = SCP_CheckAck(server);
 
 				//parse scp commands
-				while ((c == 'D') || (c == 'C') || (c == 'E'))
-				{
+				while ((c == 'D') || (c == 'C') || (c == 'E')) {
 					if (m_cancelled)
 						break;
 
 					cmd = "" + (char)c;
-					if (c == 'E')
-					{
+					if (c == 'E') {
 						c = SCP_CheckAck(server);
 						dir = Path.GetDirectoryName(dir);
 						if (Verbos)
@@ -308,8 +290,7 @@ namespace LibSterileSSH
 
 					//reading file size
 					filesize = 0;
-					while (true)
-					{
+					while (true) {
 						server.Read(buf, 0, 1);
 						if (buf[0] == ' ')
 							break;
@@ -317,11 +298,9 @@ namespace LibSterileSSH
 					}
 
 					//reading file name					
-					for (int i = 0; ; i++)
-					{
+					for (int i = 0; ; i++) {
 						server.Read(buf, i, 1);
-						if (buf[i] == (byte)0x0a)
-						{
+						if (buf[i] == (byte)0x0a) {
 							filename = StringAux.getString(buf, 0, i);
 							break;
 						}
@@ -331,8 +310,7 @@ namespace LibSterileSSH
 					SCP_SendAck(server);
 
 					//Receive file
-					if (c == 'C')
-					{
+					if (c == 'C') {
 						if (Verbos)
 							Console.WriteLine("Sending file modes: " + cmd);
 						SCP_ReceiveFile(server, remoteFile,
@@ -346,10 +324,8 @@ namespace LibSterileSSH
 						SCP_SendAck(server);
 					}
 					//Enter directory
-					else if (c == 'D')
-					{
-						if (dir == null)
-						{
+					else if (c == 'D') {
+						if (dir == null) {
 							if (File.Exists(localPath))
 								throw new SshTransferException("'" + localPath + "' is not a directory");
 							dir = localPath;
@@ -365,16 +341,13 @@ namespace LibSterileSSH
 				}
 				channel.disconnect();
 			}
-			catch (Exception e)
-			{
+			catch (Exception e) {
 				if (Verbos)
 					Console.WriteLine("Error: " + e.Message);
-				try
-				{
+				try {
 					channel.disconnect();
 				}
-				catch
-				{
+				catch {
 				}
 				throw e;
 			}
@@ -466,8 +439,7 @@ namespace LibSterileSSH
 			server.Write(buff, 0, buff.Length);
 			server.Flush();
 
-			if (SCP_CheckAck(server) != 0)
-			{
+			if (SCP_CheckAck(server) != 0) {
 				throw new SshTransferException("Error openning communication channel.");
 			}
 
@@ -476,8 +448,7 @@ namespace LibSterileSSH
 			FileStream fis = File.OpenRead(src);
 			byte[] buf = new byte[1024 * 10 * 2];
 
-			while (!m_cancelled)
-			{
+			while (!m_cancelled) {
 				int len = fis.Read(buf, 0, buf.Length);
 				if (len <= 0)
 					break;
@@ -497,8 +468,7 @@ namespace LibSterileSSH
 			server.Flush();
 
 			SendProgressMessage(src, dst, copied, filesize, "Verifying transfer...");
-			if (SCP_CheckAck(server) != 0)
-			{
+			if (SCP_CheckAck(server) != 0) {
 				SendEndMessage(src, dst, copied, filesize, "Transfer ended with an error.");
 				throw new SshTransferException("Unknow error during file transfer.");
 			}
@@ -520,8 +490,7 @@ namespace LibSterileSSH
 			int foo;
 			int filesize = size;
 			byte[] buf = new byte[1024];
-			while (!m_cancelled)
-			{
+			while (!m_cancelled) {
 				if (buf.Length < filesize)
 					foo = buf.Length;
 				else
@@ -548,8 +517,7 @@ namespace LibSterileSSH
 		/// <param name="dir">The directory name/param>
 		protected void SCP_EnterIntoDir(Stream server, string dir)
 		{
-			try
-			{
+			try {
 				byte[] tmp = new byte[1];
 
 				// send "C0644 filesize filename", where filename should not include '/'
@@ -562,13 +530,11 @@ namespace LibSterileSSH
 				server.Write(buff, 0, buff.Length);
 				server.Flush();
 
-				if (SCP_CheckAck(server) != 0)
-				{
+				if (SCP_CheckAck(server) != 0) {
 					throw new SshTransferException("Error openning communication channel.");
 				}
 			}
-			catch
-			{
+			catch {
 			}
 		}
 
@@ -578,8 +544,7 @@ namespace LibSterileSSH
 		/// <param name="server">A connected server I/O stream</param>
 		protected void SCP_EnterIntoParent(Stream server)
 		{
-			try
-			{
+			try {
 				byte[] tmp = new byte[1];
 
 				// send "C0644 filesize filename", where filename should not include '/'
@@ -592,13 +557,11 @@ namespace LibSterileSSH
 				server.Write(buff, 0, buff.Length);
 				server.Flush();
 
-				if (SCP_CheckAck(server) != 0)
-				{
+				if (SCP_CheckAck(server) != 0) {
 					throw new SshTransferException("Error openning communication channel.");
 				}
 			}
-			catch
-			{
+			catch {
 			}
 		}
 
@@ -618,23 +581,19 @@ namespace LibSterileSSH
 			if (b == -1)
 				return b;
 
-			if (b == 1 || b == 2)
-			{
+			if (b == 1 || b == 2) {
 				StringBuilder sb = new StringBuilder();
 				int c;
-				do
-				{
+				do {
 					c = ins.ReadByte();
 					sb.Append((char)c);
 				}
 				while (c != '\n');
-				if (b == 1)
-				{ // error
+				if (b == 1) { // error
 					//Console.WriteLine(sb.ToString());
 					throw new SshTransferException(sb.ToString());
 				}
-				if (b == 2)
-				{ // fatal error
+				if (b == 2) { // fatal error
 					//Console.WriteLine(sb.ToString());
 					throw new SshTransferException(sb.ToString());
 				}

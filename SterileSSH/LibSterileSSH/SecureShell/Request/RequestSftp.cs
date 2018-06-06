@@ -41,8 +41,7 @@ namespace LibSterileSSH.SecureShell
 			Packet packet = new Packet(buf);
 
 			bool reply = waitForReply();
-			if (reply)
-			{
+			if (reply) {
 				channel.reply = -1;
 			}
 
@@ -54,20 +53,16 @@ namespace LibSterileSSH.SecureShell
 			buf.putString(StringAux.getBytes("sftp"));
 			session.write(packet);
 
-			if (reply)
-			{
-				while (channel.reply == -1)
-				{
-					try
-					{
+			if (reply) {
+				while (channel.reply == -1) {
+					try {
 						System.Threading.Thread.Sleep(10);
 					}
 					catch//(Exception ee)
 					{
 					}
 				}
-				if (channel.reply == 0)
-				{
+				if (channel.reply == 0) {
 					throw new SshClientException("failed to send sftp request");
 				}
 			}

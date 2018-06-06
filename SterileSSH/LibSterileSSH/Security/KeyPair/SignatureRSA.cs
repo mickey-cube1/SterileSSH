@@ -133,8 +133,7 @@ namespace LibSterileSSH.Security
 
 			//Util.Dump("c:\\sig.bin", sig);
 
-			if (sig[0] == 0 && sig[1] == 0 && sig[2] == 0)
-			{
+			if (sig[0] == 0 && sig[1] == 0 && sig[2] == 0) {
 				long i1 = (sig[i++] << 24) & 0xff000000;
 				long i2 = (sig[i++] << 16) & 0x00ff0000;
 				long i3 = (sig[i++] << 8) & 0x0000ff00;

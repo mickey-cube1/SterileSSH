@@ -45,14 +45,11 @@ namespace LibSterileSSH
 		public static byte[] stripLeadingZeros(byte[] a)
 		{
 			int lastZero = -1;
-			for (int i = 0; i < a.Length; i++)
-			{
-				if (a[i] == 0)
-				{
+			for (int i = 0; i < a.Length; i++) {
+				if (a[i] == 0) {
 					lastZero = i;
 				}
-				else
-				{
+				else {
 					break;
 				}
 			}
@@ -67,10 +64,8 @@ namespace LibSterileSSH
 			byte[] path = StringAux.getBytesUTF8(_path);
 			int pathlen = path.Length;
 			int i = 0;
-			while (i < pathlen)
-			{
-				if (path[i] == '\\')
-				{
+			while (i < pathlen) {
+				if (path[i] == '\\') {
 					if (i + 1 == pathlen)
 						break;
 					System.Array.Copy(path, i + 1, path, i, path.Length - (i + 1));
@@ -113,36 +108,30 @@ namespace LibSterileSSH
 			int po = ooffset;
 			// Note: toffset, ooffset, or len might be near -1>>>1.
 			if ((ooffset < 0) || (toffset < 0) || (toffset > (long)orig.Length - len) ||
-				(ooffset > (long)other.Length - len))
-			{
+				(ooffset > (long)other.Length - len)) {
 				return false;
 			}
-			while (len-- > 0)
-			{
+			while (len-- > 0) {
 				char c1 = ta[to++];
 				char c2 = pa[po++];
-				if (c1 == c2)
-				{
+				if (c1 == c2) {
 					continue;
 				}
-				if (ignoreCase)
-				{
+				if (ignoreCase) {
 					// If characters don't match but case may be ignored,
 					// try converting both characters to uppercase.
 					// If the results match, then the comparison scan should
 					// continue.
 					char u1 = char.ToUpper(c1);
 					char u2 = char.ToUpper(c2);
-					if (u1 == u2)
-					{
+					if (u1 == u2) {
 						continue;
 					}
 					// Unfortunately, conversion to uppercase does not work properly
 					// for the Georgian alphabet, which has strange rules about case
 					// conversion.  So we need to make one last check before
 					// exiting.
-					if (char.ToLower(u1) == char.ToLower(u2))
-					{
+					if (char.ToLower(u1) == char.ToLower(u2)) {
 						continue;
 					}
 				}
@@ -156,11 +145,9 @@ namespace LibSterileSSH
 			System.Collections.ArrayList bar = new System.Collections.ArrayList();
 			int start = 0;
 			int index;
-			while (true)
-			{
+			while (true) {
 				index = foo.IndexOf(split, start);
-				if (index >= 0)
-				{
+				if (index >= 0) {
 					bar.Add(StringAux.getString(buf, start, index - start));
 					start = index + 1;
 					continue;
@@ -169,8 +156,7 @@ namespace LibSterileSSH
 				break;
 			}
 			string[] result = new string[bar.Count];
-			for (int i = 0; i < result.Length; i++)
-			{
+			for (int i = 0; i < result.Length; i++) {
 				result[i] = (string)(bar[i]);
 			}
 			return result;
@@ -188,10 +174,8 @@ namespace LibSterileSSH
 			int namelen = name.Length;
 			int i = pattern_index;
 			int j = name_index;
-			while (i < patternlen && j < namelen)
-			{
-				if (pattern[i] == '\\')
-				{
+			while (i < patternlen && j < namelen) {
+				if (pattern[i] == '\\') {
 					if (i + 1 == patternlen)
 						return false;
 					i++;
@@ -201,18 +185,14 @@ namespace LibSterileSSH
 					j++;
 					continue;
 				}
-				if (pattern[i] == '*')
-				{
+				if (pattern[i] == '*') {
 					if (patternlen == i + 1)
 						return true;
 					i++;
 					byte foo = pattern[i];
-					while (j < namelen)
-					{
-						if (foo == name[j])
-						{
-							if (glob(pattern, i, name, j))
-							{
+					while (j < namelen) {
+						if (foo == name[j]) {
+							if (glob(pattern, i, name, j)) {
 								return true;
 							}
 						}
@@ -225,8 +205,7 @@ namespace LibSterileSSH
 					continue;
 					*/
 				}
-				if (pattern[i] == '?')
-				{
+				if (pattern[i] == '?') {
 					i++;
 					j++;
 					continue;
@@ -243,15 +222,13 @@ namespace LibSterileSSH
 		}
 		internal static String getFingerPrint(IHASH hash, byte[] data)
 		{
-			try
-			{
+			try {
 				hash.Init();
 				hash.update(data, 0, data.Length);
 				byte[] foo = hash.digest();
 				System.Text.StringBuilder sb = new System.Text.StringBuilder();
 				uint bar;
-				for (int i = 0; i < foo.Length; i++)
-				{
+				for (int i = 0; i < foo.Length; i++) {
 					bar = (byte)(foo[i] & 0xff);
 					sb.AppendFormat("{0:x2}", bar);
 					if (i + 1 < foo.Length)
@@ -259,8 +236,7 @@ namespace LibSterileSSH
 				}
 				return sb.ToString();
 			}
-			catch
-			{
+			catch {
 				return "???";
 			}
 		}
@@ -269,8 +245,7 @@ namespace LibSterileSSH
 		{
 			if (foo == '=')
 				return 0;
-			for (int j = 0; j < b64.Length; j++)
-			{
+			for (int j = 0; j < b64.Length; j++) {
 				if (foo == b64[j])
 					return (byte)j;
 			}
@@ -281,17 +256,14 @@ namespace LibSterileSSH
 			byte[] foo = new byte[length];
 			int j = 0;
 			int l = length;
-			for (int i = start; i < start + length; i += 4)
-			{
+			for (int i = start; i < start + length; i += 4) {
 				foo[j] = (byte)((val(buf[i]) << 2) | ((val(buf[i + 1]) & 0x30) >> 4));
-				if (buf[i + 2] == (byte)'=')
-				{
+				if (buf[i + 2] == (byte)'=') {
 					j++;
 					break;
 				}
 				foo[j + 1] = (byte)(((val(buf[i + 1]) & 0x0f) << 4) | ((val(buf[i + 2]) & 0x3c) >> 2));
-				if (buf[i + 3] == (byte)'=')
-				{
+				if (buf[i + 3] == (byte)'=') {
 					j += 2;
 					break;
 				}
@@ -310,8 +282,7 @@ namespace LibSterileSSH
 
 			int foo = (length / 3) * 3 + start;
 			i = 0;
-			for (j = start; j < foo; j += 3)
-			{
+			for (j = start; j < foo; j += 3) {
 				k = (buf[j] >> 2) & 0x3f;
 				tmp[i++] = b64[k];
 				k = (buf[j] & 0x03) << 4 | (buf[j + 1] >> 4) & 0x0f;
@@ -323,8 +294,7 @@ namespace LibSterileSSH
 			}
 
 			foo = (start + length) - foo;
-			if (foo == 1)
-			{
+			if (foo == 1) {
 				k = (buf[j] >> 2) & 0x3f;
 				tmp[i++] = b64[k];
 				k = ((buf[j] & 0x03) << 4) & 0x3f;
@@ -332,8 +302,7 @@ namespace LibSterileSSH
 				tmp[i++] = (byte)'=';
 				tmp[i++] = (byte)'=';
 			}
-			else if (foo == 2)
-			{
+			else if (foo == 2) {
 				k = (buf[j] >> 2) & 0x3f;
 				tmp[i++] = b64[k];
 				k = (buf[j] & 0x03) << 4 | (buf[j + 1] >> 4) & 0x0f;

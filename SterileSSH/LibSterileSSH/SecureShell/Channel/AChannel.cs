@@ -44,46 +44,36 @@ namespace LibSterileSSH.SecureShell
 		private static ArrayList pool = new ArrayList();
 		internal static AChannel getChannel(String type)
 		{
-			if (type.Equals("session"))
-			{
+			if (type.Equals("session")) {
 				return new ChannelSession();
 			}
-			if (type.Equals("shell"))
-			{
+			if (type.Equals("shell")) {
 				return new ChannelShell();
 			}
-			if (type.Equals("exec"))
-			{
+			if (type.Equals("exec")) {
 				return new ChannelExec();
 			}
-			if (type.Equals("x11"))
-			{
+			if (type.Equals("x11")) {
 				return new ChannelX11();
 			}
-			if (type.Equals("direct-tcpip"))
-			{
+			if (type.Equals("direct-tcpip")) {
 				return new ChannelDirectTCPIP();
 			}
-			if (type.Equals("forwarded-tcpip"))
-			{
+			if (type.Equals("forwarded-tcpip")) {
 				return new ChannelForwardedTCPIP();
 			}
-			if (type.Equals("sftp"))
-			{
+			if (type.Equals("sftp")) {
 				return new ChannelSftp();
 			}
-			if (type.Equals("subsystem"))
-			{
+			if (type.Equals("subsystem")) {
 				return new ChannelSubsystem();
 			}
 			return null;
 		}
 		internal static AChannel getChannel(int id, Session session)
 		{
-			lock (pool)
-			{
-				for (int i = 0; i < pool.Count; i++)
-				{
+			lock (pool) {
+				for (int i = 0; i < pool.Count; i++) {
 					AChannel c = (AChannel)(pool[i]);
 					if (c.id == id && c.session == session)
 						return c;
@@ -93,8 +83,7 @@ namespace LibSterileSSH.SecureShell
 		}
 		internal static void del(AChannel c)
 		{
-			lock (pool)
-			{
+			lock (pool) {
 				pool.Remove(c);
 			}
 		}
@@ -126,8 +115,7 @@ namespace LibSterileSSH.SecureShell
 
 		internal AChannel()
 		{
-			lock (pool)
-			{
+			lock (pool) {
 				id = index++;
 				pool.Add(this);
 			}
@@ -147,12 +135,10 @@ namespace LibSterileSSH.SecureShell
 
 		public virtual void connect()
 		{
-			if (!session.isConnected())
-			{
+			if (!session.isConnected()) {
 				throw new SshClientException("session is down");
 			}
-			try
-			{
+			try {
 				Buffer buf = new Buffer(100);
 				Packet packet = new Packet(buf);
 				// send
@@ -172,30 +158,24 @@ namespace LibSterileSSH.SecureShell
 				int retry = 1000;
 				while (this.getRecipient() == -1 &&
 					session.isConnected() &&
-					retry > 0)
-				{
-					try
-					{
+					retry > 0) {
+					try {
 						ThreadAux.Sleep(50);
 					}
-					catch (Exception)
-					{
+					catch (Exception) {
 					}
 					retry--;
 				}
-				if (!session.isConnected())
-				{
+				if (!session.isConnected()) {
 					throw new SshClientException("session is down");
 				}
-				if (retry == 0)
-				{
+				if (retry == 0) {
 					throw new SshClientException("channel is not opened.");
 				}
 				connected = true;
 				start();
 			}
-			catch (Exception e)
-			{
+			catch (Exception e) {
 				connected = false;
 				if (e is SshClientException)
 					throw (SshClientException)e;
@@ -332,43 +312,35 @@ namespace LibSterileSSH.SecureShell
 		}
 		internal virtual void write(byte[] foo, int s, int l)
 		{
-			try
-			{
+			try {
 				//    if(io.outs!=null)
 				io.put(foo, s, l);
 			}
-			catch (NullReferenceException)
-			{
+			catch (NullReferenceException) {
 			}
 		}
 		internal virtual void write_ext(byte[] foo, int s, int l)
 		{
-			try
-			{
+			try {
 				//    if(io.out_ext!=null)
 				io.put_ext(foo, s, l);
 			}
-			catch (NullReferenceException)
-			{
+			catch (NullReferenceException) {
 			}
 		}
 
 		internal virtual void eof_remote()
 		{
 			_eof_remote = true;
-			try
-			{
-				if (io.outs != null)
-				{
+			try {
+				if (io.outs != null) {
 					io.outs.Close();
 					io.outs = null;
 				}
 			}
-			catch (NullReferenceException)
-			{
+			catch (NullReferenceException) {
 			}
-			catch (IOException)
-			{
+			catch (IOException) {
 			}
 		}
 
@@ -382,8 +354,7 @@ namespace LibSterileSSH.SecureShell
 				return;
 			eof_local = true;
 			//close=eof;
-			try
-			{
+			try {
 				Buffer buf = new Buffer(100);
 				Packet packet = new Packet(buf);
 				packet.reset();
@@ -391,8 +362,7 @@ namespace LibSterileSSH.SecureShell
 				buf.putInt(getRecipient());
 				session.write(packet);
 			}
-			catch (Exception)
-			{
+			catch (Exception) {
 				//System.Out.println("Channel.eof");
 				//e.printStackTrace();
 			}
@@ -443,8 +413,7 @@ namespace LibSterileSSH.SecureShell
 			if (_close)
 				return;
 			_close = true;
-			try
-			{
+			try {
 				Buffer buf = new Buffer(100);
 				Packet packet = new Packet(buf);
 				packet.reset();
@@ -452,8 +421,7 @@ namespace LibSterileSSH.SecureShell
 				buf.putInt(getRecipient());
 				session.write(packet);
 			}
-			catch (Exception)
-			{
+			catch (Exception) {
 				//e.printStackTrace();
 			}
 		}
@@ -465,26 +433,20 @@ namespace LibSterileSSH.SecureShell
 		{
 			AChannel[] channels = null;
 			int count = 0;
-			lock (pool)
-			{
+			lock (pool) {
 				channels = new AChannel[pool.Count];
-				for (int i = 0; i < pool.Count; i++)
-				{
-					try
-					{
+				for (int i = 0; i < pool.Count; i++) {
+					try {
 						AChannel c = ((AChannel)(pool[i]));
-						if (c.session == session)
-						{
+						if (c.session == session) {
 							channels[count++] = c;
 						}
 					}
-					catch (Exception)
-					{
+					catch (Exception) {
 					}
 				}
 			}
-			for (int i = 0; i < count; i++)
-			{
+			for (int i = 0; i < count; i++) {
 				channels[i].disconnect();
 			}
 		}
@@ -500,8 +462,7 @@ namespace LibSterileSSH.SecureShell
 		public virtual void disconnect()
 		{
 			//System.Out.println(this+":disconnect "+io+" "+io.in);
-			if (!connected)
-			{
+			if (!connected) {
 				return;
 			}
 			connected = false;
@@ -512,15 +473,12 @@ namespace LibSterileSSH.SecureShell
 
 			thread = null;
 
-			try
-			{
-				if (io != null)
-				{
+			try {
+				if (io != null) {
 					io.close();
 				}
 			}
-			catch (Exception)
-			{
+			catch (Exception) {
 				//e.printStackTrace();
 			}
 			io = null;
@@ -529,8 +487,7 @@ namespace LibSterileSSH.SecureShell
 
 		public virtual bool isConnected()
 		{
-			if (this.session != null)
-			{
+			if (this.session != null) {
 				return session.isConnected() && connected;
 			}
 			return false;
@@ -570,8 +527,7 @@ namespace LibSterileSSH.SecureShell
 			}
 			public override void close()
 			{
-				if (Out != null)
-				{
+				if (Out != null) {
 					this.Out.close();
 				}
 				Out = null;

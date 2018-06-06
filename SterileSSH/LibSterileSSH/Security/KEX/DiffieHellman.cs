@@ -82,8 +82,7 @@ namespace LibSterileSSH.Security
 				throw new ArgumentNullException();
 
 			DHParameters dhParams = new DHParameters();
-			try
-			{
+			try {
 				XmlDocument sp = new XmlDocument();
 				sp.LoadXml(xmlString);
 				XmlNode se = sp.DocumentElement;
@@ -98,8 +97,7 @@ namespace LibSterileSSH.Security
 				dhParams.X = Convert.FromBase64String(sl.ToString());
 				ImportParameters(dhParams);
 			}
-			finally
-			{
+			finally {
 				if (dhParams.P != null)
 					Array.Clear(dhParams.P, 0, dhParams.P.Length);
 				if (dhParams.G != null)
@@ -117,8 +115,7 @@ namespace LibSterileSSH.Security
 		{
 			StringBuilder sb = new StringBuilder();
 			DHParameters dhParams = ExportParameters(includePrivateParameters);
-			try
-			{
+			try {
 				sb.Append("<DHKeyValue>");
 
 				sb.Append("<P>");
@@ -129,8 +126,7 @@ namespace LibSterileSSH.Security
 				sb.Append(Convert.ToBase64String(dhParams.G));
 				sb.Append("</G>");
 
-				if (includePrivateParameters)
-				{
+				if (includePrivateParameters) {
 					sb.Append("<X>");
 					sb.Append(Convert.ToBase64String(dhParams.X));
 					sb.Append("</X>");
@@ -138,8 +134,7 @@ namespace LibSterileSSH.Security
 
 				sb.Append("</DHKeyValue>");
 			}
-			finally
-			{
+			finally {
 				Array.Clear(dhParams.P, 0, dhParams.P.Length);
 				Array.Clear(dhParams.G, 0, dhParams.G.Length);
 				if (dhParams.X != null)

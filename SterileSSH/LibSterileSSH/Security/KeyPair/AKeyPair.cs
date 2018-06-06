@@ -57,16 +57,13 @@ namespace LibSterileSSH.Security
 		public static AKeyPair genKeyPair(SshClient jsch, int type, int key_size)
 		{
 			AKeyPair kpair = null;
-			if (type == DSA)
-			{
+			if (type == DSA) {
 				kpair = new KeyPairDSA(jsch);
 			}
-			else if (type == RSA)
-			{
+			else if (type == RSA) {
 				kpair = new KeyPairRSA(jsch);
 			}
-			if (kpair != null)
-			{
+			if (kpair != null) {
 				kpair.generate(key_size);
 			}
 			return kpair;
@@ -108,17 +105,14 @@ namespace LibSterileSSH.Security
 			byte[] iv = _iv[0];
 			byte[] prv = StringAux.toBase64(encoded, 0, encoded.Length);
 
-			try
-			{
+			try {
 				Write(outs, getBegin());
 				Write(outs, cr);
-				if (passphrase != null)
-				{
+				if (passphrase != null) {
 					Write(outs, header[0]);
 					Write(outs, cr);
 					Write(outs, header[1]);
-					for (int j = 0; j < iv.Length; j++)
-					{
+					for (int j = 0; j < iv.Length; j++) {
 						outs.WriteByte(b2a((byte)((iv[j] >> 4) & 0x0f)));
 						outs.WriteByte(b2a((byte)(iv[j] & 0x0f)));
 					}
@@ -126,10 +120,8 @@ namespace LibSterileSSH.Security
 					Write(outs, cr);
 				}
 				int i = 0;
-				while (i < prv.Length)
-				{
-					if (i + 64 < prv.Length)
-					{
+				while (i < prv.Length) {
+					if (i + 64 < prv.Length) {
 						outs.Write(prv, i, 64);
 						Write(outs, cr);
 						i += 64;
@@ -143,8 +135,7 @@ namespace LibSterileSSH.Security
 				Write(outs, cr);
 				//outs.close();
 			}
-			catch (Exception e)
-			{
+			catch (Exception e) {
 				Console.WriteLine(e);
 			}
 		}
@@ -163,8 +154,7 @@ namespace LibSterileSSH.Security
 		{
 			byte[] pubblob = getPublicKeyBlob();
 			byte[] pub = StringAux.toBase64(pubblob, 0, pubblob.Length);
-			try
-			{
+			try {
 				Write(outs, getKeyTypeName());
 				Write(outs, space);
 				outs.Write(pub, 0, pub.Length);
@@ -172,8 +162,7 @@ namespace LibSterileSSH.Security
 				Write(outs, StringAux.getBytes(comment));
 				Write(outs, cr);
 			}
-			catch (Exception e)
-			{
+			catch (Exception e) {
 				Console.WriteLine(e);
 			}
 		}
@@ -189,15 +178,13 @@ namespace LibSterileSSH.Security
 		{
 			byte[] pubblob = getPublicKeyBlob();
 			byte[] pub = StringAux.toBase64(pubblob, 0, pubblob.Length);
-			try
-			{
+			try {
 				Write(outs, StringAux.getBytes("---- BEGIN SSH2 PUBLIC KEY ----"));
 				Write(outs, cr);
 				Write(outs, StringAux.getBytes("Comment: \"" + comment + "\""));
 				Write(outs, cr);
 				int index = 0;
-				while (index < pub.Length)
-				{
+				while (index < pub.Length) {
 					int len = 70;
 					if ((pub.Length - index) < len)
 						len = pub.Length - index;
@@ -208,8 +195,7 @@ namespace LibSterileSSH.Security
 				Write(outs, StringAux.getBytes("---- END SSH2 PUBLIC KEY ----"));
 				Write(outs, cr);
 			}
-			catch (Exception e)
-			{
+			catch (Exception e) {
 				Console.WriteLine(e);
 			}
 		}
@@ -255,20 +241,17 @@ namespace LibSterileSSH.Security
 			byte[] key = genKey(passphrase, iv);
 			byte[] encoded = plain;
 			int bsize = cipher.getBlockSize();
-			if (encoded.Length % bsize != 0)
-			{
+			if (encoded.Length % bsize != 0) {
 				byte[] foo = new byte[(encoded.Length / bsize + 1) * bsize];
 				Array.Copy(encoded, 0, foo, 0, encoded.Length);
 				encoded = foo;
 			}
 
-			try
-			{
+			try {
 				cipher.init(CipherDirectionMode.ENCRYPT_MODE, key, iv);
 				cipher.update(encoded, 0, encoded.Length, encoded, 0);
 			}
-			catch (Exception e)
-			{
+			catch (Exception e) {
 				Console.WriteLine(e);
 			}
 			return encoded;
@@ -284,16 +267,14 @@ namespace LibSterileSSH.Security
 			  for(int i=0; i<iv.Length; i++)iv[i]=0;
 			}
 			*/
-			try
-			{
+			try {
 				byte[] key = genKey(passphrase, iv);
 				cipher.init(CipherDirectionMode.DECRYPT_MODE, key, iv);
 				byte[] plain = new byte[data.Length];
 				cipher.update(data, 0, data.Length, plain, 0);
 				return plain;
 			}
-			catch (Exception e)
-			{
+			catch (Exception e) {
 				Console.WriteLine(e);
 			}
 			return null;
@@ -319,8 +300,7 @@ namespace LibSterileSSH.Security
 			int i = 1;
 			if (len <= 0x7f)
 				return i;
-			while (len > 0)
-			{
+			while (len > 0) {
 				len >>= 8;
 				i++;
 			}
@@ -330,15 +310,13 @@ namespace LibSterileSSH.Security
 		internal int writeLength(byte[] data, int index, int len)
 		{
 			int i = countLength(len) - 1;
-			if (i == 0)
-			{
+			if (i == 0) {
 				data[index++] = (byte)len;
 				return index;
 			}
 			data[index++] = (byte)(0x80 | i);
 			int j = index + i;
-			while (i > 0)
-			{
+			while (i > 0) {
 				data[index + i - 1] = (byte)(len & 0xff);
 				len >>= 8;
 				i--;
@@ -348,15 +326,12 @@ namespace LibSterileSSH.Security
 
 		private IRandom genRandom()
 		{
-			if (random == null)
-			{
-				try
-				{
+			if (random == null) {
+				try {
 					Type t = Type.GetType(jsch.getConfig("random"));
 					random = (IRandom)Activator.CreateInstance(t);
 				}
-				catch (Exception e)
-				{
+				catch (Exception e) {
 					Console.Error.WriteLine("connect: random " + e);
 				}
 			}
@@ -365,8 +340,7 @@ namespace LibSterileSSH.Security
 
 		private IHASH genHash()
 		{
-			try
-			{
+			try {
 				Type t = Type.GetType(jsch.getConfig("md5"));
 				hash = (IHASH)Activator.CreateInstance(t);
 				hash.Init();
@@ -378,8 +352,7 @@ namespace LibSterileSSH.Security
 		}
 		private ICipher genCipher()
 		{
-			try
-			{
+			try {
 				Type t;
 				t = Type.GetType(jsch.getConfig("3des-cbc"));
 				cipher = (ICipher)(Activator.CreateInstance(t));
@@ -408,15 +381,11 @@ namespace LibSterileSSH.Security
 			int hsize = hash.getBlockSize();
 			byte[] hn = new byte[key.Length / hsize * hsize +
 				(key.Length % hsize == 0 ? 0 : hsize)];
-			try
-			{
+			try {
 				byte[] tmp = null;
-				if (vendor == VENDOR_OPENSSH)
-				{
-					for (int index = 0; index + hsize <= hn.Length; )
-					{
-						if (tmp != null)
-						{
+				if (vendor == VENDOR_OPENSSH) {
+					for (int index = 0; index + hsize <= hn.Length; ) {
+						if (tmp != null) {
 							hash.update(tmp, 0, tmp.Length);
 						}
 						hash.update(passphrase, 0, passphrase.Length);
@@ -427,12 +396,9 @@ namespace LibSterileSSH.Security
 					}
 					Array.Copy(hn, 0, key, 0, key.Length);
 				}
-				else if (vendor == VENDOR_FSECURE)
-				{
-					for (int index = 0; index + hsize <= hn.Length; )
-					{
-						if (tmp != null)
-						{
+				else if (vendor == VENDOR_FSECURE) {
+					for (int index = 0; index + hsize <= hn.Length; ) {
+						if (tmp != null) {
 							hash.update(tmp, 0, tmp.Length);
 						}
 						hash.update(passphrase, 0, passphrase.Length);
@@ -443,8 +409,7 @@ namespace LibSterileSSH.Security
 					Array.Copy(hn, 0, key, 0, key.Length);
 				}
 			}
-			catch (Exception e)
-			{
+			catch (Exception e) {
 				Console.WriteLine(e);
 			}
 			return key;
@@ -452,12 +417,10 @@ namespace LibSterileSSH.Security
 
 		public void setPassphrase(String passphrase)
 		{
-			if (passphrase == null || passphrase.Length == 0)
-			{
+			if (passphrase == null || passphrase.Length == 0) {
 				setPassphrase((byte[])null);
 			}
-			else
-			{
+			else {
 				setPassphrase(StringAux.getBytes(passphrase));
 			}
 		}
@@ -481,8 +444,7 @@ namespace LibSterileSSH.Security
 		{
 			byte[] passphrase = StringAux.getBytes(_passphrase);
 			byte[] foo = decrypt(data, passphrase, iv);
-			if (parse(foo))
-			{
+			if (parse(foo)) {
 				encrypted = false;
 			}
 			return !encrypted;
@@ -492,8 +454,7 @@ namespace LibSterileSSH.Security
 		{
 			String pubkey = prvkey + ".pub";
 			//			if(!new File(pubkey).exists())
-			if (!File.Exists(pubkey))
-			{
+			if (!File.Exists(pubkey)) {
 				pubkey = null;
 			}
 			return load(jsch, prvkey, pubkey);
@@ -510,8 +471,7 @@ namespace LibSterileSSH.Security
 			int type = ERROR;
 			int vendor = VENDOR_OPENSSH;
 
-			try
-			{
+			try {
 				//File file=new File(prvkey);
 				FileStream fis = File.OpenRead(prvkey);
 				byte[] buf = new byte[(int)(fis.Length)];
@@ -520,74 +480,59 @@ namespace LibSterileSSH.Security
 
 				int i = 0;
 
-				while (i < len)
-				{
-					if (buf[i] == 'B' && buf[i + 1] == 'E' && buf[i + 2] == 'G' && buf[i + 3] == 'I')
-					{
+				while (i < len) {
+					if (buf[i] == 'B' && buf[i + 1] == 'E' && buf[i + 2] == 'G' && buf[i + 3] == 'I') {
 						i += 6;
-						if (buf[i] == 'D' && buf[i + 1] == 'S' && buf[i + 2] == 'A')
-						{
+						if (buf[i] == 'D' && buf[i + 1] == 'S' && buf[i + 2] == 'A') {
 							type = DSA;
 						}
-						else if (buf[i] == 'R' && buf[i + 1] == 'S' && buf[i + 2] == 'A')
-						{
+						else if (buf[i] == 'R' && buf[i + 1] == 'S' && buf[i + 2] == 'A') {
 							type = RSA;
 						}
-						else if (buf[i] == 'S' && buf[i + 1] == 'S' && buf[i + 2] == 'H')
-						{ // FSecure
+						else if (buf[i] == 'S' && buf[i + 1] == 'S' && buf[i + 2] == 'H') { // FSecure
 							type = UNKNOWN;
 							vendor = VENDOR_FSECURE;
 						}
-						else
-						{
+						else {
 							//System.outs.println("invalid format: "+identity);
 							throw new SshClientException("invaid privatekey: " + prvkey);
 						}
 						i += 3;
 						continue;
 					}
-					if (buf[i] == 'C' && buf[i + 1] == 'B' && buf[i + 2] == 'C' && buf[i + 3] == ',')
-					{
+					if (buf[i] == 'C' && buf[i + 1] == 'B' && buf[i + 2] == 'C' && buf[i + 3] == ',') {
 						i += 4;
-						for (int ii = 0; ii < iv.Length; ii++)
-						{
+						for (int ii = 0; ii < iv.Length; ii++) {
 							iv[ii] = (byte)(((a2b(buf[i++]) << 4) & 0xf0) + (a2b(buf[i++]) & 0xf));
 						}
 						continue;
 					}
 					if (buf[i] == 0x0d &&
-						i + 1 < buf.Length && buf[i + 1] == 0x0a)
-					{
+						i + 1 < buf.Length && buf[i + 1] == 0x0a) {
 						i++;
 						continue;
 					}
-					if (buf[i] == 0x0a && i + 1 < buf.Length)
-					{
-						if (buf[i + 1] == 0x0a)
-						{
+					if (buf[i] == 0x0a && i + 1 < buf.Length) {
+						if (buf[i + 1] == 0x0a) {
 							i += 2;
 							break;
 						}
 						if (buf[i + 1] == 0x0d &&
-							i + 2 < buf.Length && buf[i + 2] == 0x0a)
-						{
+							i + 2 < buf.Length && buf[i + 2] == 0x0a) {
 							i += 3;
 							break;
 						}
 						bool inheader = false;
-						for (int j = i + 1; j < buf.Length; j++)
-						{
+						for (int j = i + 1; j < buf.Length; j++) {
 							if (buf[j] == 0x0a)
 								break;
 							//if(buf[j]==0x0d) break;
-							if (buf[j] == ':')
-							{
+							if (buf[j] == ':') {
 								inheader = true;
 								break;
 							}
 						}
-						if (!inheader)
-						{
+						if (!inheader) {
 							i++;
 							encrypted = false;    // no passphrase
 							break;
@@ -596,16 +541,13 @@ namespace LibSterileSSH.Security
 					i++;
 				}
 
-				if (type == ERROR)
-				{
+				if (type == ERROR) {
 					throw new SshClientException("invaid privatekey: " + prvkey);
 				}
 
 				int start = i;
-				while (i < len)
-				{
-					if (buf[i] == 0x0a)
-					{
+				while (i < len) {
+					if (buf[i] == 0x0a) {
 						bool xd = (buf[i - 1] == 0x0d);
 						Array.Copy(buf, i + 1,
 							buf,
@@ -617,8 +559,7 @@ namespace LibSterileSSH.Security
 						len--;
 						continue;
 					}
-					if (buf[i] == '-')
-					{
+					if (buf[i] == '-') {
 						break;
 					}
 					i++;
@@ -629,8 +570,7 @@ namespace LibSterileSSH.Security
 					data[0] == (byte)0x3f &&
 					data[1] == (byte)0x6f &&
 					data[2] == (byte)0xf9 &&
-					data[3] == (byte)0xeb)
-				{
+					data[3] == (byte)0xeb) {
 
 					LibSterileSSH.SecureShell.Buffer _buf = new LibSterileSSH.SecureShell.Buffer(data);
 					_buf.getInt();  // 0x3f6ff9be
@@ -640,8 +580,7 @@ namespace LibSterileSSH.Security
 					byte[] _cipher = _buf.getString();
 					String cipher = StringAux.getString(_cipher);
 					//System.outs.println("cipher: "+cipher); 
-					if (cipher.Equals("3des-cbc"))
-					{
+					if (cipher.Equals("3des-cbc")) {
 						_buf.getInt();
 						byte[] foo = new byte[data.Length - _buf.getOffSet()];
 						_buf.getByte(foo);
@@ -649,8 +588,7 @@ namespace LibSterileSSH.Security
 						encrypted = true;
 						throw new SshClientException("unknown privatekey format: " + prvkey);
 					}
-					else if (cipher.Equals("none"))
-					{
+					else if (cipher.Equals("none")) {
 						_buf.getInt();
 						_buf.getInt();
 
@@ -662,10 +600,8 @@ namespace LibSterileSSH.Security
 					}
 				}
 
-				if (pubkey != null)
-				{
-					try
-					{
+				if (pubkey != null) {
+					try {
 						//file=new File(pubkey);
 						fis = File.OpenRead(pubkey);
 						buf = new byte[(int)(fis.Length)];
@@ -673,96 +609,75 @@ namespace LibSterileSSH.Security
 						fis.Close();
 
 						if (buf.Length > 4 &&             // FSecure's public key
-							buf[0] == '-' && buf[1] == '-' && buf[2] == '-' && buf[3] == '-')
-						{
+							buf[0] == '-' && buf[1] == '-' && buf[2] == '-' && buf[3] == '-') {
 
 							bool valid = true;
 							i = 0;
-							do
-							{
+							do {
 								i++;
 							} while (buf.Length > i && buf[i] != 0x0a);
-							if (buf.Length <= i)
-							{
+							if (buf.Length <= i) {
 								valid = false;
 							}
 
-							while (valid)
-							{
-								if (buf[i] == 0x0a)
-								{
+							while (valid) {
+								if (buf[i] == 0x0a) {
 									bool inheader = false;
-									for (int j = i + 1; j < buf.Length; j++)
-									{
+									for (int j = i + 1; j < buf.Length; j++) {
 										if (buf[j] == 0x0a)
 											break;
-										if (buf[j] == ':')
-										{
+										if (buf[j] == ':') {
 											inheader = true;
 											break;
 										}
 									}
-									if (!inheader)
-									{
+									if (!inheader) {
 										i++;
 										break;
 									}
 								}
 								i++;
 							}
-							if (buf.Length <= i)
-							{
+							if (buf.Length <= i) {
 								valid = false;
 							}
 
 							start = i;
-							while (valid && i < len)
-							{
-								if (buf[i] == 0x0a)
-								{
+							while (valid && i < len) {
+								if (buf[i] == 0x0a) {
 									Array.Copy(buf, i + 1, buf, i, len - i - 1);
 									len--;
 									continue;
 								}
-								if (buf[i] == '-')
-								{
+								if (buf[i] == '-') {
 									break;
 								}
 								i++;
 							}
-							if (valid)
-							{
+							if (valid) {
 								publickeyblob = StringAux.fromBase64(buf, start, i - start);
-								if (type == UNKNOWN)
-								{
-									if (publickeyblob[8] == 'd')
-									{
+								if (type == UNKNOWN) {
+									if (publickeyblob[8] == 'd') {
 										type = DSA;
 									}
-									else if (publickeyblob[8] == 'r')
-									{
+									else if (publickeyblob[8] == 'r') {
 										type = RSA;
 									}
 								}
 							}
 						}
-						else
-						{
-							if (buf[0] == 's' && buf[1] == 's' && buf[2] == 'h' && buf[3] == '-')
-							{
+						else {
+							if (buf[0] == 's' && buf[1] == 's' && buf[2] == 'h' && buf[3] == '-') {
 								i = 0;
-								while (i < len)
-								{
+								while (i < len) {
 									if (buf[i] == ' ')
 										break;
 									i++;
 								}
 								i++;
-								if (i < len)
-								{
+								if (i < len) {
 									start = i;
-									while (i < len)
-									{
+									while (i < len) {
 										if (buf[i] == ' ')
 											break;
 										i++;
@@ -777,42 +692,34 @@ namespace LibSterileSSH.Security
 					}
 				}
 			}
-			catch (Exception e)
-			{
+			catch (Exception e) {
 				if (e is SshClientException)
 					throw (SshClientException)e;
 				throw new SshClientException(e.ToString());
 			}
 
 			AKeyPair kpair = null;
-			if (type == DSA)
-			{
+			if (type == DSA) {
 				kpair = new KeyPairDSA(jsch);
 			}
-			else if (type == RSA)
-			{
+			else if (type == RSA) {
 				kpair = new KeyPairRSA(jsch);
 			}
 
-			if (kpair != null)
-			{
+			if (kpair != null) {
 				kpair.encrypted = encrypted;
 				kpair.publickeyblob = publickeyblob;
 				kpair.vendor = vendor;
 
-				if (encrypted)
-				{
+				if (encrypted) {
 					kpair.iv = iv;
 					kpair.data = data;
 				}
-				else
-				{
-					if (kpair.parse(data))
-					{
+				else {
+					if (kpair.parse(data)) {
 						return kpair;
 					}
-					else
-					{
+					else {
 						throw new SshClientException("invaid privatekey: " + prvkey);
 					}
 				}

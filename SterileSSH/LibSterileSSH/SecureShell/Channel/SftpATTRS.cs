@@ -180,35 +180,27 @@ namespace LibSterileSSH.SecureShell
 		{
 			SftpATTRS attr = new SftpATTRS();
 			attr.flags = buf.getInt();
-			if ((attr.flags & SSH_FILEXFER_ATTR_SIZE) != 0)
-			{
+			if ((attr.flags & SSH_FILEXFER_ATTR_SIZE) != 0) {
 				attr.size = buf.getLong();
 			}
-			if ((attr.flags & SSH_FILEXFER_ATTR_UIDGID) != 0)
-			{
+			if ((attr.flags & SSH_FILEXFER_ATTR_UIDGID) != 0) {
 				attr.uid = buf.getInt();
 				attr.gid = buf.getInt();
 			}
-			if ((attr.flags & SSH_FILEXFER_ATTR_PERMISSIONS) != 0)
-			{
+			if ((attr.flags & SSH_FILEXFER_ATTR_PERMISSIONS) != 0) {
 				attr.permissions = buf.getInt();
 			}
-			if ((attr.flags & SSH_FILEXFER_ATTR_ACMODTIME) != 0)
-			{
+			if ((attr.flags & SSH_FILEXFER_ATTR_ACMODTIME) != 0) {
 				attr.atime = buf.getInt();
 			}
-			if ((attr.flags & SSH_FILEXFER_ATTR_ACMODTIME) != 0)
-			{
+			if ((attr.flags & SSH_FILEXFER_ATTR_ACMODTIME) != 0) {
 				attr.mtime = buf.getInt();
 			}
-			if ((attr.flags & SSH_FILEXFER_ATTR_EXTENDED) != 0)
-			{
+			if ((attr.flags & SSH_FILEXFER_ATTR_EXTENDED) != 0) {
 				int count = buf.getInt();
-				if (count > 0)
-				{
+				if (count > 0) {
 					attr.extended = new String[count * 2];
-					for (int i = 0; i < count; i++)
-					{
+					for (int i = 0; i < count; i++) {
 						attr.extended[i * 2] = StringAux.getString(buf.getString());
 						attr.extended[i * 2 + 1] = StringAux.getString(buf.getString());
 					}
@@ -226,30 +218,23 @@ namespace LibSterileSSH.SecureShell
 		{
 			int len = 4;
 
-			if ((flags & SSH_FILEXFER_ATTR_SIZE) != 0)
-			{
+			if ((flags & SSH_FILEXFER_ATTR_SIZE) != 0) {
 				len += 8;
 			}
-			if ((flags & SSH_FILEXFER_ATTR_UIDGID) != 0)
-			{
+			if ((flags & SSH_FILEXFER_ATTR_UIDGID) != 0) {
 				len += 8;
 			}
-			if ((flags & SSH_FILEXFER_ATTR_PERMISSIONS) != 0)
-			{
+			if ((flags & SSH_FILEXFER_ATTR_PERMISSIONS) != 0) {
 				len += 4;
 			}
-			if ((flags & SSH_FILEXFER_ATTR_ACMODTIME) != 0)
-			{
+			if ((flags & SSH_FILEXFER_ATTR_ACMODTIME) != 0) {
 				len += 8;
 			}
-			if ((flags & SSH_FILEXFER_ATTR_EXTENDED) != 0)
-			{
+			if ((flags & SSH_FILEXFER_ATTR_EXTENDED) != 0) {
 				len += 4;
 				int count = extended.Length / 2;
-				if (count > 0)
-				{
-					for (int i = 0; i < count; i++)
-					{
+				if (count > 0) {
+					for (int i = 0; i < count; i++) {
 						len += 4;
 						len += extended[i * 2].Length;
 						len += 4;
@@ -263,34 +248,26 @@ namespace LibSterileSSH.SecureShell
 		internal void dump(Buffer buf)
 		{
 			buf.putInt(flags);
-			if ((flags & SSH_FILEXFER_ATTR_SIZE) != 0)
-			{
+			if ((flags & SSH_FILEXFER_ATTR_SIZE) != 0) {
 				buf.putLong(size);
 			}
-			if ((flags & SSH_FILEXFER_ATTR_UIDGID) != 0)
-			{
+			if ((flags & SSH_FILEXFER_ATTR_UIDGID) != 0) {
 				buf.putInt(uid);
 				buf.putInt(gid);
 			}
-			if ((flags & SSH_FILEXFER_ATTR_PERMISSIONS) != 0)
-			{
+			if ((flags & SSH_FILEXFER_ATTR_PERMISSIONS) != 0) {
 				buf.putInt(permissions);
 			}
-			if ((flags & SSH_FILEXFER_ATTR_ACMODTIME) != 0)
-			{
+			if ((flags & SSH_FILEXFER_ATTR_ACMODTIME) != 0) {
 				buf.putInt(atime);
 			}
-			if ((flags & SSH_FILEXFER_ATTR_ACMODTIME) != 0)
-			{
+			if ((flags & SSH_FILEXFER_ATTR_ACMODTIME) != 0) {
 				buf.putInt(mtime);
 			}
-			if ((flags & SSH_FILEXFER_ATTR_EXTENDED) != 0)
-			{
+			if ((flags & SSH_FILEXFER_ATTR_EXTENDED) != 0) {
 				int count = extended.Length / 2;
-				if (count > 0)
-				{
-					for (int i = 0; i < count; i++)
-					{
+				if (count > 0) {
+					for (int i = 0; i < count; i++) {
 						buf.putString(StringAux.getBytes(extended[i * 2]));
 						buf.putString(StringAux.getBytes(extended[i * 2 + 1]));
 					}

@@ -1,4 +1,3 @@
-
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -38,102 +37,85 @@ EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 namespace SterileSSH
 {
-    class Getopt
-    {
-        public Int32 optind;
-        public Char optopt;
-        public String optarg;
-        private Int32 place;
+	class Getopt
+	{
+		public Int32 optind;
+		public Char optopt;
+		public String optarg;
+		private Int32 place;
 
-        public Getopt()
-        {
-            optind = 0;
-            optopt = '?';
-            optarg = null;
-            place = -1;
-        }
-        public Int32 getopt(String[] argv, String ostr)
-        {
-            Int32 oli;
+		public Getopt()
+		{
+			optind = 0;
+			optopt = '?';
+			optarg = null;
+			place = -1;
+		}
+		public Int32 getopt(String[] argv, String ostr)
+		{
+			Int32 oli;
 
-            if (place == -1)
-            {
-                place = 0;
-                if (optind >= argv.Length || argv[optind][place++] != '-')
-                {
-                    place = -1;
-                    return -1;
-                }
-                optopt = argv[optind][place++];
-                if (optopt == '-' && argv[optind][place] == '\0')
-                {
-                    optind++;
-                    place = -1;
-                    return -1;
-                }
-                if (optopt == 0)
-                {
-                    place = -1;
-                    if (ostr.IndexOf('-') == -1)
-                    {
-                        return -1;
-                    }
-                    optopt = '-';
-                }
-            }
-            else
-            {
-                optopt = argv[optind][place++];
-            }
+			if (place == -1) {
+				place = 0;
+				if (optind >= argv.Length || argv[optind][place++] != '-') {
+					place = -1;
+					return -1;
+				}
+				optopt = argv[optind][place++];
+				if (optopt == '-' && argv[optind][place] == '\0') {
+					optind++;
+					place = -1;
+					return -1;
+				}
+				if (optopt == 0) {
+					place = -1;
+					if (ostr.IndexOf('-') == -1) {
+						return -1;
+					}
+					optopt = '-';
+				}
+			}
+			else {
+				optopt = argv[optind][place++];
+			}
 
-            if (optopt == ':' || (oli = ostr.IndexOf(optopt)) == -1)
-            {
-                if (place >= argv[optind].Length)
-                {
-                    optind++;
-                    place = -1;
-                }
-                return '?';
-            }
+			if (optopt == ':' || (oli = ostr.IndexOf(optopt)) == -1) {
+				if (place >= argv[optind].Length) {
+					optind++;
+					place = -1;
+				}
+				return '?';
+			}
 
-            if (ostr.Length - 1 == oli || ostr[oli + 1] != ':')
-            {
-                /* no argument option */
-                optarg = null;
-                if (place >= argv[optind].Length)
-                {
-                    optind++;
-                    place = -1;
-                }
-
-            }
-            else
-            {
-                /* option with an argument */
-                if (place < argv[optind].Length - 1)
-                {
-                    optarg = argv[optind].Substring(place);
-                }
-                else if (argv.Length > ++optind)
-                {
-                    optarg = argv[optind];
-                }
-                else
-                {
-                    place = -1;
-                    if (ostr[0] == ':')
-                    {
-                        return ':';
-                    }
-                    else
-                    {
-                        return '?';
-                    }
-                }
-                place = -1;
-                optind++;
-            }
-            return optopt;
-        }
-    }
+			if (ostr.Length - 1 == oli || ostr[oli + 1] != ':') {
+				/* no argument option */
+				optarg = null;
+				if (place >= argv[optind].Length) {
+					optind++;
+					place = -1;
+				}
+			}
+			else {
+				/* option with an argument */
+				if (place < argv[optind].Length - 1) {
+					optarg = argv[optind].Substring(place);
+				}
+				else if (argv.Length > ++optind) {
+					optarg = argv[optind];
+				}
+				else {
+					place = -1;
+					if (ostr[0] == ':') {
+						return ':';
+					}
+					else {
+						return '?';
+					}
+				}
+				place = -1;
+				optind++;
+			}
+			return optopt;
+		}
+	}
 }

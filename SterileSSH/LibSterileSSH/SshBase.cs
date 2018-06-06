@@ -154,13 +154,11 @@ namespace LibSterileSSH
 		/// </summary>
 		public virtual void Close()
 		{
-			if (m_channel != null)
-			{
+			if (m_channel != null) {
 				m_channel.disconnect();
 				m_channel = null;
 			}
-			if (m_session != null)
-			{
+			if (m_session != null) {
 				m_session.disconnect();
 				m_session = null;
 			}
@@ -288,8 +286,7 @@ namespace LibSterileSSH
 
 		private void CheckConnected()
 		{
-			if (!Connected)
-			{
+			if (!Connected) {
 				throw new Exception("SSH session is not connected.");
 			}
 		}

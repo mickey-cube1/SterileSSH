@@ -120,8 +120,7 @@ namespace LibSterileSSH.SecureShell
 
 		internal bool removeSession(Session session)
 		{
-			lock (pool)
-			{
+			lock (pool) {
 				pool.Remove(session);
 				return true;
 			}
@@ -135,10 +134,8 @@ namespace LibSterileSSH.SecureShell
 		{
 			if (known_hosts == null)
 				known_hosts = new KnownHosts(this);
-			if (known_hosts is KnownHosts)
-			{
-				lock (known_hosts)
-				{
+			if (known_hosts is KnownHosts) {
+				lock (known_hosts) {
 					((KnownHosts)known_hosts).setKnownHosts(foo);
 				}
 			}
@@ -147,10 +144,8 @@ namespace LibSterileSSH.SecureShell
 		{
 			if (known_hosts == null)
 				known_hosts = new KnownHosts(this);
-			if (known_hosts is KnownHosts)
-			{
-				lock (known_hosts)
-				{
+			if (known_hosts is KnownHosts) {
+				lock (known_hosts) {
 					((KnownHosts)known_hosts).setKnownHosts(foo);
 				}
 			}
@@ -200,21 +195,16 @@ namespace LibSterileSSH.SecureShell
 		void setProxy(String hosts, IProxy proxy)
 		{
 			String[] patterns = StringAux.split(hosts, ",");
-			if (proxies == null)
-			{
+			if (proxies == null) {
 				proxies = new System.Collections.ArrayList();
 			}
-			lock (proxies)
-			{
-				for (int i = 0; i < patterns.Length; i++)
-				{
-					if (proxy == null)
-					{
+			lock (proxies) {
+				for (int i = 0; i < patterns.Length; i++) {
+					if (proxy == null) {
 						proxies[0] = null;
 						proxies[0] = System.Text.Encoding.Default.GetBytes(patterns[i]);
 					}
-					else
-					{
+					else {
 						proxies.Add(System.Text.Encoding.Default.GetBytes(patterns[i]));
 						proxies.Add(proxy);
 					}
@@ -226,12 +216,9 @@ namespace LibSterileSSH.SecureShell
 			if (proxies == null)
 				return null;
 			byte[] _host = System.Text.Encoding.Default.GetBytes(host);
-			lock (proxies)
-			{
-				for (int i = 0; i < proxies.Count; i += 2)
-				{
-					if (StringAux.glob(((byte[])proxies[i]), _host))
-					{
+			lock (proxies) {
+				for (int i = 0; i < proxies.Count; i += 2) {
+					if (StringAux.glob(((byte[])proxies[i]), _host)) {
 						return (IProxy)(proxies[i + 1]);
 					}
 				}
@@ -245,11 +232,9 @@ namespace LibSterileSSH.SecureShell
 
 		public static void setConfig(System.Collections.Hashtable foo)
 		{
-			lock (config)
-			{
+			lock (config) {
 				System.Collections.IEnumerator e = foo.Keys.GetEnumerator();
-				while (e.MoveNext())
-				{
+				while (e.MoveNext()) {
 					String key = (String)(e.Current);
 					config.Add(key, (String)(foo[key]));
 				}

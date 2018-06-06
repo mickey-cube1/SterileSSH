@@ -45,17 +45,14 @@ namespace LibSterileSSH.Security
 		static int times = 0;
 		public void fill(byte[] foo, int start, int len)
 		{
-			try
-			{
-				if (len > tmp.Length)
-				{
+			try {
+				if (len > tmp.Length) {
 					tmp = new byte[len];
 				}
 				rand.GetBytes(tmp);
 				Array.Copy(tmp, 0, foo, start, len);
 			}
-			catch (Exception)
-			{
+			catch (Exception) {
 				times++;
 				Console.WriteLine(times + ") Array.Copy(tmp={0}, 0, foo={1}, {2}, {3}", tmp.Length, foo.Length, start, len);
 			}

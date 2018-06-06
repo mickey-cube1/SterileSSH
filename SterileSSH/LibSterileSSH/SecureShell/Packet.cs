@@ -87,8 +87,7 @@ namespace LibSterileSSH.SecureShell
 		{
 			uint len = (uint)buffer.index;
 			int pad = (int)((-len) & (bsize - 1));
-			if (pad < bsize)
-			{
+			if (pad < bsize) {
 				pad += bsize;
 			}
 			len = (uint)(len + pad - 4);
@@ -98,8 +97,7 @@ namespace LibSterileSSH.SecureShell
 			tmp[3] = (byte)(len);
 			Array.Copy(tmp, 0, buffer.buffer, 0, 4);
 			buffer.buffer[4] = (byte)pad;
-			lock (random)
-			{
+			lock (random) {
 				random.fill(buffer.buffer, buffer.index, pad);
 			}
 			buffer.skip(pad);

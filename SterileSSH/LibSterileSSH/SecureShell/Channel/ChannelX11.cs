@@ -59,8 +59,7 @@ namespace LibSterileSSH.SecureShell
 										 0x61,0x62,0x63,0x64,0x65,0x66};
 		internal static int revtable(byte foo)
 		{
-			for (int i = 0; i < table.Length; i++)
-			{
+			for (int i = 0; i < table.Length; i++) {
 				if (table[i] == foo)
 					return i;
 			}
@@ -70,8 +69,7 @@ namespace LibSterileSSH.SecureShell
 		{
 			cookie_hex = StringAux.getBytes(foo);
 			cookie = new byte[16];
-			for (int i = 0; i < 16; i++)
-			{
+			for (int i = 0; i < 16; i++) {
 				cookie[i] = (byte)(((revtable(cookie_hex[i * 2]) << 4) & 0xf0) |
 					((revtable(cookie_hex[i * 2 + 1])) & 0xf));
 			}
@@ -86,15 +84,12 @@ namespace LibSterileSSH.SecureShell
 		}
 		internal static byte[] getFakedCookie(Session session)
 		{
-			lock (faked_cookie_hex_pool)
-			{
+			lock (faked_cookie_hex_pool) {
 				byte[] foo = (byte[])faked_cookie_hex_pool[session];
-				if (foo == null)
-				{
+				if (foo == null) {
 					IRandom random = Session.random;
 					foo = new byte[16];
-					lock (random)
-					{
+					lock (random) {
 						random.fill(foo, 0, 16);
 					}
 					/*
@@ -106,8 +101,7 @@ namespace LibSterileSSH.SecureShell
 					*/
 					faked_cookie_pool.Add(session, foo);
 					byte[] bar = new byte[32];
-					for (int i = 0; i < 16; i++)
-					{
+					for (int i = 0; i < 16; i++) {
 						bar[2 * i] = table[(foo[i] >> 4) & 0xf];
 						bar[2 * i + 1] = table[(foo[i]) & 0xf];
 					}
@@ -128,8 +122,7 @@ namespace LibSterileSSH.SecureShell
 			setLocalPacketSize(LOCAL_MAXIMUM_PACKET_SIZE);
 
 			type = StringAux.getBytes("x11");
-			try
-			{
+			try {
 				IPEndPoint ep = new IPEndPoint(Dns.GetHostEntry(host).AddressList[0], port);
 				socket = new Socket(ep.AddressFamily, SocketType.Stream, ProtocolType.Tcp);
 				socket.SetSocketOption(SocketOptionLevel.Socket, SocketOptionName.NoDelay, 1);
@@ -139,8 +132,7 @@ namespace LibSterileSSH.SecureShell
 				io.setInputStream(ns);
 				io.setOutputStream(ns);
 			}
-			catch (Exception e)
-			{
+			catch (Exception e) {
 				Console.WriteLine(e);
 			}
 		}
@@ -151,17 +143,14 @@ namespace LibSterileSSH.SecureShell
 			Buffer buf = new Buffer(rmpsize);
 			Packet packet = new Packet(buf);
 			int i = 0;
-			try
-			{
-				while (thread != null)
-				{
+			try {
+				while (thread != null) {
 					i = io.ins.Read(buf.buffer,
 						14,
 						buf.buffer.Length - 14
 						- 16 - 20 // padding and mac
 						);
-					if (i <= 0)
-					{
+					if (i <= 0) {
 						eof();
 						break;
 					}
@@ -175,8 +164,7 @@ namespace LibSterileSSH.SecureShell
 					session.write(packet, this, i);
 				}
 			}
-			catch
-			{
+			catch {
 				//System.out.println(e);
 			}
 			thread = null;
@@ -186,33 +174,27 @@ namespace LibSterileSSH.SecureShell
 		{
 			//if(eof_local)return;
 
-			if (_init)
-			{
+			if (_init) {
 				int plen = (foo[s + 6] & 0xff) * 256 + (foo[s + 7] & 0xff);
 				int dlen = (foo[s + 8] & 0xff) * 256 + (foo[s + 9] & 0xff);
-				if ((foo[s] & 0xff) == 0x42)
-				{
+				if ((foo[s] & 0xff) == 0x42) {
 				}
-				else if ((foo[s] & 0xff) == 0x6c)
-				{
+				else if ((foo[s] & 0xff) == 0x6c) {
 					plen = (int)(((uint)plen >> 8) & 0xff) | ((plen << 8) & 0xff00);
 					dlen = (int)(((uint)dlen >> 8) & 0xff) | ((dlen << 8) & 0xff00);
 				}
-				else
-				{
+				else {
 					// ??
 				}
 				byte[] bar = new byte[dlen];
 				Array.Copy(foo, s + 12 + plen + ((-plen) & 3), bar, 0, dlen);
 				byte[] faked_cookie = (byte[])faked_cookie_pool[session];
 
-				if (equals(bar, faked_cookie))
-				{
+				if (equals(bar, faked_cookie)) {
 					if (cookie != null)
 						Array.Copy(cookie, 0, foo, s + 12 + plen + ((-plen) & 3), dlen);
 				}
-				else
-				{
+				else {
 					Console.WriteLine("wrong cookie");
 				}
 				_init = false;
@@ -224,38 +206,29 @@ namespace LibSterileSSH.SecureShell
 		{
 			close();
 			thread = null;
-			try
-			{
-				if (io != null)
-				{
-					try
-					{
+			try {
+				if (io != null) {
+					try {
 						if (io.ins != null)
 							io.ins.Close();
 					}
-					catch
-					{
+					catch {
 					}
-					try
-					{
+					try {
 						if (io.outs != null)
 							io.outs.Close();
 					}
-					catch
-					{
+					catch {
 					}
 				}
-				try
-				{
+				try {
 					if (socket != null)
 						socket.Close();
 				}
-				catch
-				{
+				catch {
 				}
 			}
-			catch (Exception e)
-			{
+			catch (Exception e) {
 				Console.WriteLine(e.StackTrace);
 			}
 			io = null;
@@ -266,8 +239,7 @@ namespace LibSterileSSH.SecureShell
 		{
 			if (foo.Length != bar.Length)
 				return false;
-			for (int i = 0; i < foo.Length; i++)
-			{
+			for (int i = 0; i < foo.Length; i++) {
 				if (foo[i] != bar[i])
 					return false;
 			}

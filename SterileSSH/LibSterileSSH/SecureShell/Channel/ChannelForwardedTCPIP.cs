@@ -59,11 +59,9 @@ namespace LibSterileSSH.SecureShell
 
 		public override void init()
 		{
-			try
-			{
+			try {
 				io = new IO();
-				if (lport == -1)
-				{
+				if (lport == -1) {
 					Type c = Type.GetType(target);
 					IForwardedTCPIPDaemon daemon = (IForwardedTCPIPDaemon)Activator.CreateInstance(c);
 					daemon.setChannel(this);
@@ -73,8 +71,7 @@ namespace LibSterileSSH.SecureShell
 					connected = true;
 					return;
 				}
-				else
-				{
+				else {
 					TcpSocket socket = (factory == null) ?
 						new TcpSocket(target, lport) :
 						factory.createSocket(target, lport);
@@ -84,8 +81,7 @@ namespace LibSterileSSH.SecureShell
 					connected = true;
 				}
 			}
-			catch (Exception e)
-			{
+			catch (Exception e) {
 				Console.WriteLine("target={0},port={1}", target, lport);
 				Console.WriteLine(e);
 			}
@@ -97,17 +93,14 @@ namespace LibSterileSSH.SecureShell
 			Buffer buf = new Buffer(rmpsize);
 			Packet packet = new Packet(buf);
 			int i = 0;
-			try
-			{
-				while (thread != null && io != null && io.ins != null)
-				{
+			try {
+				while (thread != null && io != null && io.ins != null) {
 					i = io.ins.Read(buf.buffer,
 						14,
 						buf.buffer.Length - 14
 						- 32 - 20 // padding and mac
 						);
-					if (i <= 0)
-					{
+					if (i <= 0) {
 						eof();
 						break;
 					}
@@ -147,10 +140,8 @@ namespace LibSterileSSH.SecureShell
 			System.out.println("orgport: "+orgport);
 			*/
 
-			lock (pool)
-			{
-				for (int i = 0; i < pool.Count; i++)
-				{
+			lock (pool) {
+				for (int i = 0; i < pool.Count; i++) {
 					Object[] foo = (Object[])(pool[i]);
 					if (foo[0] != session)
 						continue;
@@ -158,22 +149,18 @@ namespace LibSterileSSH.SecureShell
 						continue;
 					this.rport = port;
 					this.target = (String)foo[2];
-					if (foo[3] == null || (foo[3] is Object[]))
-					{
+					if (foo[3] == null || (foo[3] is Object[])) {
 						this.lport = -1;
 					}
-					else
-					{
+					else {
 						this.lport = ((int)foo[3]);
 					}
-					if (foo.Length >= 5)
-					{
+					if (foo.Length >= 5) {
 						this.factory = ((ISocketFactory)foo[4]);
 					}
 					break;
 				}
-				if (target == null)
-				{
+				if (target == null) {
 					Console.WriteLine("??");
 				}
 			}
@@ -181,10 +168,8 @@ namespace LibSterileSSH.SecureShell
 
 		internal static Object[] getPort(Session session, int rport)
 		{
-			lock (pool)
-			{
-				for (int i = 0; i < pool.Count; i++)
-				{
+			lock (pool) {
+				for (int i = 0; i < pool.Count; i++) {
 					Object[] bar = (Object[])(pool[i]);
 					if (bar[0] != session)
 						continue;
@@ -199,26 +184,21 @@ namespace LibSterileSSH.SecureShell
 		internal static String[] getPortForwarding(Session session)
 		{
 			ArrayList foo = new ArrayList();
-			lock (pool)
-			{
-				for (int i = 0; i < pool.Count; i++)
-				{
+			lock (pool) {
+				for (int i = 0; i < pool.Count; i++) {
 					Object[] bar = (Object[])(pool[i]);
 					if (bar[0] != session)
 						continue;
-					if (bar[3] == null)
-					{
+					if (bar[3] == null) {
 						foo.Add(bar[1] + ":" + bar[2] + ":");
 					}
-					else
-					{
+					else {
 						foo.Add(bar[1] + ":" + bar[2] + ":" + bar[3]);
 					}
 				}
 			}
 			String[] bar2 = new String[foo.Count];
-			for (int i = 0; i < foo.Count; i++)
-			{
+			for (int i = 0; i < foo.Count; i++) {
 				bar2[i] = (String)(foo[i]);
 			}
 			return bar2;
@@ -226,10 +206,8 @@ namespace LibSterileSSH.SecureShell
 
 		internal static void addPort(Session session, int port, String target, int lport, ISocketFactory factory)
 		{
-			lock (pool)
-			{
-				if (getPort(session, port) != null)
-				{
+			lock (pool) {
+				if (getPort(session, port) != null) {
 					throw new SshClientException("PortForwardingR: remote port " + port + " is already registered.");
 				}
 				Object[] foo = new Object[5];
@@ -243,10 +221,8 @@ namespace LibSterileSSH.SecureShell
 		}
 		internal static void addPort(Session session, int port, String daemon, Object[] arg)
 		{
-			lock (pool)
-			{
-				if (getPort(session, port) != null)
-				{
+			lock (pool) {
+				if (getPort(session, port) != null) {
 					throw new SshClientException("PortForwardingR: remote port " + port + " is already registered.");
 				}
 				Object[] foo = new Object[4];
@@ -263,11 +239,9 @@ namespace LibSterileSSH.SecureShell
 		}
 		internal static void delPort(Session session, int rport)
 		{
-			lock (pool)
-			{
+			lock (pool) {
 				Object[] foo = null;
-				for (int i = 0; i < pool.Count; i++)
-				{
+				for (int i = 0; i < pool.Count; i++) {
 					Object[] bar = (Object[])(pool[i]);
 					if (bar[0] != session)
 						continue;
@@ -284,8 +258,7 @@ namespace LibSterileSSH.SecureShell
 			Buffer buf = new Buffer(100); // ??
 			Packet packet = new Packet(buf);
 
-			try
-			{
+			try {
 				// byte SSH_MSG_GLOBAL_REQUEST 80
 				// string "cancel-tcpip-forward"
 				// boolean want_reply
@@ -308,20 +281,16 @@ namespace LibSterileSSH.SecureShell
 		{
 			int[] rport = null;
 			int count = 0;
-			lock (pool)
-			{
+			lock (pool) {
 				rport = new int[pool.Count];
-				for (int i = 0; i < pool.Count; i++)
-				{
+				for (int i = 0; i < pool.Count; i++) {
 					Object[] bar = (Object[])(pool[i]);
-					if (bar[0] == session)
-					{
+					if (bar[0] == session) {
 						rport[count++] = ((int)bar[1]);
 					}
 				}
 			}
-			for (int i = 0; i < count; i++)
-			{
+			for (int i = 0; i < count; i++) {
 				delPort(session, rport[i]);
 			}
 		}

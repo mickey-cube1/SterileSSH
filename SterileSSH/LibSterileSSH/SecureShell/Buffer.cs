@@ -52,7 +52,8 @@ namespace LibSterileSSH.SecureShell
 			index = 0;
 			s = 0;
 		}
-		public Buffer() : this(1024 * 10 * 2)
+		public Buffer()
+			: this(1024 * 10 * 2)
 		{
 		}
 		public void putByte(byte foo)
@@ -108,8 +109,7 @@ namespace LibSterileSSH.SecureShell
 		}
 		internal void putPad(int n)
 		{
-			while (n > 0)
-			{
+			while (n > 0) {
 				buffer[index++] = (byte)0;
 				n--;
 			}
@@ -117,14 +117,12 @@ namespace LibSterileSSH.SecureShell
 		public void putMPInt(byte[] foo)
 		{
 			int i = foo.Length;
-			if ((foo[0] & 0x80) != 0)
-			{
+			if ((foo[0] & 0x80) != 0) {
 				i++;
 				putInt(i);
 				putByte((byte)0);
 			}
-			else
-			{
+			else {
 				putInt(i);
 			}
 			putByte(foo);
@@ -191,8 +189,7 @@ namespace LibSterileSSH.SecureShell
 			int bytes = (bits + 7) / 8;
 			byte[] foo = new byte[bytes];
 			getByte(foo, 0, bytes);
-			if ((foo[0] & 0x80) != 0)
-			{
+			if ((foo[0] & 0x80) != 0) {
 				byte[] bar = new byte[foo.Length + 1];
 				bar[0] = 0; // ??
 				Array.Copy(foo, 0, bar, 1, foo.Length);

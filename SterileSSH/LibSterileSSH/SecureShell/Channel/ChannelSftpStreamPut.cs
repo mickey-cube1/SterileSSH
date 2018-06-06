@@ -37,55 +37,44 @@ namespace LibSterileSSH.SecureShell
 
 		public override void Write(byte[] d, int s, int len)
 		{
-			if (init)
-			{
+			if (init) {
 				startid = sftp.seq;
 				_ackid = sftp.seq;
 				init = false;
 			}
 
-			try
-			{
+			try {
 				int _len = len;
-				while (_len > 0)
-				{
+				while (_len > 0) {
 					int sent = sftp.sendWRITE(handle, _offset[0], d, s, _len);
 					_offset[0] += sent;
 					s += sent;
 					_len -= sent;
 					if ((sftp.seq - 1) == startid ||
-						StreamAux.available(sftp.io.ins) >= 1024)
-					{
-						while (StreamAux.available(sftp.io.ins) > 0)
-						{
-							if (sftp.checkStatus(ackid, header))
-							{
+						StreamAux.available(sftp.io.ins) >= 1024) {
+						while (StreamAux.available(sftp.io.ins) > 0) {
+							if (sftp.checkStatus(ackid, header)) {
 								_ackid = ackid[0];
-								if (startid > _ackid || _ackid > sftp.seq - 1)
-								{
+								if (startid > _ackid || _ackid > sftp.seq - 1) {
 									throw new SftpException(ChannelSftp.SSH_FX_FAILURE, "");
 								}
 								ackcount++;
 							}
-							else
-							{
+							else {
 								break;
 							}
 						}
 					}
 				}
-				if (monitor != null && !monitor.count(len))
-				{
+				if (monitor != null && !monitor.count(len)) {
 					close();
 					throw new IOException("canceled");
 				}
 			}
-			catch (IOException e)
-			{
+			catch (IOException e) {
 				throw e;
 			}
-			catch (Exception e)
-			{
+			catch (Exception e) {
 				throw new IOException(e.ToString());
 			}
 		}
@@ -97,38 +86,30 @@ namespace LibSterileSSH.SecureShell
 		}
 		public override void Close()
 		{
-			if (!init)
-			{
-				try
-				{
+			if (!init) {
+				try {
 					int _ackcount = sftp.seq - startid;
-					while (_ackcount > ackcount)
-					{
-						if (!sftp.checkStatus(null, header))
-						{
+					while (_ackcount > ackcount) {
+						if (!sftp.checkStatus(null, header)) {
 							break;
 						}
 						ackcount++;
 					}
 				}
-				catch (SftpException e)
-				{
+				catch (SftpException e) {
 					throw new IOException(e.ToString());
 				}
 			}
 
 			if (monitor != null)
 				monitor.end();
-			try
-			{
+			try {
 				sftp._sendCLOSE(handle, header);
 			}
-			catch (IOException e)
-			{
+			catch (IOException e) {
 				throw e;
 			}
-			catch (Exception e)
-			{
+			catch (Exception e) {
 				throw new IOException(e.ToString());
 			}
 		}

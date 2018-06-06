@@ -53,12 +53,10 @@ namespace LibSterileSSH.SecureShell
 			String username = session.username;
 
 			byte[] _username = null;
-			try
-			{
+			try {
 				_username = StringAux.getBytesUTF8(username);
 			}
-			catch
-			{//(java.io.UnsupportedEncodingException e){
+			catch {//(java.io.UnsupportedEncodingException e){
 				_username = StringAux.getBytes(username);
 			}
 
@@ -75,41 +73,34 @@ namespace LibSterileSSH.SecureShell
 			session.write(packet);
 
 		loop:
-			while (true)
-			{
+			while (true) {
 				// receive
 				// byte      SSH_MSG_USERAUTH_SUCCESS(52)
 				// string    service name
 				buf = session.read(buf);
 				//System.out.println("UserAuthNone: read: 52 ? "+    buf.buffer[5]);
-				if (buf.buffer[5] == Session.SSH_MSG_USERAUTH_SUCCESS)
-				{
+				if (buf.buffer[5] == Session.SSH_MSG_USERAUTH_SUCCESS) {
 					return true;
 				}
-				if (buf.buffer[5] == Session.SSH_MSG_USERAUTH_BANNER)
-				{
+				if (buf.buffer[5] == Session.SSH_MSG_USERAUTH_BANNER) {
 					buf.getInt();
 					buf.getByte();
 					buf.getByte();
 					byte[] _message = buf.getString();
 					byte[] lang = buf.getString();
 					String message = null;
-					try
-					{
+					try {
 						message = StringAux.getStringUTF8(_message);
 					}
-					catch
-					{//(java.io.UnsupportedEncodingException e){
+					catch {//(java.io.UnsupportedEncodingException e){
 						message = StringAux.getString(_message);
 					}
-					if (userinfo != null)
-					{
+					if (userinfo != null) {
 						userinfo.showMessage(message);
 					}
 					goto loop;
 				}
-				if (buf.buffer[5] == Session.SSH_MSG_USERAUTH_FAILURE)
-				{
+				if (buf.buffer[5] == Session.SSH_MSG_USERAUTH_FAILURE) {
 					buf.getInt();
 					buf.getByte();
 					buf.getByte();
@@ -123,8 +114,7 @@ namespace LibSterileSSH.SecureShell
 					//	}
 					break;
 				}
-				else
-				{
+				else {
 					//      System.out.println("USERAUTH fail ("+buf.buffer[5]+")");
 					throw new SshClientException("USERAUTH fail (" + buf.buffer[5] + ")");
 				}

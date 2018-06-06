@@ -95,10 +95,8 @@ namespace SterileSSH
 
 			int optch;
 			Getopt getopt = new Getopt();
-			while ((optch = getopt.getopt(argv, "Bhko:sV46CD:H:K:L:NP:R:S:TW:Z:d:i:l:m:tvw:z:")) != -1)
-			{
-				switch (optch)
-				{
+			while ((optch = getopt.getopt(argv, "Bhko:sV46CD:H:K:L:NP:R:S:TW:Z:d:i:l:m:tvw:z:")) != -1) {
+				switch (optch) {
 					case 'B':				/* --batch */
 						/* FIXME: */
 						break;
@@ -211,26 +209,21 @@ namespace SterileSSH
 			Int32 argidx = getopt.optind;
 			while (argidx < argv.Length) {
 				String p = argv[argidx];
-				if (p.Length > 0)
-				{
-					if (coninfo == null)
-					{
+				if (p.Length > 0) {
+					if (coninfo == null) {
 						coninfo = new SshConnectionInfo(p);
 					}
-					else
-					{
+					else {
 					}
 				}
 				argidx++;
 			}
 
-			if (coninfo == null)
-			{
+			if (coninfo == null) {
 				usage();
 				Environment.Exit(0);
 			}
-			if (coninfo.Pass == null)
-			{
+			if (coninfo.Pass == null) {
 				coninfo.Pass = globalconinfo.Pass;
 			}
 			RunSsh(coninfo);
@@ -238,8 +231,7 @@ namespace SterileSSH
 
 		public static void RunSsh(SshConnectionInfo input)
 		{
-			try
-			{
+			try {
 				SshShell shell = new SshShell(input.Host, input.User);
 				if (input.Pass != null)
 					shell.Password = input.Pass;
@@ -253,24 +245,21 @@ namespace SterileSSH
 				shell.Connect();
 				Console.WriteLine("OK");
 
-				while (shell.ShellOpened)
-				{
+				while (shell.ShellOpened) {
 					System.Threading.Thread.Sleep(500);
 				}
 				Console.Write("Disconnecting...");
 				shell.Close();
 				Console.WriteLine("OK");
 			}
-			catch (Exception e)
-			{
+			catch (Exception e) {
 				Console.WriteLine(e.Message);
 			}
 		}
 
 		public static string[] GetArgs(string[] args)
 		{
-			for (int i = 0; i < args.Length; i++)
-			{
+			for (int i = 0; i < args.Length; i++) {
 				Console.Write("Enter {0}: ", args[i]);
 				args[i] = Console.ReadLine();
 			}

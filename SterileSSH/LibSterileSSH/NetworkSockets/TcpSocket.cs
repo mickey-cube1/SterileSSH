@@ -19,12 +19,10 @@ namespace LibSterileSSH
 
 		protected void SetSocketOption(SocketOptionLevel level, SocketOptionName name, int val)
 		{
-			try
-			{
+			try {
 				sock.SetSocketOption(SocketOptionLevel.Socket, SocketOptionName.NoDelay, val);
 			}
-			catch
-			{
+			catch {
 			}
 		}
 
@@ -37,12 +35,10 @@ namespace LibSterileSSH
 		public TcpSocket(string host, int port)
 		{
 			IPEndPoint ep = null;
-			try
-			{
+			try {
 				ep = new IPEndPoint(IPAddress.Parse(host), port);
 			}
-			catch (Exception)
-			{
+			catch (Exception) {
 				ep = new IPEndPoint(Dns.GetHostEntry(host).AddressList[0], port);
 			}
 			this.sock = new Socket(ep.AddressFamily, SocketType.Stream, ProtocolType.Tcp);
@@ -71,12 +67,10 @@ namespace LibSterileSSH
 
 		public void setTcpNoDelay(bool b)
 		{
-			if (b)
-			{
+			if (b) {
 				SetSocketOption(SocketOptionLevel.Socket, SocketOptionName.NoDelay, 1);
 			}
-			else
-			{
+			else {
 				SetSocketOption(SocketOptionLevel.Socket, SocketOptionName.NoDelay, 0);
 			}
 		}

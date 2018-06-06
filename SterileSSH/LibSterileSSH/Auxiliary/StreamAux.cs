@@ -21,11 +21,9 @@ namespace LibSterileSSH
 			int i = 0;
 			int count = 0;
 			byte[] buf = new byte[len];
-			while (len > 0)
-			{
+			while (len > 0) {
 				i = s.Read(buf, count, (int)len);//tamir: possible lost of pressision
-				if (i <= 0)
-				{
+				if (i <= 0) {
 					throw new RuntimeException("inputstream is closed");
 					//return (s-foo)==0 ? i : s-foo;
 				}
@@ -36,8 +34,7 @@ namespace LibSterileSSH
 		}
 		public static int available(Stream s)
 		{
-			if (s is LibSterileSSH.PipedInputStream)
-			{
+			if (s is LibSterileSSH.PipedInputStream) {
 				return ((LibSterileSSH.PipedInputStream)s).available();
 			}
 			throw new RuntimeException("JStream.available() -- Method not implemented");

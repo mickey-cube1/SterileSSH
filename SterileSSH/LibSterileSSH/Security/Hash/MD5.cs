@@ -46,14 +46,12 @@ namespace LibSterileSSH.Security
 		}
 		public void Init()
 		{
-			try
-			{
+			try {
 				//md=MessageDigest.getInstance("MD5"); 
 				md = new System.Security.Cryptography.MD5CryptoServiceProvider();
 				cs = new System.Security.Cryptography.CryptoStream(System.IO.Stream.Null, md, System.Security.Cryptography.CryptoStreamMode.Write);
 			}
-			catch (Exception e)
-			{
+			catch (Exception e) {
 				Console.WriteLine(e);
 			}
 		}

@@ -50,8 +50,7 @@ namespace LibSterileSSH.Math.Prime
 			else
 				Rounds = 2;
 
-			switch (confidence)
-			{
+			switch (confidence) {
 				case ConfidenceFactor.ExtraLow:
 					Rounds >>= 2;
 					return Rounds != 0 ? Rounds : 1;
@@ -108,10 +107,8 @@ namespace LibSterileSSH.Math.Prime
 			RandomNumberGenerator rng = RandomNumberGenerator.Create();
 			BigInteger.ModulusRing mr = new BigInteger.ModulusRing(bi);
 
-			for (int round = 0; round < Rounds; round++)
-			{
-				while (true)
-				{		           // generate a < n
+			for (int round = 0; round < Rounds; round++) {
+				while (true) {		           // generate a < n
 					a = BigInteger.genRandom(bits, rng);
 
 					// make sure "a" is not 0
@@ -128,11 +125,9 @@ namespace LibSterileSSH.Math.Prime
 					continue;              // a^t mod p = 1
 
 				bool result = false;
-				for (int j = 0; j < s; j++)
-				{
+				for (int j = 0; j < s; j++) {
 
-					if (b == p_sub1)
-					{         // a^((2^j)*t) mod p = p-1 for some 0 <= j <= s-1
+					if (b == p_sub1) {         // a^((2^j)*t) mod p = p-1 for some 0 <= j <= s-1
 						result = true;
 						break;
 					}
@@ -159,8 +154,7 @@ namespace LibSterileSSH.Math.Prime
 
 			BigInteger.ModulusRing mr = new BigInteger.ModulusRing(bi);
 
-			for (int round = 0; round < Rounds; round++)
-			{
+			for (int round = 0; round < Rounds; round++) {
 
 				BigInteger b = mr.Pow(BigInteger.smallPrimes[round], t);
 
@@ -168,11 +162,9 @@ namespace LibSterileSSH.Math.Prime
 					continue;              // a^t mod p = 1
 
 				bool result = false;
-				for (int j = 0; j < s; j++)
-				{
+				for (int j = 0; j < s; j++) {
 
-					if (b == p_sub1)
-					{         // a^((2^j)*t) mod p = p-1 for some 0 <= j <= s-1
+					if (b == p_sub1) {         // a^((2^j)*t) mod p = p-1 for some 0 <= j <= s-1
 						result = true;
 						break;
 					}

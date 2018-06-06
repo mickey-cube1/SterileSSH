@@ -53,14 +53,12 @@ namespace LibSterileSSH.SecureShell
 
 		internal void setKnownHosts(String foo)
 		{
-			try
-			{
+			try {
 				known_hosts = foo;
 				FileStream fis = File.OpenRead(foo);
 				setKnownHosts(new StreamReader(fis));
 			}
-			catch
-			{
+			catch {
 			}
 		}
 		internal void setKnownHosts(StreamReader foo)
@@ -70,8 +68,7 @@ namespace LibSterileSSH.SecureShell
 			byte i;
 			int j;
 			bool error = false;
-			try
-			{
+			try {
 				StreamReader fis = foo;
 				String host;
 				String key = null;
@@ -79,112 +76,90 @@ namespace LibSterileSSH.SecureShell
 				byte[] buf = new byte[1024];
 				int bufl = 0;
 			loop:
-				while (true)
-				{
+				while (true) {
 					bufl = 0;
-					while (true)
-					{
+					while (true) {
 						j = fis.Read();
-						if (j == -1)
-						{
+						if (j == -1) {
 							goto break_loop;
 						}
-						if (j == 0x0d)
-						{
+						if (j == 0x0d) {
 							continue;
 						}
-						if (j == 0x0a)
-						{
+						if (j == 0x0a) {
 							break;
 						}
 						buf[bufl++] = (byte)j;
 					}
 
 					j = 0;
-					while (j < bufl)
-					{
+					while (j < bufl) {
 						i = buf[j];
-						if (i == ' ' || i == '\t')
-						{
+						if (i == ' ' || i == '\t') {
 							j++;
 							continue;
 						}
-						if (i == '#')
-						{
+						if (i == '#') {
 							addInvalidLine(System.Text.Encoding.Default.GetString(buf, 0, bufl));
 							goto loop;
 						}
 						break;
 					}
-					if (j >= bufl)
-					{
+					if (j >= bufl) {
 						addInvalidLine(System.Text.Encoding.Default.GetString(buf, 0, bufl));
 						goto loop;
 					}
 
 					sb.Length = 0;
-					while (j < bufl)
-					{
+					while (j < bufl) {
 						i = buf[j++];
-						if (i == 0x20 || i == '\t')
-						{
+						if (i == 0x20 || i == '\t') {
 							break;
 						}
 						sb.Append((char)i);
 					}
 					host = sb.ToString();
-					if (j >= bufl || host.Length == 0)
-					{
+					if (j >= bufl || host.Length == 0) {
 						addInvalidLine(System.Text.Encoding.Default.GetString(buf, 0, bufl));
 						goto loop;
 					}
 
 					sb.Length = 0;
 					type = -1;
-					while (j < bufl)
-					{
+					while (j < bufl) {
 						i = buf[j++];
-						if (i == 0x20 || i == '\t')
-						{
+						if (i == 0x20 || i == '\t') {
 							break;
 						}
 						sb.Append((char)i);
 					}
-					if (sb.ToString().Equals("ssh-dss"))
-					{
+					if (sb.ToString().Equals("ssh-dss")) {
 						type = HostKey.SSHDSS;
 					}
-					else if (sb.ToString().Equals("ssh-rsa"))
-					{
+					else if (sb.ToString().Equals("ssh-rsa")) {
 						type = HostKey.SSHRSA;
 					}
-					else
-					{
+					else {
 						j = bufl;
 					}
-					if (j >= bufl)
-					{
+					if (j >= bufl) {
 						addInvalidLine(StringAux.getString(buf, 0, bufl));
 						goto loop;
 					}
 
 					sb.Length = 0;
-					while (j < bufl)
-					{
+					while (j < bufl) {
 						i = buf[j++];
-						if (i == 0x0d)
-						{
+						if (i == 0x0d) {
 							continue;
 						}
-						if (i == 0x0a)
-						{
+						if (i == 0x0a) {
 							break;
 						}
 						sb.Append((char)i);
 					}
 					key = sb.ToString();
-					if (key.Length == 0)
-					{
+					if (key.Length == 0) {
 						addInvalidLine(StringAux.getString(buf, 0, bufl));
 						goto loop;
 					}
@@ -201,15 +176,12 @@ namespace LibSterileSSH.SecureShell
 			break_loop:
 
 				fis.Close();
-				if (error)
-				{
+				if (error) {
 					throw new SshClientException("KnownHosts: invalid format");
 				}
 			}
-			catch (Exception e)
-			{
-				if (e is SshClientException)
-				{
+			catch (Exception e) {
+				if (e is SshClientException) {
 					throw (SshClientException)e;
 				}
 				throw new SshClientException(e.ToString());
@@ -236,18 +208,14 @@ namespace LibSterileSSH.SecureShell
 			HostKey hk;
 			int result = HostKeyRepositoryCheckResult.NOT_INCLUDED;
 			int type = getType(key);
-			for (int i = 0; i < pool.Count; i++)
-			{
+			for (int i = 0; i < pool.Count; i++) {
 				hk = (HostKey)(pool[i]);
-				if (isIncluded(hk.host, host) && hk.type == type)
-				{
-					if (hk.key.SequenceEqual(key))
-					{
+				if (isIncluded(hk.host, host) && hk.type == type) {
+					if (hk.key.SequenceEqual(key)) {
 						//System.out.println("find!!");
 						return HostKeyRepositoryCheckResult.OK;
 					}
-					else
-					{
+					else {
 						result = HostKeyRepositoryCheckResult.CHANGED;
 					}
 				}
@@ -259,11 +227,9 @@ namespace LibSterileSSH.SecureShell
 		{
 			HostKey hk;
 			int type = getType(key);
-			for (int i = 0; i < pool.Count; i++)
-			{
+			for (int i = 0; i < pool.Count; i++) {
 				hk = (HostKey)(pool[i]);
-				if (isIncluded(hk.host, host) && hk.type == type)
-				{
+				if (isIncluded(hk.host, host) && hk.type == type) {
 					/*
 							if(Util.array_equals(hk.key, key)){ return; }
 							if(hk.host.equals(host)){
@@ -282,35 +248,28 @@ namespace LibSterileSSH.SecureShell
 
 			String bar = getKnownHostsRepositoryID();
 			if (userinfo != null &&
-				bar != null)
-			{
+				bar != null) {
 				bool foo = true;
 				FileInfo goo = new FileInfo(bar);
-				if (!goo.Exists)
-				{
+				if (!goo.Exists) {
 					foo = false;
-					if (userinfo != null)
-					{
+					if (userinfo != null) {
 						foo = userinfo.promptYesNo(
 							bar + " does not exist.\n" +
 							"Are you sure you want to create it?"
 							);
 						DirectoryInfo dir = goo.Directory;
-						if (foo && dir != null && !dir.Exists)
-						{
+						if (foo && dir != null && !dir.Exists) {
 							foo = userinfo.promptYesNo(
 								"The parent directory " + dir.Name + " does not exist.\n" +
 								"Are you sure you want to create it?"
 								);
-							if (foo)
-							{
-								try
-								{
+							if (foo) {
+								try {
 									dir.Create();
 									userinfo.showMessage(dir.Name + " has been succesfully created.\nPlease check its access permission.");
 								}
-								catch
-								{
+								catch {
 									userinfo.showMessage(dir.Name + " has not been created.");
 									foo = false;
 								}
@@ -320,14 +279,11 @@ namespace LibSterileSSH.SecureShell
 							foo = false;
 					}
 				}
-				if (foo)
-				{
-					try
-					{
+				if (foo) {
+					try {
 						sync(bar);
 					}
-					catch (Exception e)
-					{
+					catch (Exception e) {
 						Console.WriteLine("sync known_hosts: " + e);
 					}
 				}
@@ -340,18 +296,15 @@ namespace LibSterileSSH.SecureShell
 		}
 		public HostKey[] getHostKey(String host, String type)
 		{
-			lock (pool)
-			{
+			lock (pool) {
 				int count = 0;
-				for (int i = 0; i < pool.Count; i++)
-				{
+				for (int i = 0; i < pool.Count; i++) {
 					HostKey hk = (HostKey)pool[i];
 					if (hk.type == HostKey.UNKNOWN)
 						continue;
 					if (host == null ||
 						(isIncluded(hk.host, host) &&
-						(type == null || hk.getType().Equals(type))))
-					{
+						(type == null || hk.getType().Equals(type)))) {
 						count++;
 					}
 				}
@@ -359,15 +312,13 @@ namespace LibSterileSSH.SecureShell
 					return null;
 				HostKey[] foo = new HostKey[count];
 				int j = 0;
-				for (int i = 0; i < pool.Count; i++)
-				{
+				for (int i = 0; i < pool.Count; i++) {
 					HostKey hk = (HostKey)pool[i];
 					if (hk.type == HostKey.UNKNOWN)
 						continue;
 					if (host == null ||
 						(isIncluded(hk.host, host) &&
-						(type == null || hk.getType().Equals(type))))
-					{
+						(type == null || hk.getType().Equals(type)))) {
 						foo[j++] = hk;
 					}
 				}
@@ -381,26 +332,21 @@ namespace LibSterileSSH.SecureShell
 		public void remove(String host, String type, byte[] key)
 		{
 			bool _sync = false;
-			for (int i = 0; i < pool.Count; i++)
-			{
+			for (int i = 0; i < pool.Count; i++) {
 				HostKey hk = (HostKey)(pool[i]);
 				if (host == null ||
 					(hk.getHost().Equals(host) &&
 					(type == null || (hk.getType().Equals(type) &&
-					(key == null || key.SequenceEqual(hk.key))))))
-				{
+					(key == null || key.SequenceEqual(hk.key)))))) {
 					pool.Remove(hk);
 					_sync = true;
 				}
 			}
-			if (_sync)
-			{
-				try
-				{
+			if (_sync) {
+				try {
 					sync();
 				}
-				catch
-				{
+				catch {
 				};
 			}
 		}
@@ -424,17 +370,14 @@ namespace LibSterileSSH.SecureShell
 		void dump(FileStream outs)
 		{
 			//StreamWriter outs = new StreamWriter(fs);
-			try
-			{
+			try {
 				HostKey hk;
-				for (int i = 0; i < pool.Count; i++)
-				{
+				for (int i = 0; i < pool.Count; i++) {
 					hk = (HostKey)(pool[i]);
 					//hk.dump(out);
 					String host = hk.getHost();
 					String type = hk.getType();
-					if (type.Equals("UNKNOWN"))
-					{
+					if (type.Equals("UNKNOWN")) {
 						Write(outs, StringAux.getBytes(host));
 						Write(outs, cr);
 						continue;
@@ -448,8 +391,7 @@ namespace LibSterileSSH.SecureShell
 				}
 				outs.Flush();
 			}
-			catch (Exception e)
-			{
+			catch (Exception e) {
 				Console.WriteLine(e);
 			}
 		}
@@ -472,20 +414,17 @@ namespace LibSterileSSH.SecureShell
 			int hostlen = host.Length;
 			int hostslen = hosts.Length;
 			int j;
-			while (i < hostslen)
-			{
+			while (i < hostslen) {
 				j = hosts.IndexOf(',', i);
 				if (j == -1)
 					break;
-				if (!host.Equals(hosts.Substring(i, j)))
-				{
+				if (!host.Equals(hosts.Substring(i, j))) {
 					i = j + 1;
 					continue;
 				}
 				return hosts.Substring(0, i) + hosts.Substring(j + 1);
 			}
-			if (hosts.EndsWith(host) && hostslen - i == hostlen)
-			{
+			if (hosts.EndsWith(host) && hostslen - i == hostlen) {
 				return hosts.Substring(0, (hostlen == hostslen) ? 0 : hostslen - hostlen - 1);
 			}
 			return hosts;
@@ -496,18 +435,15 @@ namespace LibSterileSSH.SecureShell
 			int hostlen = host.Length;
 			int hostslen = hosts.Length;
 			int j;
-			while (i < hostslen)
-			{
+			while (i < hostslen) {
 				j = hosts.IndexOf(',', i);
-				if (j == -1)
-				{
+				if (j == -1) {
 					if (hostlen != hostslen - i)
 						return false;
 					return StringAux.regionMatches(hosts, true, i, host, 0, hostlen);
 					//return hosts.substring(i).equals(host);
 				}
-				if (hostlen == (j - i))
-				{
+				if (hostlen == (j - i)) {
 					if (StringAux.regionMatches(hosts, true, i, host, 0, hostlen))
 						return true;
 					//if(hosts.substring(i, i+hostlen).equals(host)) return true;

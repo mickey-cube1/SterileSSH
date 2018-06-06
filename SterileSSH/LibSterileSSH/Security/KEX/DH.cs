@@ -51,8 +51,7 @@ namespace LibSterileSSH.Security
 		}
 		public byte[] getE()
 		{
-			if (e_array == null)
-			{
+			if (e_array == null) {
 
 				dh = new DiffieHellmanManaged(p, g, 0);
 				e_array = dh.CreateKeyExchange();
@@ -61,8 +60,7 @@ namespace LibSterileSSH.Security
 		}
 		public byte[] getK()
 		{
-			if (K_array == null)
-			{
+			if (K_array == null) {
 				K_array = dh.DecryptKeyExchange(f);
 			}
 			return K_array;

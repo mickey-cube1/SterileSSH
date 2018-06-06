@@ -40,14 +40,12 @@ namespace SterileSSH
 		public static String Version()
 		{
 			String rv = "UNKOWN";
-			try
-			{
+			try {
 				System.Reflection.Assembly asm
 					= System.Reflection.Assembly.GetAssembly(typeof(Env));
 				rv = asm.GetName().Version.ToString();
 			}
-			catch
-			{
+			catch {
 			}
 			return rv;
 		}

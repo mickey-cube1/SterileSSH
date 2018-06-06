@@ -118,14 +118,12 @@ namespace LibSterileSSH
 		/// </summary>
 		public override void Close()
 		{
-			try
-			{
+			try {
 				base.Close();
 				m_in.Close();
 				m_out.Close();
 			}
-			catch
-			{
+			catch {
 			}
 		}
 

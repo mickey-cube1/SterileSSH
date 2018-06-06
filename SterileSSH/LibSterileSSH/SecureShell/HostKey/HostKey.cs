@@ -52,16 +52,13 @@ namespace LibSterileSSH.SecureShell
 		{
 			this.host = host;
 			this.key = key;
-			if (key[8] == 'd')
-			{
+			if (key[8] == 'd') {
 				this.type = SSHDSS;
 			}
-			else if (key[8] == 'r')
-			{
+			else if (key[8] == 'r') {
 				this.type = SSHRSA;
 			}
-			else
-			{
+			else {
 				throw new SshClientException("invalid key type");
 			}
 		}
@@ -77,12 +74,10 @@ namespace LibSterileSSH.SecureShell
 		}
 		public String getType()
 		{
-			if (type == SSHDSS)
-			{
+			if (type == SSHDSS) {
 				return System.Text.Encoding.Default.GetString(sshdss);
 			}
-			if (type == SSHRSA)
-			{
+			if (type == SSHRSA) {
 				return System.Text.Encoding.Default.GetString(sshrsa);
 			}
 			return "UNKNOWN";
@@ -94,12 +89,10 @@ namespace LibSterileSSH.SecureShell
 		public String getFingerPrint(SshClient jsch)
 		{
 			IHASH hash = null;
-			try
-			{
+			try {
 				hash = (IHASH)Activator.CreateInstance(Type.GetType(jsch.getConfig("md5")));
 			}
-			catch (Exception e)
-			{
+			catch (Exception e) {
 				Console.Error.WriteLine("getFingerPrint: " + e);
 			}
 			return StringAux.getFingerPrint(hash, key);

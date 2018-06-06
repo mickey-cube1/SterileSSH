@@ -47,8 +47,7 @@ namespace LibSterileSSH.Security
 		}
 		public void init(byte[] key)
 		{
-			if (key.Length > 16)
-			{
+			if (key.Length > 16) {
 				byte[] tmp = new byte[16];
 				Array.Copy(key, 0, tmp, 0, 16);
 				key = tmp;

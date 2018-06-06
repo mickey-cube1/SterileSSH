@@ -58,18 +58,15 @@ namespace LibSterileSSH.SecureShell
 		}
 		public override void start()
 		{
-			try
-			{
+			try {
 				IRequest request;
 
-				if (xforwading)
-				{
+				if (xforwading) {
 					request = new RequestX11();
 					request.request(session, this);
 				}
 
-				if (pty)
-				{
+				if (pty) {
 					request = new RequestPtyReq();
 					request.request(session, this);
 				}
@@ -77,8 +74,7 @@ namespace LibSterileSSH.SecureShell
 				request = new RequestExec(command);
 				request.request(session, this);
 			}
-			catch (Exception)
-			{
+			catch (Exception) {
 				throw new SshClientException("ChannelExec");
 			}
 			thread = new ThreadAux(this);
